@@ -1,91 +1,14 @@
 import React from 'react';
-import { ExperienceItem, ProjectItem, ResumeData } from '../types';
+import { ResumeData } from '../types';
 import { Globe, Linkedin, Mail, MapPin } from 'lucide-react';
+import { formatUrl, highlightText } from '../utils/formatters';
+import { SectionHeader } from './SectionHeader';
+import { ExperienceBlock } from './ExperienceBlock';
+import { ProjectBlock } from './ProjectBlock';
 
 interface ResumePaperProps {
   data: ResumeData;
 }
-
-// Helper to bold specific patterns (numbers, metrics)
-const highlightText = (text?: string) => {
-  if (!text) return text;
-  const regex = /(\d+(?:[.,]\d+)?(?:%|x)|\$[0-9.]+[MK]?\+?)/g;
-  const parts = text.split(regex);
-  return parts.map((part, i) => 
-    regex.test(part) ? <strong key={i} className="font-semibold text-resume-primary">{part}</strong> : part
-  );
-};
-
-// Helper to ensure URL has proper protocol
-const formatUrl = (url: string) => {
-  if (!url) return '#';
-  if (url.startsWith('http://') || url.startsWith('https://')) {
-    return url;
-  }
-  return `https://${url}`;
-};
-
-// Section Header: Small, Bold, Uppercase, Tracking
-const SectionHeader: React.FC<{ title: string }> = ({ title }) => (
-  <h3 className="text-resume-section font-bold uppercase text-resume-primary border-b border-resume-border pb-1 mb-4 mt-6 first:mt-0 tracking-wider break-after-avoid">
-    {title}
-  </h3>
-);
-
-// Experience Block: Tight vertical rhythm, single line header
-const ExperienceBlock: React.FC<{ item: ExperienceItem }> = ({ item }) => (
-  <div className="mb-4 last:mb-0 break-inside-avoid">
-    {/* Header Line: Role | Company ......... Date */}
-    <div className="flex justify-between items-baseline mb-1">
-      <div className="text-[11pt] text-resume-primary">
-        <span className="font-bold">{item.role}</span>
-        <span className="mx-1.5 text-resume-border">|</span>
-        <span className="font-medium">{item.company}</span>
-      </div>
-      <span className="text-resume-meta text-resume-muted font-normal whitespace-nowrap">
-        {item.duration}
-      </span>
-    </div>
-    
-    {/* Bullets */}
-    {item.highlights && item.highlights.length > 0 && (
-      <ul className="list-none space-y-1">
-        {item.highlights.map((h, idx) => (
-          <li key={idx} className="text-resume-body text-resume-secondary relative pl-3.5 before:content-['•'] before:absolute before:left-0 before:text-resume-muted">
-            <span className="font-semibold mr-1">{h.title}:</span>
-            {highlightText(h.description)}
-          </li>
-        ))}
-      </ul>
-    )}
-  </div>
-);
-
-// Project Block: Similar density to Experience
-const ProjectBlock: React.FC<{ item: ProjectItem }> = ({ item }) => (
-  <div className="mb-4 last:mb-0 break-inside-avoid">
-    {/* Header Line: Title (Role) */}
-    <div className="flex justify-between items-baseline mb-1">
-      <div className="text-[11pt] text-resume-primary font-bold">
-        {item.title} <span className="font-normal text-resume-muted text-[10pt] ml-1">({item.role})</span>
-      </div>
-    </div>
-    
-    <p className="text-resume-body text-resume-secondary mb-1.5">
-      {highlightText(item.description)}
-    </p>
-
-    {item.details && item.details.length > 0 && (
-      <div className="flex flex-wrap gap-x-4 gap-y-1 text-resume-meta text-resume-muted">
-        {item.details.map((d, idx) => (
-          <span key={idx}>
-            <span className="font-semibold text-resume-primary opacity-80">{d.label}:</span> {d.value}
-          </span>
-        ))}
-      </div>
-    )}
-  </div>
-);
 
 // Main Component
 export const ResumePaper: React.FC<ResumePaperProps> = ({ data }) => {
@@ -174,15 +97,17 @@ export const ResumePaper: React.FC<ResumePaperProps> = ({ data }) => {
       {data.summary && data.summary.length > 0 && (
         <section className="mb-5">
           <div className="text-resume-body text-resume-secondary text-justify">
-             {data.summary.map((para, i) => (
+             {Array.isArray(data.summary) ? data.summary.map((para, i) => (
                <span key={i} className={i > 0 ? "ml-1" : ""}>{highlightText(para)} </span>
-             ))}
+             )) : (
+               <span>{highlightText(data.summary as unknown as string)} </span>
+             )}
           </div>
         </section>
       )}
 
       {/* --- EXPERIENCE --- */}
-      {data.experience && data.experience.length > 0 && (
+      {Array.isArray(data.experience) && data.experience.length > 0 && (
         <section className="mb-5">
           <SectionHeader title="Experience" />
           <div className="flex flex-col">
@@ -195,7 +120,7 @@ export const ResumePaper: React.FC<ResumePaperProps> = ({ data }) => {
 
       {/* --- PROJECTS --- */}
       {/* FORCED PAGE BREAK BEFORE PROJECTS WITH TOP PADDING TO MATCH PAGE 1 MARGIN */}
-      {data.projects && data.projects.length > 0 && (
+      {Array.isArray(data.projects) && data.projects.length > 0 && (
         <section className="mb-5 break-before-page pt-[12.7mm]">
           <SectionHeader title="Product Ventures & Innovation" />
           <div className="flex flex-col">
@@ -224,7 +149,7 @@ export const ResumePaper: React.FC<ResumePaperProps> = ({ data }) => {
         )}
 
         {/* Education */}
-        {data.education && data.education.length > 0 && (
+        {Array.isArray(data.education) && data.education.length > 0 && (
           <div className="flex-[1]">
             <SectionHeader title="Education" />
             <ul className="space-y-2">
