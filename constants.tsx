@@ -134,6 +134,176 @@ export const INITIAL_RESUME_DATA: ResumeData = {
   ]
 };
 
+export const RESUME_PRESETS: Record<string, { label: string; data: ResumeData }> = {
+  designer: {
+    label: "Senior Product Designer",
+    data: INITIAL_RESUME_DATA
+  },
+  engineer: {
+    label: "Senior Full-Stack Engineer",
+    data: {
+      name: "Alex Diakov",
+      title: "Senior Full-Stack Engineer | React, Node.js & Cloud Architectures",
+      summary: [
+        "Senior software engineer with 7+ years of experience designing and deploying high-performance React web applications, microservices, and secure cloud setups.",
+        "Proven expertise in optimizing render efficiency, constructing atomic component structures, and orchestrating serverless APIs. Passionate about marrying engineering precision with fluid UI/UX experiences."
+      ],
+      contact: {
+        website: "github.com/alex-diakov",
+        linkedin: "linkedin.com/in/alex-diakov",
+        email: "diakovoleksandr@gmail.com",
+        location: "Kyiv, Ukraine"
+      },
+      experience: [
+        {
+          role: "Lead Full-Stack Engineer",
+          company: "Hitachi High-Tech",
+          duration: "May 2024 – Dec 2024",
+          type: "Contract",
+          highlights: [
+            {
+              title: "HMI Dashboard UI",
+              description: "Engineered high-performance real-time instrumentation dashboards using React, WebSockets, and Canvas, reducing telemetry lag by 40%."
+            },
+            {
+              title: "State Architecture",
+              description: "Refactored decentralized application states into standardized atomic managers, mitigating unnecessary virtual-DOM cycles."
+            },
+            {
+              title: "CI/CD Orchestration",
+              description: "Established continuous-delivery runners with strict Cypress testing gates, reducing release-cycle times on the main pipeline."
+            }
+          ]
+        },
+        {
+          role: "Senior Frontend Developer",
+          company: "Tobii",
+          duration: "Mar 2021 – May 2024",
+          type: "Full-time",
+          highlights: [
+            {
+              title: "Analytics Portal",
+              description: "Shipped core interactive layer visualizing massive eye-tracking logs. Implemented lazy-loaded dynamic viewports, allowing analysis of long-running sessions."
+            },
+            {
+              title: "Bundle Core Refactor",
+              description: "Audited build targets and treeshook packages, optimizing critical load times by 35% and improving lighthouse scores."
+            }
+          ]
+        },
+        {
+          role: "Lead Systems Engineer",
+          company: "Filmocracy",
+          duration: "Apr 2020 – Mar 2021",
+          type: "Full-time",
+          highlights: [
+            {
+              title: "Decentralized Ledger UI",
+              description: "Designed secure wallet interaction and checkout gateways, boosting successful transactions by 22%."
+            }
+          ]
+        }
+      ],
+      projects: [
+        {
+          title: "Kubernetes Cloud Deployer",
+          role: "Founder & Lead Developer",
+          description: "Engineered a container deployment platform enabling 1-click stack configs under secure isolation.",
+          details: [
+            { label: "Engineering", value: "Built using Go, React, and Redis cache. Deployed strictly as microservices with isolated state nodes." },
+            { label: "Outcome", value: "Scaled to 150+ prototype clusters successfully with minimal operational overhead." }
+          ]
+        }
+      ],
+      skills: {
+        "Languages": "TypeScript, JavaScript (ES6+), Go, HTML5/CSS3 Core structures.",
+        "Frameworks": "React, Next.js, Express, Tailwind CSS, GraphQL, Apollo.",
+        "Automation": "Docker, Kubernetes, AWS Services (S3, Lambda, EC2), GitHub Actions."
+      },
+      education: [
+        {
+          institution: "TOBII ACADEMY",
+          certification: "Certified Eye-Tracking Systems Integrator",
+          year: "2022"
+        }
+      ]
+    }
+  },
+  manager: {
+    label: "Senior Product Manager",
+    data: {
+      name: "Alex Diakov",
+      title: "Senior Product Manager | High-Scale B2B SaaS & Growth Operations",
+      summary: [
+        "Results-oriented Product Manager with 7+ years of experience leading cross-functional agile teams. Focused on user-acquisition formulas, product pricing models, and stakeholder alignment.",
+        "Adept at translating complex technological architectures and business metrics into straightforward product roadmaps that elevate team output and customer lifetime value."
+      ],
+      contact: {
+        website: "linkedin.com/in/alex-diakov",
+        linkedin: "linkedin.com/in/alex-diakov",
+        email: "diakovoleksandr@gmail.com",
+        location: "Kyiv, Ukraine"
+      },
+      experience: [
+        {
+          role: "Senior Product Manager",
+          company: "Hitachi High-Tech",
+          duration: "May 2024 – Dec 2024",
+          type: "Contract",
+          highlights: [
+            {
+              title: "Strategic Vision",
+              description: "Formulated the next-gen IoT dashboard product roadmap, aligning key stakeholders across design and engineering departments."
+            },
+            {
+              title: "KPI Optimization",
+              description: "Introduced detailed event instrumentation and analytics, revealing bottleneck drop-offs and reclaiming user onboarding rates."
+            }
+          ]
+        },
+        {
+          role: "Product Owner — BI Framework",
+          company: "Tobii",
+          duration: "Mar 2021 – May 2024",
+          type: "Full-time",
+          highlights: [
+            {
+              title: "SaaS Launch",
+              description: "Collaborated in launching Tobii Cloud subscription model, generating consistent ARR growth in the first 12 months."
+            },
+            {
+              title: "Product Discovery",
+              description: "Conducted 40+ structured ethnographic interviews, synthesizing pain-points to refine core UX patterns."
+            }
+          ]
+        }
+      ],
+      projects: [
+        {
+          title: "A/B Platform Infrastructure",
+          role: "Product Lead",
+          description: "Conceived and executed an internal A/B experiments engine to run low-friction client validation pools.",
+          details: [
+            { label: "Impact", value: "Slashed experiment configuration time from 10 days to 2, increasing experimentation volume." }
+          ]
+        }
+      ],
+      skills: {
+        "Strategic": "Product Roadmapping, OKR Alignment, Customer Discovery, Cohort Studies.",
+        "Technical": "SQL Querying, Amplitude, Google Analytics, Jira & Notion setup.",
+        "Agile": "Scrum Master Certification, Sprint Planning, backlogs prioritization."
+      },
+      education: [
+        {
+          institution: "PRODUCT ALLIANCE",
+          certification: "Executive Product Management Program",
+          year: "2021"
+        }
+      ]
+    }
+  }
+};
+
 export const ICONS = {
   website: <Globe className="w-3.5 h-3.5 mr-1.5" />,
   linkedin: <Linkedin className="w-3.5 h-3.5 mr-1.5" />,

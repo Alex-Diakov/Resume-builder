@@ -1,5 +1,8 @@
 {
-  "name": "Shadow Guide - Alex Diakov",
-  "description": "Interactive guide on the Anatomy of a 'Convenient Person', featuring Fawn response analysis and somatic practices.",
-  "requestFramePermissions": []
+  "name": "Cognitive Resume Analyzer & Builder",
+  "description": "Resume builder and diagnostic visualizer optimized around reader attention laws, recruiter eye-tracking patterns, and cognitive load measurements, with server-side AI-powered rephrasing suggestions.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
 }

@@ -2,8 +2,11 @@ import React from 'react';
 import { ExperienceItem } from '../types';
 import { highlightText } from '../utils/formatters';
 
-export const ExperienceBlock: React.FC<{ item: ExperienceItem }> = ({ item }) => (
-  <div className="mb-4 last:mb-0 break-inside-avoid">
+export const ExperienceBlock: React.FC<{ item: ExperienceItem; spacing?: number }> = ({ item, spacing = 1.0 }) => (
+  <div 
+    className="last:mb-0 break-inside-avoid"
+    style={{ marginBottom: `${spacing * 12}px` }} // slightly tighter baseline for beautiful formatting
+  >
     {/* Header Line: Role | Company ......... Date */}
     <div className="flex justify-between items-baseline mb-1">
       <div className="text-[11pt] text-resume-primary">

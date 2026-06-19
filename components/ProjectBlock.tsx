@@ -2,8 +2,11 @@ import React from 'react';
 import { ProjectItem } from '../types';
 import { highlightText } from '../utils/formatters';
 
-export const ProjectBlock: React.FC<{ item: ProjectItem }> = ({ item }) => (
-  <div className="mb-4 last:mb-0 break-inside-avoid">
+export const ProjectBlock: React.FC<{ item: ProjectItem; spacing?: number }> = ({ item, spacing = 1.0 }) => (
+  <div 
+    className="last:mb-0 break-inside-avoid"
+    style={{ marginBottom: `${spacing * 12}px` }} // tighter baseline
+  >
     {/* Header Line: Title (Role) */}
     <div className="flex justify-between items-baseline mb-1">
       <div className="text-[11pt] text-resume-primary font-bold">
