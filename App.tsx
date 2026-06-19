@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
+import { Brain, Code2, Sliders } from 'lucide-react';
 import { ResumePaper } from './components/ResumePaper';
 import { Toolbar } from './components/Toolbar';
 import { SidebarEditor } from './components/SidebarEditor';
@@ -294,6 +295,9 @@ const App: React.FC = () => {
         {/* Main Resume Canvas Area */}
         <main className="flex-1 overflow-y-auto w-full bg-slate-950/70 p-4 md:p-8 flex justify-center print:p-0 print:block print:overflow-visible relative">
           <div className="w-full max-w-[210mm] transition-all duration-300 ease-in-out print:max-w-none print:w-full min-h-full">
+            
+
+
             <ResumePaper 
               data={resumeData} 
               paddingTopBottom={paddingTopBottom}

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { motion } from 'motion/react';
 import { 
   FileJson, 
   Code2, 
@@ -95,8 +96,10 @@ export const SidebarEditor: React.FC<SidebarEditorProps> = ({
   const [analysisResult, setAnalysisResult] = useState<any>(null);
   const [analyzing, setAnalyzing] = useState(false);
   const [analyzerWarning, setAnalyzerWarning] = useState<string | null>(null);
+  const [analyzedDataString, setAnalyzedDataString] = useState<string>('');
 
   const runCognitiveAnalysis = async () => {
+    const dataToAnalyze = JSON.stringify(resumeData);
     setAnalyzing(true);
     setAnalyzerWarning(null);
     try {
@@ -112,6 +115,7 @@ export const SidebarEditor: React.FC<SidebarEditorProps> = ({
       }
       const data = await response.json();
       setAnalysisResult(data);
+      setAnalyzedDataString(dataToAnalyze);
       if (data.warning) {
         setAnalyzerWarning(data.warning);
       }
@@ -191,6 +195,7 @@ export const SidebarEditor: React.FC<SidebarEditorProps> = ({
     if (found) {
       onChangeData(updated);
       setJsonInput(JSON.stringify(updated, null, 2));
+      setAnalyzedDataString(JSON.stringify(updated));
       
       // Filter out or mark as applied
       if (analysisResult && analysisResult.rewrites) {
@@ -223,6 +228,7 @@ export const SidebarEditor: React.FC<SidebarEditorProps> = ({
       if (fuzzyMatch) {
         onChangeData(updated);
         setJsonInput(JSON.stringify(updated, null, 2));
+        setAnalyzedDataString(JSON.stringify(updated));
         if (analysisResult && analysisResult.rewrites) {
           setAnalysisResult({
             ...analysisResult,
@@ -235,10 +241,13 @@ export const SidebarEditor: React.FC<SidebarEditorProps> = ({
     }
   };
 
-  // Trigger analysis automatically on switching to the tab if no analysis is present yet
+  // Trigger analysis automatically on switching to the tab if the data has been modified
   useEffect(() => {
-    if (activeTab === 'ats' && !analysisResult && !analyzing) {
-      runCognitiveAnalysis();
+    if (activeTab === 'ats' && !analyzing) {
+      const currentDataStr = JSON.stringify(resumeData);
+      if (currentDataStr !== analyzedDataString) {
+        runCognitiveAnalysis();
+      }
     }
   }, [activeTab]);
 
@@ -493,78 +502,76 @@ export const SidebarEditor: React.FC<SidebarEditorProps> = ({
 
   return (
     <div className="flex flex-col h-full bg-[#141218] border-r border-[#2d2a33] w-full shrink-0 print:hidden shadow-2xl z-20 font-sans">
-      {/* Tab Selectors using M3 Rounded Pill Switch Design */}
-      <div className="flex bg-[#141218] px-3.5 py-3 gap-2 shrink-0 border-b border-[#2d2a33]">
-        <button
+      {/* Tab Selectors using Sleek Minimalist Underline Design with sliding accent underline */}
+      <div className="flex bg-[#141218] px-4 py-2 gap-1 shrink-0 border-b border-[#2d2a33]">
+        <motion.button
           onClick={() => setActiveTab('form')}
-          className={`relative px-3 py-2.5 rounded-full text-[11px] uppercase tracking-wider font-bold flex-1 flex flex-col items-center gap-1.5 transition-all duration-200 cursor-pointer overflow-hidden group select-none ${
-            activeTab === 'form' ? 'text-white' : 'text-[#cac4d0] hover:text-white'
+          whileHover={{ y: -0.5 }}
+          whileTap={{ scale: 0.97 }}
+          className={`relative px-3 py-3 rounded-xl text-[11px] uppercase tracking-wider font-extrabold flex-1 flex flex-col items-center gap-1.5 transition-colors duration-300 cursor-pointer select-none group z-10 ${
+            activeTab === 'form' ? 'text-white' : 'text-[#cac4d0] hover:text-[#d3bbff]'
           }`}
         >
-          {activeTab === 'form' && (
-            <span className="absolute inset-0 bg-[#4f378b] rounded-full -z-10" />
-          )}
-          <Sliders className={`w-4 h-4 transition-transform duration-200 group-hover:scale-110 ${activeTab === 'form' ? 'text-[#eaddff]' : 'text-[#cac4d0]'}`} />
+          <Sliders className={`w-4 h-4 transition-transform duration-200 group-hover:scale-110 ${activeTab === 'form' ? 'text-[#eaddff]' : 'text-[#cac4d0] group-hover:text-[#d3bbff]'}`} />
           <span>Forms Edit</span>
-        </button>
-        <button
+          {activeTab === 'form' && (
+            <motion.span 
+              layoutId="activeTabUnderline"
+              className="absolute bottom-0 left-2 right-2 h-[2.5px] bg-[#9a6eff] rounded-full shadow-[0_1px_10px_rgba(154,110,255,0.7)]"
+              transition={{ type: "spring", stiffness: 350, damping: 28 }}
+            />
+          )}
+        </motion.button>
+        <motion.button
           onClick={() => setActiveTab('json')}
-          className={`relative px-3 py-2.5 rounded-full text-[11px] uppercase tracking-wider font-bold flex-1 flex flex-col items-center gap-1.5 transition-all duration-200 cursor-pointer overflow-hidden group select-none ${
-            activeTab === 'json' ? 'text-white' : 'text-[#cac4d0] hover:text-white'
+          whileHover={{ y: -0.5 }}
+          whileTap={{ scale: 0.97 }}
+          className={`relative px-3 py-3 rounded-xl text-[11px] uppercase tracking-wider font-extrabold flex-1 flex flex-col items-center gap-1.5 transition-colors duration-300 cursor-pointer select-none group z-10 ${
+            activeTab === 'json' ? 'text-white' : 'text-[#cac4d0] hover:text-[#b2f293]'
           }`}
         >
-          {activeTab === 'json' && (
-            <span className="absolute inset-0 bg-[#4f378b] rounded-full -z-10" />
-          )}
-          <Code2 className={`w-4 h-4 transition-transform duration-200 group-hover:scale-110 ${activeTab === 'json' ? 'text-[#eaddff]' : 'text-[#cac4d0]'}`} />
+          <Code2 className={`w-4 h-4 transition-transform duration-200 group-hover:scale-110 ${activeTab === 'json' ? 'text-[#b2f293]' : 'text-[#cac4d0] group-hover:text-[#b2f293]'}`} />
           <span>JSON Data</span>
-        </button>
-        <button
+          {activeTab === 'json' && (
+            <motion.span 
+              layoutId="activeTabUnderline"
+              className="absolute bottom-0 left-2 right-2 h-[2.5px] bg-[#7ed348] rounded-full shadow-[0_1px_10px_rgba(126,211,72,0.7)]"
+              transition={{ type: "spring", stiffness: 350, damping: 28 }}
+            />
+          )}
+        </motion.button>
+        <motion.button
           onClick={() => setActiveTab('ats')}
-          className={`relative px-3 py-2.5 rounded-full text-[11px] uppercase tracking-wider font-bold flex-1 flex flex-col items-center gap-1.5 transition-all duration-200 cursor-pointer overflow-hidden group select-none ${
-            activeTab === 'ats' ? 'text-white' : 'text-[#cac4d0] hover:text-white'
+          whileHover={{ y: -0.5 }}
+          whileTap={{ scale: 0.97 }}
+          className={`relative px-3 py-3 rounded-xl text-[11px] uppercase tracking-wider font-extrabold flex-1 flex flex-col items-center gap-1.5 transition-colors duration-300 cursor-pointer select-none group z-10 ${
+            activeTab === 'ats' ? 'text-white' : 'text-[#cac4d0] hover:text-cyan-300'
           }`}
         >
-          {activeTab === 'ats' && (
-            <span className="absolute inset-0 bg-[#4f378b] rounded-full -z-10" />
-          )}
-          <Brain className={`w-4 h-4 transition-transform duration-200 group-hover:scale-110 ${activeTab === 'ats' ? 'text-[#eaddff]' : 'text-[#cac4d0]'}`} />
+          <div className="relative">
+            <Eye className={`w-4 h-4 transition-transform duration-200 group-hover:scale-110 ${activeTab === 'ats' ? 'text-cyan-400' : 'text-[#cac4d0] group-hover:text-cyan-300'}`} />
+            {activeTab === 'ats' && (
+              <span className="absolute -top-0.5 -right-1.5 flex h-1.5 w-1.5">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-cyan-400"></span>
+              </span>
+            )}
+          </div>
           <span>Cognitive & ATS</span>
-        </button>
+          {activeTab === 'ats' && (
+            <motion.span 
+              layoutId="activeTabUnderline"
+              className="absolute bottom-0 left-2 right-2 h-[2.5px] bg-[#22d3ee] rounded-full shadow-[0_1px_10px_rgba(34,211,238,0.7)]"
+              transition={{ type: "spring", stiffness: 350, damping: 28 }}
+            />
+          )}
+        </motion.button>
       </div>
 
       {/* Main Control Areas */}
       <div className="flex-1 relative flex flex-col min-h-0 bg-[#1c1b21] overflow-y-auto">
         {activeTab === 'form' && (
           <div className="p-5 space-y-5 pb-16">
-            
-            {/* Realtime Page Statistics Panel */}
-            <div className="bg-[#201e25] rounded-xl p-4.5 border border-[#312e39] shadow-md flex flex-col gap-3 animate-fade-in">
-              <div className="flex items-center justify-between">
-                <span className="text-xs text-[#cac4d0] font-bold uppercase tracking-wider font-display">A4 Page Allocation</span>
-                <span className={`px-3.5 py-1 rounded-full text-xs font-bold font-mono transition-all border ${
-                  parseFloat(pageFraction) > 2.0 
-                    ? 'bg-[#8c1d18]/20 text-[#f2b8b5] border-[#8c1d18]' 
-                    : 'bg-[#375a25]/20 text-[#b2f293] border-[#375a25]'
-                }`}>
-                  📄 {pageFraction} Pages
-                </span>
-              </div>
-              
-              {parseFloat(pageFraction) > 2.0 ? (
-                <div className="text-xs text-[#f2b8b5] bg-[#8c1d18]/10 p-3 rounded-lg border border-[#8c1d18]/30 leading-relaxed font-medium flex items-start gap-2.5">
-                  <AlertTriangle className="w-4.5 h-4.5 shrink-0 text-[#f2b8b5] mt-0.5" />
-                  <div>
-                    Your content spills over A4 Page 2! Avoid orphan blocks by clicking <strong className="text-white underline cursor-pointer hover:text-[#eaddff]" onClick={autoFitContent}>"Auto-Fit Spacing"</strong> below.
-                  </div>
-                </div>
-              ) : (
-                <div className="text-xs text-[#b2f293] bg-[#375a25]/15 p-3 rounded-lg border border-[#375a25]/20 leading-relaxed font-medium flex items-start gap-2.5">
-                  <Check className="w-4.5 h-4.5 shrink-0 text-[#b2f293]" />
-                  <span>Perfect size matches typical recruiter standard grids! Excellent density.</span>
-                </div>
-              )}
-            </div>
 
             {/* EXPANDABLE ACCORDIONS FOR SECTIONS */}
             
@@ -1242,24 +1249,6 @@ export const SidebarEditor: React.FC<SidebarEditorProps> = ({
 
         {activeTab === 'ats' && (
           <div className="p-5 space-y-5 pb-16 animate-fade-in font-sans">
-            {/* COGNITIVE USABILITY ENGINE HEADERS */}
-            <div className="bg-[#221330]/45 border border-[#57438c]/40 rounded-xl p-4 shadow-lg flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <Brain className="w-5 h-5 text-[#bb86fc]" />
-                <div className="text-left">
-                  <h4 className="text-xs font-black text-purple-100 uppercase tracking-wider font-display">Attention Laws Diagnostic</h4>
-                  <p className="text-[10px] text-[#cac4d0]">Recruiter eye-tracking & cognitive-fatigue scanning</p>
-                </div>
-              </div>
-              <button
-                onClick={runCognitiveAnalysis}
-                disabled={analyzing}
-                className="p-2 bg-[#31234a]/85 hover:bg-[#4f378b]/90 disabled:opacity-50 text-[#eaddff] rounded-lg transition-all duration-200 cursor-pointer flex items-center justify-center border border-[#57438c]"
-                title="Recalibrate metrics"
-              >
-                <RefreshCw className={`w-4 h-4 ${analyzing ? "animate-spin text-[#bb86fc]" : ""}`} />
-              </button>
-            </div>
 
             {/* ERROR/WARNING FEEDBACK BOXES */}
             {analyzerWarning && (
@@ -1288,6 +1277,18 @@ export const SidebarEditor: React.FC<SidebarEditorProps> = ({
             {/* METRICS DASHBOARD */}
             {!analyzing && analysisResult && (
               <div className="space-y-4 animate-fade-in-up">
+                {/* Elegant inline controls */}
+                <div className="flex items-center justify-between text-[11px] text-[#cac4d0] font-sans px-1">
+                  <span className="font-extrabold uppercase tracking-wider text-cyan-400">Usability & Scan Scores</span>
+                  <button
+                    onClick={runCognitiveAnalysis}
+                    disabled={analyzing}
+                    className="flex items-center gap-1 text-[10px] text-[#bb86fc] hover:text-[#d3bbff] disabled:opacity-50 cursor-pointer uppercase tracking-widest font-extrabold transition-colors"
+                  >
+                    <RefreshCw className={`w-3 h-3 ${analyzing ? "animate-spin" : ""}`} /> Recalibrate
+                  </button>
+                </div>
+
                 <div className="grid grid-cols-2 gap-3.5">
                   <div className="bg-[#1c1b21] p-3.5 rounded-xl border border-[#312e39] text-center relative overflow-hidden group">
                     <span className="block text-[8px] uppercase font-bold text-[#cac4d0]/60 tracking-wider">Overall Impact</span>
