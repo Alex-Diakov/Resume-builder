@@ -1,106 +1,106 @@
 # 📄 AI Resume Builder & Cognitive ATS Optimizer
-> **Сверхточный конструктор резюме и интеллектуальный ATS-валидатор нового поколения.** Создан для профессионалов, которые ценят идеальную типографику, умную логику и хотят гарантированно обходить жесткие фильтры автоматических систем подбора (ATS).
+> **A high-precision resume developer and intelligent next-generation ATS scanner.** Built for professionals who value flawless typography, fluid real-time synchronization, and guaranteed placement past strict Applicant Tracking Systems.
 
 ---
 
-## ⚡ О проекте
+## ⚡ Overview
 
-Этот инструмент решает две главные боли при создании резюме: **визуальную небрежность** и **низкую читаемость для алгоритмов ATS**. Проект объединяет в себе пиксельно-точный визуальный редактор А4 формата, интерактивный JSON-редактор с мгновенной синхронизацией и встроенную когнитивную нейросетевую систему диагностики резюме (АТS-анализ).
+This application addresses the two most critical friction points in modern job hunting: **visual presentation inconsistency** and **algorithm-level ATS unreadability**. The workspace merges a pixel-perfect, interactive A4 layout canvas, a direct JSON data stream representation with instant two-way synchronization, and an active cognitive AI scanner (ATS Diagnostics engine).
 
 ```
  ┌────────────────────────────────────────────────────────┐
- │                      АКТИВНЫЙ ХАБ                       │
+ │                      WORSKPACE HUB                     │
  │  ┌──────────────┐   ┌──────────────┐   ┌────────────┐  │
  │  │  Forms Edit  │ ⇆ │  JSON Data  │ ⇆ │   AI Eye   │  │
  │  └──────────────┘   └──────────────┘   └────────────┘  │
  └──────────────────────────┬─────────────────────────────┘
                             ▼
  ┌────────────────────────────────────────────────────────┐
- │            РЕАЛХАБ-СИНХРОНИЗАЦИЯ НА ХОДУ                │
+ │               REAL-TIME LIVE SYNC CANVASES             │
  └────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## 🔥 Ключевые преимущества и ценностные фичи
+## 🔥 Key Features & Value Propositions
 
-### 1. 🔍 Интеллектуальный ATS-валидатор (AI Cognitive Diagnostics)
-*   **Анализ когнитивной нагрузки и усталости рекрутера**: Оценка структуры, плотности текста и логических блоков с точки зрения человеческого внимания.
-*   **Датчик «AI Eye»**: Проверка резюме на соответствие современным законам сканирования документов.
-*   **Автоматическое кэширование результатов**: Интеллектуальный контроль состояния (`analyzedDataString`). Анализ перезапускается **только тогда, когда вы действительно внесли изменения** в JSON или форму, предотвращая лишние запросы и задержки при переключении вкладок.
-*   **Actionable-рекомендации**: Прямые советы по удалению слабых клише («коммуникабельный», «целеустремленный») и замене их на сильные метрики результатов.
+### 1. 🔍 Intelligent ATS & Usability Scanner (AI Eye Diagnostics)
+*   **Cognitive Load & Fatigue Analysis**: Estimates recruiter stress scores, reading density, and visual balance constraints to respect human scanning patterns.
+*   **"AI Eye" System**: Tailored to check layouts against industry-standard scanning patterns (F-pattern, E-pattern).
+*   **Smart State Caching & Delta Optimizations**: Remembers the latest analyzed data (`analyzedDataString`). The diagnostic pipeline **only re-evaluates when active data has changed in Forms or JSON code**, preventing redundant background calls when switching tabs or navigating around.
+*   **Actionable Quality Reports**: Flags hollow buzzwords ("visionary", "team player") and suggests highly impact-driven metric alternatives.
 
-### 2. 🎚 Сверхточная А4-верстка (Pixel-Perfect Grid)
-*   Никаких «поехавших» полей и случайного переноса одной строчки на бессмысленную вторую страницу.
-*   Встроенный регулятор внешних отступов и компактности контента для идеальной посадки под классический стандартный лист А4 (210х297мм).
+### 2. 🎚 High-Fidelity A4 Print Layout (Pixel-Perfect Grids)
+*   Eliminates broken content overflow, orphaned sections, and chaotic double pages.
+*   Includes built-in margins, vertical spacing sliders, and high-quality margins designed around metric standard A4 ratios (210mm x 297mm).
 
-### 3. 🔄 Двусторонняя живая синхронизация
-*   **Режим заполнения форм (Forms)**: для быстрого и простого ввода данных.
-*   **Режим кода (JSON Stream)**: для гиков и тех, кто хочет иметь исходный код резюме в чистом портативном формате JSON. Изменили JSON — моментально обновились формы и печатный холст.
+### 3. &nbsp;🔄 Bidirectional Dynamic Live Sync
+*   **Structured Form Input Panel**: A simplified, responsive input form for swift draft edits and quick additions.
+*   **Raw Code Data Stream (JSON)**: For power-users who want to import or export their resumes in portable, clean JSON formatting. Any keypress instantly replicates into the form elements and renders on the live paper canvas.
 
-### 4. 🖨 Чистый экспорт без лишнего мусора
-*   Внедрены CSS-директивы печати (`@media print`). При экспорте в PDF через браузер (`Ctrl + P`) все панели управления, кнопки и меню мгновенно скрываются, оставляя на выходе кристально-чистый документ.
-
----
-
-## 🛠 Технологический стек
-
-*   **Frontend**: React 18 + TypeScript — строгая типизация данных резюме.
-*   **Сборщик**: Vite — сверхбыстрый запуск сервера разработки и моментальный билд.
-*   **Стилизация**: Tailwind CSS — современная легковесная утилитарная верстка с глубокой оптимизацией.
-*   **Анимации**: Framer Motion (`motion/react`) — плавный ход вкладок, интерактивный скользящий индикатор активного режима, приятный тактильный отклик интерфейса.
-*   **Иконки**: Lucide React — легкий и чистый пак современных векторных иконок.
+### 4. 🖨 Perfect Borderless Print Layouts (`@media print`)
+*   Designed to use native browser-level export workflows (`Ctrl + P` or `Cmd + P`). Interactive workspace controls, toolbars, and selectors are completely hidden at print-time, outputting clean, professional paper sheets.
 
 ---
 
-## ⚙️ Быстрый запуск
+## 🛠 Tech Stack
 
-### 1. Клонирование репозитория
+*   **Frontend**: React 18 + TypeScript — robust state control and strong type safety definitions.
+*   **Build Tool**: Vite — incredibly fast development hot-reload & highly optimized bundle outputs.
+*   **CSS Utility Framework**: Tailwind CSS — custom atomic styling with customized theme tokens.
+*   **Motion System**: Framer Motion (`motion/react`) — spring-physics driven slider underlines, smooth entry transitions, and highly responsive interactive click reactions.
+*   **Icon Library**: Lucide React — light and consistent SVG vector iconography.
+
+---
+
+## ⚙️ Quick Start Guide
+
+### 1. Clone the Repository
 ```bash
 git clone https://github.com/your-username/ai-resume-builder.git
 cd ai-resume-builder
 ```
 
-### 2. Установка зависимостей
+### 2. Install Project Dependencies
 ```bash
 npm install
 ```
 
-### 3. Запуск в режиме разработки
+### 3. Launch Development Server
 ```bash
 npm run dev
 ```
-Приложение будет доступно по адресу `http://localhost:3000` (или на другом свободном порту, указанном в консоли).
+The developer workbench will launch and be reachable on `http://localhost:3000`.
 
-### 4. Сборка для продакшена (Production Build)
+### 4. Build for Production Deployment
 ```bash
 npm run build
 ```
-Готовые статические файлы будут сохранены в директорию `dist/`, готовые к деплою на Vercel, Netlify, GitHub Pages или ваш собственный сервер.
+Compiled, production-ready static assets will be packed into the `/dist` directory.
 
 ---
 
-## 📂 Структура данных JSON
+## 📂 Portable JSON Resume Model
 
-Вся структура вашего резюме хранится в чистом стандартизированном JSON-документе. Вы можете сохранить её локально, переносить между устройствами или сохранять версии:
+Your data belongs completely to you. The resume configuration is structured inside a highly standardized schema:
 
 ```json
 {
   "personal": {
-    "name": "Имя Фамилия",
+    "name": "Alex Diakov",
     "title": "Middle / Senior Frontend Engineer",
     "email": "example@email.com",
-    "phone": "+7 (999) 000-00-00",
-    "location": "Москва, Россия",
+    "phone": "+1 (555) 019-2834",
+    "location": "Berlin, Germany",
     "website": "github.com/yourprofile"
   },
-  "summary": "Разработчик с фокусом на глубокую оптимизацию UI/UX процессов...",
+  "summary": "Engineering specialist focused on frontend scalability and deep structural optimization and design...",
   "experience": [
     {
       "company": "Tech Global Inc.",
       "role": "Senior Frontend Developer",
       "period": "2023 - Present",
-      "description": "Оптимизировал производительность веб-приложения на 40%..."
+      "description": "Optimized core user interface web app metric loads by 40%..."
     }
   ]
 }
@@ -108,8 +108,8 @@ npm run build
 
 ---
 
-## 🛡 Лицензия
-Этот проект распространяется под лицензией MIT. Вы можете свободно использовать его, модифицировать и делиться им!
+## 🛡 License
+This project is licensed under the terms of the MIT License. Feel free to use, modify, share, and expand as you like!
 
 ---
-> **Создайте резюме, которое сделает разницу между сухим отказом робота ATS и приглашением на оффер вашей мечты!** 🎯
+> **Deliver a resume designed specifically to overcome robotic filters and hook recruiter attention on first glance!** 🎯
