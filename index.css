@@ -43,12 +43,36 @@
     ::-webkit-scrollbar {
         display: none;
     }
-    .resume-sheet {
+    #resume-content {
+      padding: 0 !important;
       margin: 0 !important;
-      width: 210mm !important;
-      min-height: 297mm !important;
-      box-shadow: none !important;
+      gap: 0 !important;
+      background-color: white !important;
     }
+    .resume-page {
+      box-shadow: none !important;
+      border: none !important;
+      margin: 0 !important;
+      border-radius: 0 !important;
+      height: 296mm !important; /* Matches export height to prevent subpixel page overflow */
+      width: 210mm !important;
+      overflow: hidden !important;
+    }
+    .resume-page:not(:last-child) {
+      page-break-after: always !important;
+      break-after: page !important;
+    }
+    .resume-page:last-child {
+      page-break-after: avoid !important;
+      break-after: avoid !important;
+    }
+  }
+
+  .resume-page {
+    position: relative;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
+    border-radius: 4px;
+    transition: all 0.2s ease-in-out;
   }
 
   .break-before-page {

@@ -1186,31 +1186,6 @@ export const SidebarEditor: React.FC<SidebarEditorProps> = ({
 
         {activeTab === 'json' && (
           <div className="flex-1 flex flex-col min-h-0 animate-fade-in font-sans">
-            {/* Presets load banner */}
-            <div className="p-4 bg-[#25232a] border-b border-[#312e39] shrink-0">
-              <span className="block text-[10px] font-bold text-[#bb86fc] uppercase tracking-wider mb-2.5">Load High-Success Sandbox Templates:</span>
-              <div className="flex flex-wrap gap-2">
-                <button 
-                  onClick={() => handleLoadPreset('designer')}
-                  className="bg-[#4f378b]/40 text-[#eaddff] hover:bg-[#4f378b]/80 border border-[#4f378b]/65 px-3.5 py-1.5 rounded-full text-xs font-semibold tracking-wide transition-all cursor-pointer"
-                >
-                  Product Designer
-                </button>
-                <button 
-                  onClick={() => handleLoadPreset('engineer')}
-                  className="bg-[#4f378b]/40 text-[#eaddff] hover:bg-[#4f378b]/80 border border-[#4f378b]/65 px-3.5 py-1.5 rounded-full text-xs font-semibold tracking-wide transition-all cursor-pointer"
-                >
-                  Fullstack Dev
-                </button>
-                <button 
-                  onClick={() => handleLoadPreset('manager')}
-                  className="bg-[#4f378b]/40 text-[#eaddff] hover:bg-[#4f378b]/80 border border-[#4f378b]/65 px-3.5 py-1.5 rounded-full text-xs font-semibold tracking-wide transition-all cursor-pointer"
-                >
-                  Product Manager
-                </button>
-              </div>
-            </div>
-
             <div className="flex items-center justify-between px-4.5 py-2.5 bg-[#25232a]/40 border-b border-[#312e39] shrink-0">
               <div className="flex items-center gap-2">
                  <span className="relative flex h-2 w-2">

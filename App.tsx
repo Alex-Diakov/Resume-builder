@@ -110,10 +110,9 @@ const App: React.FC = () => {
   const autoFitContent = useCallback(() => {
     const el = document.getElementById('resume-content');
     if (!el) return;
-    const height = el.clientHeight;
+    const pages = el.querySelectorAll('.resume-page');
     
-    // Standard 2 A4 pages height is around 2245 pixels
-    if (height > 2245) {
+    if (pages.length > 2) {
       // Over second page, apply super-compact settings
       setSpacingPreset('super');
       setPaddingTopBottom(8.0);
@@ -121,7 +120,7 @@ const App: React.FC = () => {
       setSectionSpacing(0.55);
       setItemSpacing(0.55);
     } else {
-      // Small/moderate spill, compact preset is perfect
+      // Direct, clean compact settings to keep it tightly aligned to exactly A4 bounds
       setSpacingPreset('compact');
       setPaddingTopBottom(10.0);
       setPaddingLeftRight(12.0);
@@ -185,14 +184,34 @@ const App: React.FC = () => {
     // from the live viewport, and use 0-margin page parameters.
     clone.style.width = '210mm';
     clone.style.margin = '0';
-    clone.style.paddingTop = `${paddingTopBottom}mm`;
-    clone.style.paddingBottom = `${paddingTopBottom}mm`;
-    clone.style.paddingLeft = `${paddingLeftRight}mm`;
-    clone.style.paddingRight = `${paddingLeftRight}mm`;
-    clone.style.minHeight = '297mm';
+    clone.style.padding = '0';
+    clone.style.gap = '0';
+    clone.style.rowGap = '0';
     clone.style.boxSizing = 'border-box';
-    clone.style.backgroundColor = '#ffffff';
-    clone.classList.remove('mx-auto', 'shadow-xl', 'relative', 'z-0'); 
+    clone.style.backgroundColor = 'transparent';
+    clone.classList.remove('mx-auto', 'shadow-xl', 'relative', 'z-0', 'gap-8', 'pb-16'); 
+
+    // Apply strict clean layout styles directly on cloned pages
+    const clonedPages = clone.querySelectorAll('.resume-page');
+    clonedPages.forEach((page: any, idx: number) => {
+      page.style.boxShadow = 'none';
+      page.style.border = 'none';
+      page.style.borderRadius = '0';
+      page.style.margin = '0';
+      page.style.width = '210mm';
+      page.style.height = '296mm'; // Slightly less than 297mm to prevent subpixel overflow on page boundaries
+      page.style.boxSizing = 'border-box';
+      page.classList.remove('shadow-xl', 'rounded-md', 'mx-auto');
+      
+      // Control breaks perfectly per page
+      if (idx < clonedPages.length - 1) {
+        page.style.pageBreakAfter = 'always';
+        page.style.breakAfter = 'page';
+      } else {
+        page.style.pageBreakAfter = 'avoid';
+        page.style.breakAfter = 'avoid';
+      }
+    });
     
     container.appendChild(clone);
     document.body.appendChild(container);
