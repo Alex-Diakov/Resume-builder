@@ -44,4 +44,6 @@ export interface ResumeData {
   skills: Record<string, string>;
   education: EducationItem[];
   atsKeywords?: string;
+  photo?: string;
+  showPhoto?: boolean;
 }

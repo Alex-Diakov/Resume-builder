@@ -227,48 +227,62 @@ export const ResumePaper: React.FC<ResumePaperProps> = ({
                 case 'header':
                   return (
                     <header key={block.id} style={gapStyle}>
-                      <h1 className="font-display text-resume-name font-bold text-resume-primary mb-1">
-                        {data.name}
-                      </h1>
-                      <h2 className="font-display text-resume-title font-medium text-resume-secondary mb-3">
-                        {data.title}
-                      </h2>
-                      
-                      <div className="flex flex-wrap items-center gap-x-2 text-resume-meta text-resume-muted leading-none">
-                        {data.contact.website && (
-                          <>
-                            <a href={formatUrl(data.contact.website)} target="_blank" rel="noreferrer" className="flex items-center text-resume-accent font-medium hover:text-resume-primary transition-colors group">
-                              <Globe className="w-3.5 h-3.5 mr-1.5 text-resume-muted group-hover:text-resume-accent transition-colors" />
-                              Portfolio
-                            </a>
-                            <span className="text-resume-border">•</span>
-                          </>
+                      <div className="flex items-start gap-4">
+                        {data.photo && data.showPhoto !== false && (
+                          <div className="shrink-0">
+                            <img 
+                              src={data.photo} 
+                              alt={data.name} 
+                              className="w-[96px] h-[96px] object-cover rounded-xl border border-resume-border shadow-sm bg-slate-50"
+                              referrerPolicy="no-referrer"
+                            />
+                          </div>
                         )}
+                        <div className="flex-1 min-w-0">
+                          <h1 className="font-display text-resume-name font-bold text-resume-primary mb-1 leading-tight">
+                            {data.name}
+                          </h1>
+                          <h2 className="font-display text-resume-title font-medium text-resume-secondary mb-2.5">
+                            {data.title}
+                          </h2>
+                          
+                          <div className="flex flex-wrap items-center gap-x-2 text-resume-meta text-resume-muted leading-none">
+                            {data.contact.website && (
+                              <>
+                                <a href={formatUrl(data.contact.website)} target="_blank" rel="noreferrer" className="flex items-center text-resume-accent font-medium hover:text-resume-primary transition-colors group">
+                                  <Globe className="w-3.5 h-3.5 mr-1.5 text-resume-muted group-hover:text-resume-accent transition-colors" />
+                                  Portfolio
+                                </a>
+                                <span className="text-resume-border">•</span>
+                              </>
+                            )}
 
-                        {data.contact.linkedin && (
-                          <>
-                            <a href={formatUrl(data.contact.linkedin)} target="_blank" rel="noreferrer" className="flex items-center text-resume-accent font-medium hover:text-resume-primary transition-colors group">
-                              <Linkedin className="w-3.5 h-3.5 mr-1.5 text-resume-muted group-hover:text-resume-accent transition-colors" />
-                              LinkedIn
-                            </a>
-                            <span className="text-resume-border">•</span>
-                          </>
-                        )}
+                            {data.contact.linkedin && (
+                              <>
+                                <a href={formatUrl(data.contact.linkedin)} target="_blank" rel="noreferrer" className="flex items-center text-resume-accent font-medium hover:text-resume-primary transition-colors group">
+                                  <Linkedin className="w-3.5 h-3.5 mr-1.5 text-resume-muted group-hover:text-resume-accent transition-colors" />
+                                  LinkedIn
+                                </a>
+                                <span className="text-resume-border">•</span>
+                              </>
+                            )}
 
-                        <a href={`mailto:${data.contact.email}`} className="flex items-center text-resume-accent font-medium hover:text-resume-primary transition-colors group">
-                          <Mail className="w-3.5 h-3.5 mr-1.5 text-resume-muted group-hover:text-resume-accent transition-colors" />
-                          {data.contact.email}
-                        </a>
-                        
-                        {data.contact.location && (
-                          <>
-                            <span className="text-resume-border">•</span>
-                            <span className="flex items-center cursor-default">
-                              <MapPin className="w-3.5 h-3.5 mr-1.5 text-resume-muted" />
-                              {data.contact.location}
-                            </span>
-                          </>
-                        )}
+                            <a href={`mailto:${data.contact.email}`} className="flex items-center text-resume-accent font-medium hover:text-resume-primary transition-colors group">
+                              <Mail className="w-3.5 h-3.5 mr-1.5 text-resume-muted group-hover:text-resume-accent transition-colors" />
+                              {data.contact.email}
+                            </a>
+                            
+                            {data.contact.location && (
+                              <>
+                                <span className="text-resume-border">•</span>
+                                <span className="flex items-center cursor-default">
+                                  <MapPin className="w-3.5 h-3.5 mr-1.5 text-resume-muted" />
+                                  {data.contact.location}
+                                </span>
+                              </>
+                            )}
+                          </div>
+                        </div>
                       </div>
                     </header>
                   );

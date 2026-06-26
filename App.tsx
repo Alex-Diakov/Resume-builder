@@ -1,10 +1,10 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Brain, Code2, Sliders } from 'lucide-react';
 import { ResumePaper } from './components/ResumePaper';
 import { Toolbar } from './components/Toolbar';
 import { SidebarEditor } from './components/SidebarEditor';
+import { IntroAnimation } from './components/IntroAnimation';
 import { INITIAL_RESUME_DATA } from './constants';
-import { ResumeData } from './types';
+import { useResumeContext } from './contexts/ResumeContext';
 
 // Declare html2pdf on window
 declare global {
@@ -14,119 +14,45 @@ declare global {
 }
 
 const App: React.FC = () => {
+  const [showIntro, setShowIntro] = useState(() => {
+    try {
+      return !sessionStorage.getItem('intro_seen_v2');
+    } catch (e) {
+      return true;
+    }
+  });
   const [isGenerating, setIsGenerating] = useState(false);
-  const [resumeData, setResumeData] = useState<ResumeData>(INITIAL_RESUME_DATA);
-  const [jsonInput, setJsonInput] = useState(() => JSON.stringify(INITIAL_RESUME_DATA, null, 2));
-  const [atsInput, setAtsInput] = useState('');
-  const [jsonError, setJsonError] = useState<string | null>(null);
-  
-  // Layout Controls State
-  const [paddingTopBottom, setPaddingTopBottom] = useState(12.7);
-  const [paddingLeftRight, setPaddingLeftRight] = useState(14);
-  const [sectionSpacing, setSectionSpacing] = useState(1.0);
-  const [itemSpacing, setItemSpacing] = useState(1.0);
-  const [spacingPreset, setSpacingPreset] = useState<'standard' | 'compact' | 'super'>('standard');
-  const [showPageGuides, setShowPageGuides] = useState(true);
-  
-  const [activeTab, setActiveTab] = useState<'form' | 'json' | 'ats'>('form');
+  const [activeTab, setActiveTab] = useState<'form' | 'json' | 'cognitive' | 'ats'>('form');
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [resumeHeight, setResumeHeight] = useState(0);
 
-  // Load from LocalStorage on mount
+  const {
+    resumeData,
+    setJsonInput,
+    setAtsInput,
+    paddingTopBottom,
+    paddingLeftRight,
+    sectionSpacing,
+    itemSpacing,
+    showPageGuides,
+    // Add these so they are accessible
+    jsonInput,
+    atsInput,
+    jsonError,
+    handleUpdateResumeData,
+    setPaddingTopBottom,
+    setPaddingLeftRight,
+    setSectionSpacing,
+    setItemSpacing,
+    spacingPreset,
+    handleApplySpacingPreset,
+    setShowPageGuides,
+    autoFitContent,
+    pageFraction,
+    resumeHeight,
+  } = useResumeContext();
+
   useEffect(() => {
     document.title = "Resume Builder Pro";
-    const savedData = localStorage.getItem('resume_data_v1');
-    if (savedData) {
-      try {
-        const parsed = JSON.parse(savedData);
-        // Ensure mergedData has all keys
-        const merged = { ...INITIAL_RESUME_DATA, ...parsed };
-        setResumeData(merged);
-        setJsonInput(JSON.stringify(merged, null, 2));
-        setAtsInput(merged.atsKeywords || '');
-      } catch (e) {
-        console.error("Failed to load saved data", e);
-      }
-    }
-  }, []);
-
-  // Monitor Height for Live A4 Split Statistics
-  useEffect(() => {
-    const el = document.getElementById('resume-content');
-    if (!el) return;
-    
-    // Initial value setup
-    setResumeHeight(el.clientHeight);
-
-    const obs = new ResizeObserver((entries) => {
-      for (const entry of entries) {
-        setResumeHeight(entry.target.clientHeight);
-      }
-    });
-    
-    obs.observe(el);
-    return () => obs.disconnect();
-  }, [resumeData, paddingTopBottom, paddingLeftRight, sectionSpacing, itemSpacing, activeTab, sidebarOpen]);
-
-  // Debounced parsing of JSON input
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      try {
-        const parsed = JSON.parse(jsonInput);
-        const mergedData = { ...INITIAL_RESUME_DATA, ...parsed, atsKeywords: atsInput };
-        setResumeData(mergedData);
-        setJsonError(null);
-        localStorage.setItem('resume_data_v1', JSON.stringify(mergedData));
-      } catch (err: any) {
-        setJsonError(err.message);
-      }
-    }, 400);
-
-    return () => clearTimeout(timer);
-  }, [jsonInput, atsInput]);
-
-  // Apply Spacing Presets
-  const handleApplySpacingPreset = (preset: 'standard' | 'compact' | 'super') => {
-    setSpacingPreset(preset);
-    if (preset === 'standard') {
-      setPaddingTopBottom(12.7);
-      setPaddingLeftRight(14);
-      setSectionSpacing(1.0);
-      setItemSpacing(1.0);
-    } else if (preset === 'compact') {
-      setPaddingTopBottom(10.0);
-      setPaddingLeftRight(12.0);
-      setSectionSpacing(0.75);
-      setItemSpacing(0.75);
-    } else if (preset === 'super') {
-      setPaddingTopBottom(8.0);
-      setPaddingLeftRight(10.0);
-      setSectionSpacing(0.55);
-      setItemSpacing(0.55);
-    }
-  };
-
-  // Auto-fit function inside App to adjust spacings dynamically based on page overflow
-  const autoFitContent = useCallback(() => {
-    const el = document.getElementById('resume-content');
-    if (!el) return;
-    const pages = el.querySelectorAll('.resume-page');
-    
-    if (pages.length > 2) {
-      // Over second page, apply super-compact settings
-      setSpacingPreset('super');
-      setPaddingTopBottom(8.0);
-      setPaddingLeftRight(10.0);
-      setSectionSpacing(0.55);
-      setItemSpacing(0.55);
-    } else {
-      // Direct, clean compact settings to keep it tightly aligned to exactly A4 bounds
-      setSpacingPreset('compact');
-      setPaddingTopBottom(10.0);
-      setPaddingLeftRight(12.0);
-      setSectionSpacing(0.75);
-      setItemSpacing(0.75);
-    }
   }, []);
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -216,10 +142,52 @@ const App: React.FC = () => {
     container.appendChild(clone);
     document.body.appendChild(container);
 
-    // Clean, direct, human-authored file naming based on user's exact name
-    const rawName = resumeData.name || 'Resume';
-    // Remove invalid OS characters, replace spaces with underscores, support Cyrillic characters cleanly
-    const nameStr = rawName.trim().replace(/[^a-zA-Z0-9а-яА-Я- ]/g, '').replace(/\s+/g, '_');
+    // Precise, structured file naming parsing First Name, Last Name, Title, and Business Specialization Type
+    const rawFullName = (resumeData.name || 'Resume').trim();
+    const nameParts = rawFullName.split(/\s+/);
+    const firstName = nameParts[0] || '';
+    const lastName = nameParts.slice(1).join(' ') || '';
+
+    const rawTitleAndBusiness = (resumeData.title || '').trim();
+    let titlePart = rawTitleAndBusiness;
+    let businessTypePart = '';
+
+    // Split role title from business specialization type using standard dividers (| , — -)
+    if (rawTitleAndBusiness.includes('|')) {
+      const parts = rawTitleAndBusiness.split('|');
+      titlePart = parts[0].trim();
+      businessTypePart = parts.slice(1).join(' ').trim();
+    } else if (rawTitleAndBusiness.includes('—')) {
+      const parts = rawTitleAndBusiness.split('—');
+      titlePart = parts[0].trim();
+      businessTypePart = parts.slice(1).join(' ').trim();
+    } else if (rawTitleAndBusiness.includes('-')) {
+      const parts = rawTitleAndBusiness.split('-');
+      titlePart = parts[0].trim();
+      businessTypePart = parts.slice(1).join(' ').trim();
+    } else if (rawTitleAndBusiness.includes(',')) {
+      const parts = rawTitleAndBusiness.split(',');
+      titlePart = parts[0].trim();
+      businessTypePart = parts.slice(1).join(' ').trim();
+    }
+
+    // Clean all parts to contain only valid OS filename characters and replace spaces with underscores
+    const cleanFirst = firstName.replace(/[^a-zA-Z0-9а-яА-Я-]/g, '').trim();
+    const cleanLast = lastName.replace(/[^a-zA-Z0-9а-яА-Я- ]/g, '').replace(/\s+/g, '_').trim();
+    const cleanTitle = titlePart.replace(/[^a-zA-Z0-9а-яА-Я- ]/g, '').replace(/\s+/g, '_').trim();
+    const cleanBusiness = businessTypePart.replace(/[^a-zA-Z0-9а-яА-Я- ]/g, '').replace(/\s+/g, '_').trim();
+
+    // Construct the elegant, descriptive filename
+    let nameStr = '';
+    if (cleanFirst) nameStr += cleanFirst;
+    if (cleanLast) nameStr += (nameStr ? `_${cleanLast}` : cleanLast);
+    if (cleanTitle) nameStr += (nameStr ? `_${cleanTitle}` : cleanTitle);
+    if (cleanBusiness) nameStr += (nameStr ? `_${cleanBusiness}` : cleanBusiness);
+
+    if (!nameStr) {
+      nameStr = 'Resume';
+    }
+
     const fileName = `${nameStr}.pdf`;
 
     const opt = {
@@ -252,18 +220,21 @@ const App: React.FC = () => {
     }
   }, [resumeData, paddingTopBottom, paddingLeftRight]);
 
-  const handleUpdateResumeData = (newData: ResumeData) => {
-    setResumeData(newData);
-    setJsonInput(JSON.stringify(newData, null, 2));
-    localStorage.setItem('resume_data_v1', JSON.stringify(newData));
-  };
-
-  // Convert height in pixels to actual A4 fraction
-  // Page height is 297mm. At 96DPI, 297mm equals 297 * 3.7795 px = 1122.5 pixels
-  const pageFraction = resumeHeight === 0 ? '2.0' : (resumeHeight / 1122.5).toFixed(1);
+  if (showIntro) {
+    return (
+      <IntroAnimation 
+        onComplete={() => {
+          setShowIntro(false);
+          try {
+            sessionStorage.setItem('intro_seen_v2', 'true');
+          } catch (e) {}
+        }} 
+      />
+    );
+  }
 
   return (
-    <div className="h-screen flex flex-col bg-slate-900 font-sans overflow-hidden print:h-auto print:block print:overflow-visible print:bg-white relative">
+    <div className="h-screen flex flex-col bg-ds-bg font-sans overflow-hidden print:h-auto print:block print:overflow-visible print:bg-white relative">
       <Toolbar 
         onFileUpload={handleFileUpload}
         onDownloadPdf={handleDownloadPdf}
@@ -282,37 +253,14 @@ const App: React.FC = () => {
         >
           <div className="w-full md:w-96 lg:w-[450px] shrink-0 h-full overflow-hidden animate-fade-in">
             <SidebarEditor
-              jsonInput={jsonInput}
-              setJsonInput={setJsonInput}
-              atsInput={atsInput}
-              setAtsInput={setAtsInput}
-              jsonError={jsonError}
               activeTab={activeTab}
               setActiveTab={setActiveTab}
-              
-              paddingTopBottom={paddingTopBottom}
-              setPaddingTopBottom={setPaddingTopBottom}
-              paddingLeftRight={paddingLeftRight}
-              setPaddingLeftRight={setPaddingLeftRight}
-              sectionSpacing={sectionSpacing}
-              setSectionSpacing={setSectionSpacing}
-              itemSpacing={itemSpacing}
-              setItemSpacing={setItemSpacing}
-              spacingPreset={spacingPreset}
-              onApplySpacingPreset={handleApplySpacingPreset}
-              showPageGuides={showPageGuides}
-              setShowPageGuides={setShowPageGuides}
-              
-              resumeData={resumeData}
-              onChangeData={handleUpdateResumeData}
-              autoFitContent={autoFitContent}
-              pageFraction={pageFraction}
             />
           </div>
         </div>
 
         {/* Main Resume Canvas Area */}
-        <main className="flex-1 overflow-y-auto w-full bg-slate-950/70 p-4 md:p-8 flex justify-center print:p-0 print:block print:overflow-visible relative">
+        <main className="flex-1 overflow-y-auto w-full bg-ds-bg/85 p-4 md:p-8 flex justify-center print:p-0 print:block print:overflow-visible relative">
           <div className="w-full max-w-[210mm] transition-all duration-300 ease-in-out print:max-w-none print:w-full min-h-full">
             
 

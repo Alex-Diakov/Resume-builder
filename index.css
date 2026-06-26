@@ -5,6 +5,40 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    /* Design Tokens for Dark Theme GUI - UI Designer Audit Approved */
+    --color-surface-bg: #0d0c11;                /* Deep premium charcoal-black main canvas */
+    --color-surface-panel: #14121a;             /* Main sidebar panel */
+    --color-surface-container: #1b1922;         /* Nested groups and card inputs */
+    --color-surface-active: #25222d;            /* Focus states and selected list elements */
+    --color-surface-hover: #1f1d26;             /* Transition trigger states */
+    
+    --color-brand-primary: #a855f7;             /* Vibrant Purple-Indigo Accent key */
+    --color-brand-primary-hover: #9333ea;       /* Focused action key */
+    --color-brand-primary-light: rgba(168, 85, 247, 0.12); /* Selected overlays */
+    
+    --color-brand-secondary: #22d3ee;           /* Tech Cyan focus anchors */
+    --color-brand-secondary-hover: #0891b2;
+    --color-brand-secondary-light: rgba(34, 211, 238, 0.1);
+
+    --color-text-high: #f5f2fa;                 /* Maximum readability text for dark panels */
+    --color-text-medium: #d6cfde;               /* High accessibility body copy secondary descriptions */
+    --color-text-muted: #a69bb0;                /* WCAG Contrast Ratio-Compliant muted metadata (4.5:1 ratio over dark backgrounds) */
+    --color-text-disabled: #6d6178;             /* Input labels placeholders */
+
+    --color-border-main: #2b2734;               /* Ultra-thin separator lines */
+    --color-border-focus: #c084fc;              /* Active focus rings */
+
+    --color-status-success: #34d399;            /* Positive validation values */
+    --color-status-warning: #fbc02d;            /* Moderate actions recommended */
+    --color-status-error: #f87171;              /* Fault parameters needing remediation */
+
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 12px -2px rgba(0, 0, 0, 0.45);
+    --shadow-lg: 0 12px 28px -4px rgba(0, 0, 0, 0.65);
+    --shadow-glow: 0 0 15px rgba(168, 85, 247, 0.25);
+  }
+
   @page {
     margin: 0;
     size: A4;
@@ -15,7 +49,8 @@
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
     font-family: 'Plus Jakarta Sans', 'Inter', ui-sans-serif, system-ui, sans-serif;
-    background-color: #0d0c0f; /* Deep neutral violet-black background */
+    background-color: var(--color-surface-bg); /* Deep neutral violet-black background system token */
+    color: var(--color-text-medium);
   }
 
   /* Custom scrollbar matching Material 3 theme */

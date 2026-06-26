@@ -1,80 +1,94 @@
-# 📄 AI Resume Builder & Cognitive ATS Optimizer
-> **A high-precision resume developer and intelligent next-generation ATS scanner.** Built for professionals who value flawless typography, fluid real-time synchronization, and guaranteed placement past strict Applicant Tracking Systems.
+# 📄 The Executive Manifesto: Neuro-Cognitive ATS Optimizer
+> **A resume is not a list of tasks. It is an executive manifesto. It is a psychological instrument of high-stakes persuasion.**
+> Built for professionals across the globe who demand flawless typography, deterministic structure, and science-backed framing to conquer Applicant Tracking Systems (ATS) and human recruiters alike.
 
 ---
 
-## ⚡ Overview
+## ⚡ The Philosophy
 
-This application addresses the two most critical friction points in modern job hunting: **visual presentation inconsistency** and **algorithm-level ATS unreadability**. The workspace merges a pixel-perfect, interactive A4 layout canvas, a direct JSON data stream representation with instant two-way synchronization, and an active cognitive AI scanner (ATS Diagnostics engine).
+For decades, professionals have been taught to treat resumes as historical ledgers—a dry catalog of past duties. **This is a fundamental mistake.** 
+
+In the modern attention economy, human recruiters spend an average of **6.4 seconds** scanning a resume. ATS algorithms filter candidates with merciless binary precision. 
+
+Your resume must be engineered not as a history book, but as a **high-precision teleological weapon**. It must translate subordinate-level duties into C-level business outcomes. It must respect Miller's Law of working memory. It must guide the eye along the natural F-Pattern scanning flow. 
+
+This application was architected on this exact philosophy. It addresses the two most critical friction points in modern executive job hunting: **visual presentation inconsistency** and **algorithm-level cognitive overload**.
+
+Unlike standard template builders, this tool implements a **Neuro-Cognitive AI Engine** (powered by Gemini) running purely on the server to perform elite C-level executive optimizations.
 
 ```
  ┌────────────────────────────────────────────────────────┐
  │                      WORSKPACE HUB                     │
  │  ┌──────────────┐   ┌──────────────┐   ┌────────────┐  │
- │  │  Forms Edit  │ ⇆ │  JSON Data  │ ⇆ │   AI Eye   │  │
+ │  │  Forms Edit  │ ⇆ │  JSON Sync   │ ⇆ │ Cognitive  │  │
  │  └──────────────┘   └──────────────┘   └────────────┘  │
- └──────────────────────────┬─────────────────────────────┘
-                            ▼
- ┌────────────────────────────────────────────────────────┐
- │               REAL-TIME LIVE SYNC CANVASES             │
- └────────────────────────────────────────────────────────┘
+ │                                                  ▲     │
+ └─────────────────────────┬────────────────────────│─────┘
+                           ▼                        │
+          ┌────────────────────────────────┐     ┌─────────────┐
+          │  REAL-TIME LIVE SYNC CANVASES  │     │ Express API │
+          └────────────────────────────────┘     └─────────────┘
 ```
 
 ---
 
 ## 🔥 Key Features & Value Propositions
 
-### 1. 🔍 Intelligent ATS & Usability Scanner (AI Eye Diagnostics)
-*   **Cognitive Load & Fatigue Analysis**: Estimates recruiter stress scores, reading density, and visual balance constraints to respect human scanning patterns.
-*   **"AI Eye" System**: Tailored to check layouts against industry-standard scanning patterns (F-pattern, E-pattern).
-*   **Smart State Caching & Delta Optimizations**: Remembers the latest analyzed data (`analyzedDataString`). The diagnostic pipeline **only re-evaluates when active data has changed in Forms or JSON code**, preventing redundant background calls when switching tabs or navigating around.
-*   **Actionable Quality Reports**: Flags hollow buzzwords ("visionary", "team player") and suggests highly impact-driven metric alternatives.
+### 1. 🧠 Neuro-Cognitive AI Scanner (Gemini-Powered)
+*   **Executive Framing Rewrites**: Automatically translates weak, duty-based bullets ("helped make website") into C-level business outcomes ("Architected diagnostic digital platform, reducing latency and saving 40 engineering hours per quarter").
+*   **Psychological Information Laws**: Real-time evaluation against Miller's Law (working memory fatigue) and the 6-Second Screen Rule.
+*   **KPI & Visual Scanning Scores**: Quantifies metrics density and grades the F-Pattern eye-tracking flow of your layout.
+*   **Graceful Degradation Engine**: If the neural network (Gemini API) experiences transient errors, the server instantly falls back to a deterministic **Local Heuristic Assessment Engine** for zero-downtime operations.
 
 ### 2. 🎚 High-Fidelity A4 Print Layout (Pixel-Perfect Grids)
 *   Eliminates broken content overflow, orphaned sections, and chaotic double pages.
-*   Includes built-in margins, vertical spacing sliders, and high-quality margins designed around metric standard A4 ratios (210mm x 297mm).
+*   Includes built-in layout modes (`Standard`, `Compact`, `Super Compact`) and structural guides to ensure everything fits perfectly onto A4 bounds.
+*   Live page fraction calculators warn you when content spills over.
 
-### 3. &nbsp;🔄 Bidirectional Dynamic Live Sync
+### 3. 🔄 Bidirectional Dynamic Live Sync
 *   **Structured Form Input Panel**: A simplified, responsive input form for swift draft edits and quick additions.
-*   **Raw Code Data Stream (JSON)**: For power-users who want to import or export their resumes in portable, clean JSON formatting. Any keypress instantly replicates into the form elements and renders on the live paper canvas.
+*   **Raw Code Data Stream (JSON)**: For power-users who want to import or export their resumes in portable, clean JSON formatting. Any keypress instantly replicates.
 
-### 4. 🖨 Perfect Borderless Print Layouts (`@media print`)
-*   Designed to use native browser-level export workflows (`Ctrl + P` or `Cmd + P`). Interactive workspace controls, toolbars, and selectors are completely hidden at print-time, outputting clean, professional paper sheets.
+### 4. 🖨 Perfect Borderless PDF Print Layouts
+*   Includes native 1-click PDF generation via standard print workflows, guaranteeing pixel-perfect styling match between the web app and the downloaded PDF.
 
 ---
 
 ## 🛠 Tech Stack
 
-*   **Frontend**: React 18 + TypeScript — robust state control and strong type safety definitions.
-*   **Build Tool**: Vite — incredibly fast development hot-reload & highly optimized bundle outputs.
-*   **CSS Utility Framework**: Tailwind CSS — custom atomic styling with customized theme tokens.
-*   **Motion System**: Framer Motion (`motion/react`) — spring-physics driven slider underlines, smooth entry transitions, and highly responsive interactive click reactions.
-*   **Icon Library**: Lucide React — light and consistent SVG vector iconography.
+The workspace operates as a full-stack application securely keeping all AI operations server-side.
+
+*   **Frontend**: React 18 + TypeScript
+*   **Backend**: Node.js + Express (serving Vite middleware)
+*   **AI Engine**: Official Google Gen AI TypeScript SDK (`@google/genai`) -> *gemini-3.5-flash*
+*   **CSS Utility Framework**: Tailwind CSS
+*   **Motion System**: Framer Motion (`motion/react`)
 
 ---
 
 ## ⚙️ Quick Start Guide
 
-### 1. Clone the Repository
-```bash
-git clone https://github.com/your-username/ai-resume-builder.git
-cd ai-resume-builder
-```
-
-### 2. Install Project Dependencies
+### 1. Install Project Dependencies
 ```bash
 npm install
 ```
 
-### 3. Launch Development Server
+### 2. Configure Environment Secrets
+Create a `.env` file (or configure Settings -> Secrets) and add your Gemini API Key. This must remain server-side.
+```env
+GEMINI_API_KEY="your_api_key_here"
+```
+
+### 3. Launch Full-Stack Development Server
 ```bash
 npm run dev
 ```
-The developer workbench will launch and be reachable on `http://localhost:3000`.
+The server binds to `0.0.0.0:3000`. The frontend will Hot-Reload, and Express API routes will be available at `/api/*`.
 
 ### 4. Build for Production Deployment
 ```bash
 npm run build
+npm run start
 ```
 Compiled, production-ready static assets will be packed into the `/dist` directory.
 
@@ -82,25 +96,25 @@ Compiled, production-ready static assets will be packed into the `/dist` directo
 
 ## 📂 Portable JSON Resume Model
 
-Your data belongs completely to you. The resume configuration is structured inside a highly standardized schema:
+Your professional identity is yours to own. The configuration is structured inside a highly standardized, portable schema designed for global professionals:
 
 ```json
 {
   "personal": {
-    "name": "Alex Diakov",
-    "title": "Middle / Senior Frontend Engineer",
-    "email": "example@email.com",
+    "name": "Jane Doe",
+    "title": "Chief Operating Officer",
+    "email": "jane.doe@executive-network.com",
     "phone": "+1 (555) 019-2834",
-    "location": "Berlin, Germany",
-    "website": "github.com/yourprofile"
+    "location": "New York, USA",
+    "website": "linkedin.com/in/janedoe"
   },
-  "summary": "Engineering specialist focused on frontend scalability and deep structural optimization and design...",
+  "summary": "Strategic operational executive specializing in enterprise scaling, structural optimization, and driving multi-million dollar revenue growth...",
   "experience": [
     {
-      "company": "Tech Global Inc.",
-      "role": "Senior Frontend Developer",
-      "period": "2023 - Present",
-      "description": "Optimized core user interface web app metric loads by 40%..."
+      "company": "Global Enterprise Corp.",
+      "role": "VP of Operations",
+      "period": "2020 - Present",
+      "description": "Architected a comprehensive logistical overhaul that improved Q4 delivery metrics by 40%..."
     }
   ]
 }
@@ -112,4 +126,4 @@ Your data belongs completely to you. The resume configuration is structured insi
 This project is licensed under the terms of the MIT License. Feel free to use, modify, share, and expand as you like!
 
 ---
-> **Deliver a resume designed specifically to overcome robotic filters and hook recruiter attention on first glance!** 🎯
+> **A resume is the highest ROI document you will ever write. Treat it accordingly.** 🎯

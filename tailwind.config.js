@@ -9,6 +9,28 @@ export default {
   theme: {
     extend: {
       colors: {
+        ds: {
+          bg: 'var(--color-surface-bg)',
+          panel: 'var(--color-surface-panel)',
+          container: 'var(--color-surface-container)',
+          active: 'var(--color-surface-active)',
+          hover: 'var(--color-surface-hover)',
+          primary: 'var(--color-brand-primary)',
+          'primary-hover': 'var(--color-brand-primary-hover)',
+          'primary-light': 'var(--color-brand-primary-light)',
+          secondary: 'var(--color-brand-secondary)',
+          'secondary-hover': 'var(--color-brand-secondary-hover)',
+          'secondary-light': 'var(--color-brand-secondary-light)',
+          'text-high': 'var(--color-text-high)',
+          'text-medium': 'var(--color-text-medium)',
+          'text-muted': 'var(--color-text-muted)',
+          'text-disabled': 'var(--color-text-disabled)',
+          border: 'var(--color-border-main)',
+          'border-focus': 'var(--color-border-focus)',
+          success: 'var(--color-status-success)',
+          warning: 'var(--color-status-warning)',
+          error: 'var(--color-status-error)',
+        },
         resume: {
           primary: '#1E293B',    // Slate 800 - soft, premium anthracite
           secondary: '#475569',  // Slate 600 - exquisite muted slate for description & body text
@@ -17,18 +39,18 @@ export default {
           border: '#E2E8F0',     // Slate 200 - clean separators
         },
         m3: {
-          primary: '#bb86fc', // Pastel violet key
-          onPrimary: '#2d005d',
-          primaryContainer: '#4f378b', // Rich purple backing
-          onPrimaryContainer: '#eaddff',
-          secondary: '#33b5e5', // High fidelity cyber blue-green
-          surface: '#121115', // True dark violet-gray surface
-          surfaceContainer: '#1c1b21', // Lighter container
-          surfaceContainerHigh: '#26242c', // Active items
-          outline: '#49454f', // Clean outline border
-          outlineVariant: '#79747e', // Faded outline border
-          onSurface: '#e6e1e5',
-          onSurfaceVariant: '#cac4d0',
+          primary: 'var(--color-brand-primary)',
+          onPrimary: '#1a003d',
+          primaryContainer: 'var(--color-brand-primary-light)',
+          onPrimaryContainer: 'var(--color-text-high)',
+          secondary: 'var(--color-brand-secondary)',
+          surface: 'var(--color-surface-panel)', 
+          surfaceContainer: 'var(--color-surface-container)', 
+          surfaceContainerHigh: 'var(--color-surface-active)',
+          outline: 'var(--color-border-main)', 
+          outlineVariant: 'var(--color-text-muted)', 
+          onSurface: 'var(--color-text-high)',
+          onSurfaceVariant: 'var(--color-text-medium)',
         },
       },
       fontFamily: {
