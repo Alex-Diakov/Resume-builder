@@ -60,7 +60,7 @@ The workspace operates as a full-stack application securely keeping all AI opera
 
 *   **Frontend**: React 18 + TypeScript
 *   **Backend**: Node.js + Express (serving Vite middleware)
-*   **AI Engine**: Official Google Gen AI TypeScript SDK (`@google/genai`) -> *gemini-3.5-flash*
+*   **AI Engine**: Official Google Gen AI TypeScript SDK (`@google/genai`) -> *gemini-2.5-flash*
 *   **CSS Utility Framework**: Tailwind CSS
 *   **Motion System**: Framer Motion (`motion/react`)
 

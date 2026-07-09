@@ -15,6 +15,7 @@ router.post("/analyze", async (req: Request, res: Response, next: NextFunction) 
     return res.json(result);
 
   } catch (apiError: any) {
+    console.error("Gemini API Error in /analyze:", apiError);
     // Zero-Downtime Design: fallback to scientific heuristic scoring dynamically
     const fallbackAnalysis = generateHeuristicBackupAnalysis(req.body.resumeData);
     return res.json({

@@ -136,7 +136,7 @@ export const SidebarAtsTab: React.FC<SidebarAtsTabProps> = ({
             <textarea
               value={atsInput}
               onChange={(e) => setAtsInput(e.target.value)}
-              className="w-full p-3.5 bg-ds-container border border-ds-border text-ds-text-high font-mono text-xs rounded-xl focus:border-ds-border-focus focus:outline-none focus:ring-1 focus:ring-ds-primary/20 resize-none transition-colors shadow-inner"
+              className="w-full p-3.5 bg-ds-container border border-ds-border text-ds-text-high font-mono text-xs rounded-xl focus:border-ds-border-focus focus:outline-none focus-visible:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:ring-1 focus-visible:ring-ds-primary/20 resize-none transition-colors shadow-inner"
               rows={6}
               placeholder="E.g., React, Kubernetes, Agility, Product Strategy, Roadmap, SaaS, Customer Retention, Figma..."
             />

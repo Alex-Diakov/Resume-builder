@@ -166,7 +166,7 @@ export const SidebarCognitiveTab: React.FC<SidebarCognitiveTabProps> = ({
             </div>
             <button
               onClick={runCognitiveAnalysis}
-              className="w-full py-2.5 bg-ds-primary hover:bg-ds-primary-hover text-white rounded-xl text-xs font-bold tracking-wider uppercase transition-all duration-200 cursor-pointer shadow-md hover:shadow-glow active:scale-95 flex items-center justify-center gap-2 border border-ds-border"
+              className="w-full py-2.5 bg-ds-primary hover:bg-ds-primary-hover text-white rounded-xl text-xs font-bold tracking-wider uppercase transition-all duration-200 cursor-pointer shadow-md hover:shadow-glow active:scale-95 flex items-center justify-center gap-2 border border-ds-border focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-ds-primary/50 focus-visible:ring-offset-2 focus-visible:ring-offset-ds-panel"
             >
               <RefreshCw className="w-4 h-4" />
               <span>Perform Cognitive Scan</span>
@@ -182,7 +182,7 @@ export const SidebarCognitiveTab: React.FC<SidebarCognitiveTabProps> = ({
             <div className="flex bg-ds-container p-1.5 rounded-xl border border-ds-border gap-1 shrink-0 relative">
               <button
                 onClick={() => setActiveSubTab('overview')}
-                className={`flex-grow relative py-2.5 px-3 rounded-xl text-xs uppercase font-bold tracking-wider transition-all duration-300 cursor-pointer flex items-center justify-center gap-2 z-10 ${
+                className={`flex-grow relative py-2.5 px-3 rounded-xl text-xs uppercase font-bold tracking-wider transition-all duration-300 cursor-pointer flex items-center justify-center gap-2 z-10 focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-ds-primary/50 focus-visible:ring-offset-1 focus-visible:ring-offset-ds-panel ${
                   activeSubTab === 'overview' ? 'text-white' : 'text-ds-text-medium hover:text-ds-text-high'
                 }`}
               >
@@ -199,7 +199,7 @@ export const SidebarCognitiveTab: React.FC<SidebarCognitiveTabProps> = ({
 
               <button
                 onClick={() => setActiveSubTab('laws')}
-                className={`flex-grow relative py-2.5 px-3 rounded-xl text-xs uppercase font-bold tracking-wider transition-all duration-300 cursor-pointer flex items-center justify-center gap-2 z-10 ${
+                className={`flex-grow relative py-2.5 px-3 rounded-xl text-xs uppercase font-bold tracking-wider transition-all duration-300 cursor-pointer flex items-center justify-center gap-2 z-10 focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-ds-primary/50 focus-visible:ring-offset-1 focus-visible:ring-offset-ds-panel ${
                   activeSubTab === 'laws' ? 'text-white' : 'text-ds-text-medium hover:text-ds-text-high'
                 }`}
               >
@@ -216,7 +216,7 @@ export const SidebarCognitiveTab: React.FC<SidebarCognitiveTabProps> = ({
 
               <button
                 onClick={() => setActiveSubTab('frames')}
-                className={`flex-grow relative py-2.5 px-3 rounded-xl text-xs uppercase font-bold tracking-wider transition-all duration-300 cursor-pointer flex items-center justify-center gap-2 z-10 ${
+                className={`flex-grow relative py-2.5 px-3 rounded-xl text-xs uppercase font-bold tracking-wider transition-all duration-300 cursor-pointer flex items-center justify-center gap-2 z-10 focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-ds-primary/50 focus-visible:ring-offset-1 focus-visible:ring-offset-ds-panel ${
                   activeSubTab === 'frames' ? 'text-white' : 'text-ds-text-medium hover:text-ds-text-high'
                 }`}
               >

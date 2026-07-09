@@ -69,7 +69,7 @@ export const SidebarJsonTab: React.FC<SidebarJsonTabProps> = ({
           {/* PASTE FROM CLIPBOARD ACTION BUTTON */}
           <button 
             onClick={handlePaste}
-            className="flex items-center gap-1.5 text-xs text-ds-text-muted hover:text-ds-text-high transition-colors cursor-pointer"
+            className="flex items-center gap-1.5 text-xs text-ds-text-muted hover:text-ds-text-high transition-colors cursor-pointer focus-visible:outline-none focus-visible:text-ds-text-high focus-visible:underline"
             title="Paste JSON from system clipboard"
           >
             {pasted ? <Check className="w-4 h-4 text-emerald-400" /> : <Clipboard className="w-4 h-4 text-ds-primary" />}
@@ -79,7 +79,7 @@ export const SidebarJsonTab: React.FC<SidebarJsonTabProps> = ({
           {/* COPY TO CLIPBOARD ACTION BUTTON */}
           <button 
             onClick={handleCopy}
-            className="flex items-center gap-1.5 text-xs text-ds-text-muted hover:text-ds-text-high transition-colors cursor-pointer border-l border-ds-border pl-3.5"
+            className="flex items-center gap-1.5 text-xs text-ds-text-muted hover:text-ds-text-high transition-colors cursor-pointer border-l border-ds-border pl-3.5 focus-visible:outline-none focus-visible:text-ds-text-high focus-visible:underline"
             title="Copy JSON Code"
           >
             {copied ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4 text-ds-primary" />}
@@ -93,7 +93,7 @@ export const SidebarJsonTab: React.FC<SidebarJsonTabProps> = ({
           ref={textareaRef}
           value={jsonInput}
           onChange={(e) => setJsonInput(e.target.value)}
-          className="flex-1 w-full p-4.5 bg-transparent text-ds-text-high font-mono text-[11px] leading-relaxed resize-none focus:outline-none"
+          className="flex-1 w-full p-4.5 bg-transparent text-ds-text-high font-mono text-[11px] leading-relaxed resize-none focus:outline-none focus-visible:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:ring-1 focus-visible:ring-ds-primary/20 focus-visible:bg-ds-container"
           spellCheck={false}
           placeholder="Paste your JSON here..."
         />

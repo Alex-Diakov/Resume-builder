@@ -16,6 +16,8 @@ import {
   Upload
 } from 'lucide-react';
 import { ResumeData, ExperienceItem, ProjectItem, EducationItem } from '../types';
+import { useResumeForm } from '../hooks/useResumeForm';
+import { useResumeContext } from '../contexts/ResumeContext';
 
 interface SidebarFormTabProps {
   resumeData: ResumeData;
@@ -57,36 +59,35 @@ export const SidebarFormTab: React.FC<SidebarFormTabProps> = ({
 }) => {
   const [activeAccordion, setActiveAccordion] = useState<string | null>('personal');
   const [isDragging, setIsDragging] = useState(false);
-  const [photoError, setPhotoError] = useState<string | null>(null);
 
-  const handlePhotoFile = (file: File) => {
-    setPhotoError(null);
-    if (!file.type.startsWith('image/')) {
-      setPhotoError('Unsupported file type. Please upload an image (PNG, JPG, WebP).');
-      return;
-    }
-    // Check file size (e.g., 2MB limit for base64)
-    if (file.size > 2 * 1024 * 1024) {
-      setPhotoError('Image is too large (max 2MB) to ensure light weight.');
-      return;
-    }
+  const { compressPdf, setCompressPdf, pdfImageQuality, setPdfImageQuality } = useResumeContext();
 
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      if (e.target?.result) {
-        const updated = { 
-          ...resumeData, 
-          photo: e.target.result as string, 
-          showPhoto: resumeData.showPhoto !== undefined ? resumeData.showPhoto : true 
-        };
-        onChangeData(updated);
-      }
-    };
-    reader.onerror = () => {
-      setPhotoError('Error reading file.');
-    };
-    reader.readAsDataURL(file);
-  };
+  const {
+    photoError,
+    handlePhotoFile,
+    handleFieldChange,
+    handleUpdateSummaryPara,
+    handleAddSummaryPara,
+    handleRemoveSummaryPara,
+    handleUpdateExperience,
+    handleUpdateHighlight,
+    handleAddHighlight,
+    handleRemoveHighlight,
+    handleAddExperienceItem,
+    handleRemoveExperienceItem,
+    handleUpdateProject,
+    handleUpdateDetailRow,
+    handleAddDetailRow,
+    handleRemoveDetailRow,
+    handleAddProjectItem,
+    handleRemoveProjectItem,
+    handleUpdateSkillCategory,
+    handleAddSkillCategory,
+    handleRemoveSkillCategory,
+    handleUpdateEducation,
+    handleAddEducationItem,
+    handleRemoveEducation
+  } = useResumeForm(resumeData, onChangeData);
 
   // Handle accordion toggle
   const toggleAccordion = (sec: string) => {
@@ -94,176 +95,8 @@ export const SidebarFormTab: React.FC<SidebarFormTabProps> = ({
   };
 
   // General Form Handlers
-  const handleFieldChange = (path: string, val: any) => {
-    const updated = { ...resumeData };
-    if (path.startsWith('contact.')) {
-      const field = path.split('.')[1];
-      updated.contact = { ...updated.contact, [field]: val };
-    } else {
-      (updated as any)[path] = val;
-    }
-    onChangeData(updated);
-  };
-
-  const handleUpdateSummaryPara = (index: number, val: string) => {
-    const newSummary = [...(resumeData.summary || [])];
-    newSummary[index] = val;
-    handleFieldChange('summary', newSummary);
-  };
-
-  const handleAddSummaryPara = () => {
-    const newSummary = [...(resumeData.summary || []), ''];
-    handleFieldChange('summary', newSummary);
-  };
-
-  const handleRemoveSummaryPara = (index: number) => {
-    const newSummary = (resumeData.summary || []).filter((_, idx) => idx !== index);
-    handleFieldChange('summary', newSummary);
-  };
-
-  // Experience Handlers
-  const handleUpdateExperience = (itemIndex: number, field: keyof ExperienceItem, val: any) => {
-    const updatedExp = [...(resumeData.experience || [])];
-    updatedExp[itemIndex] = { ...updatedExp[itemIndex], [field]: val };
-    handleFieldChange('experience', updatedExp);
-  };
-
-  const handleUpdateHighlight = (expIndex: number, hIndex: number, field: 'title' | 'description', val: string) => {
-    const updatedExp = [...(resumeData.experience || [])];
-    const item = { ...updatedExp[expIndex] };
-    const highlights = [...(item.highlights || [])];
-    highlights[hIndex] = { ...highlights[hIndex], [field]: val };
-    item.highlights = highlights;
-    updatedExp[expIndex] = item;
-    handleFieldChange('experience', updatedExp);
-  };
-
-  const handleAddHighlight = (expIndex: number) => {
-    const updatedExp = [...(resumeData.experience || [])];
-    const item = { ...updatedExp[expIndex] };
-    item.highlights = [...(item.highlights || []), { title: 'New Result', description: 'Describe quantified achievement...' }];
-    updatedExp[expIndex] = item;
-    handleFieldChange('experience', updatedExp);
-  };
-
-  const handleRemoveHighlight = (expIndex: number, hIndex: number) => {
-    const updatedExp = [...(resumeData.experience || [])];
-    const item = { ...updatedExp[expIndex] };
-    item.highlights = (item.highlights || []).filter((_, idx) => idx !== hIndex);
-    updatedExp[expIndex] = item;
-    handleFieldChange('experience', updatedExp);
-  };
-
-  const handleAddExperienceItem = () => {
-    const newItem: ExperienceItem = {
-      role: 'Role Title',
-      company: 'Company Name',
-      duration: 'Year – Year',
-      type: 'Full-time',
-      highlights: [
-        { title: "Key Outcome", description: "Describe a scalable result here." }
-      ]
-    };
-    handleFieldChange('experience', [...(resumeData.experience || []), newItem]);
-  };
-
-  const handleRemoveExperienceItem = (index: number) => {
-    const list = (resumeData.experience || []).filter((_, idx) => idx !== index);
-    handleFieldChange('experience', list);
-  };
-
-  // Projects handlers
-  const handleUpdateProject = (pIndex: number, field: keyof ProjectItem, val: any) => {
-    const list = [...(resumeData.projects || [])];
-    list[pIndex] = { ...list[pIndex], [field]: val };
-    handleFieldChange('projects', list);
-  };
-
-  const handleUpdateDetailRow = (pIndex: number, dIndex: number, field: 'label' | 'value', val: string) => {
-    const list = [...(resumeData.projects || [])];
-    const proj = { ...list[pIndex] };
-    const details = [...(proj.details || [])];
-    details[dIndex] = { ...details[dIndex], [field]: val };
-    proj.details = details;
-    list[pIndex] = proj;
-    handleFieldChange('projects', list);
-  };
-
-  const handleAddDetailRow = (pIndex: number) => {
-    const list = [...(resumeData.projects || [])];
-    const proj = { ...list[pIndex] };
-    proj.details = [...(proj.details || []), { label: 'New Metric', value: 'Value' }];
-    list[pIndex] = proj;
-    handleFieldChange('projects', list);
-  };
-
-  const handleRemoveDetailRow = (pIndex: number, dIndex: number) => {
-    const list = [...(resumeData.projects || [])];
-    const proj = { ...list[pIndex] };
-    proj.details = (proj.details || []).filter((_, idx) => idx !== dIndex);
-    list[pIndex] = proj;
-    handleFieldChange('projects', list);
-  };
-
-  const handleAddProjectItem = () => {
-    const newItem: ProjectItem = {
-      title: "New Venture",
-      role: "Lead Designer",
-      description: "Brief description of innovation background.",
-      details: [
-        { label: "Engineering", value: "React stack execution" }
-      ]
-    };
-    handleFieldChange('projects', [...(resumeData.projects || []), newItem]);
-  };
-
-  const handleRemoveProjectItem = (index: number) => {
-    const list = (resumeData.projects || []).filter((_, idx) => idx !== index);
-    handleFieldChange('projects', list);
-  };
-
-  // Core Competencies / Skills Handlers
-  const handleUpdateSkillCategory = (oldCategory: string, newCategory: string, skills: string) => {
-    const skillsCopy = { ...resumeData.skills };
-    if (oldCategory !== newCategory) {
-      delete skillsCopy[oldCategory];
-    }
-    skillsCopy[newCategory] = skills;
-    handleFieldChange('skills', skillsCopy);
-  };
-
-  const handleAddSkillCategory = () => {
-    const skillsCopy = { ...resumeData.skills, "New Category": "List keywords..." };
-    handleFieldChange('skills', skillsCopy);
-  };
-
-  const handleRemoveSkillCategory = (cat: string) => {
-    const skillsCopy = { ...resumeData.skills };
-    delete skillsCopy[cat];
-    handleFieldChange('skills', skillsCopy);
-  };
-
-  // Education Handlers
-  const handleUpdateEducation = (idx: number, field: keyof EducationItem, val: string) => {
-    const list = [...(resumeData.education || [])];
-    list[idx] = { ...list[idx], [field]: val };
-    handleFieldChange('education', list);
-  };
-
-  const handleAddEducationItem = () => {
-    const newItem: EducationItem = {
-      institution: "Institution Name",
-      certification: "Degree Certification Name",
-      year: "2024"
-    };
-    handleFieldChange('education', [...(resumeData.education || []), newItem]);
-  };
-
-  const handleRemoveEducation = (idx: number) => {
-    const list = (resumeData.education || []).filter((_, i) => i !== idx);
-    handleFieldChange('education', list);
-  };
-
+  // Handlers are now provided by useResumeForm hook
+  
   return (
     <div className="p-5 space-y-5 pb-16">
 
@@ -277,7 +110,7 @@ export const SidebarFormTab: React.FC<SidebarFormTabProps> = ({
       }`}>
         <button 
           onClick={() => toggleAccordion('personal')}
-          className="w-full flex items-center justify-between p-4.5 text-sm font-semibold text-ds-text-high cursor-pointer"
+          className="w-full flex items-center justify-between p-4.5 text-sm font-semibold text-ds-text-high cursor-pointer focus-visible:outline-none focus-visible:bg-ds-hover rounded-xl"
         >
           <div className="flex items-center gap-3">
             <User className={`w-4.5 h-4.5 transition-colors duration-200 ${activeAccordion === 'personal' ? 'text-ds-primary' : 'text-ds-text-muted'}`} />
@@ -360,7 +193,7 @@ export const SidebarFormTab: React.FC<SidebarFormTabProps> = ({
                           id="toggle-photo-display"
                           type="button"
                           onClick={() => handleFieldChange('showPhoto', !(resumeData.showPhoto !== false))}
-                          className={`relative inline-flex h-4.5 w-8 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+                          className={`relative inline-flex h-4.5 w-8 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-[#bb86fc]/50 focus-visible:ring-offset-1 focus-visible:ring-offset-ds-panel ${
                             resumeData.showPhoto !== false ? 'bg-[#bb86fc]' : 'bg-[#49454f]'
                           }`}
                         >
@@ -380,7 +213,7 @@ export const SidebarFormTab: React.FC<SidebarFormTabProps> = ({
                           delete updated.photo;
                           onChangeData(updated);
                         }}
-                        className="w-full py-1 bg-[#8c1d18]/10 hover:bg-[#8c1d18]/25 text-[#f2b8b5] border border-[#8c1d18]/30 rounded-lg text-[9.5px] font-bold uppercase tracking-wider transition-all duration-150 cursor-pointer"
+                        className="w-full py-1 bg-[#8c1d18]/10 hover:bg-[#8c1d18]/25 text-[#f2b8b5] border border-[#8c1d18]/30 rounded-lg text-[9.5px] font-bold uppercase tracking-wider transition-all duration-150 cursor-pointer focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-[#f2b8b5]/50 focus-visible:ring-offset-1 focus-visible:ring-offset-ds-panel"
                       >
                         Delete Photo
                       </button>
@@ -404,7 +237,7 @@ export const SidebarFormTab: React.FC<SidebarFormTabProps> = ({
                 type="text" 
                 value={resumeData.name} 
                 onChange={(e) => handleFieldChange('name', e.target.value)}
-                className="w-full bg-ds-panel border border-ds-border rounded-xl py-2 px-3 text-ds-text-high text-xs focus:outline-none focus:border-ds-border-focus focus:ring-1 focus:ring-ds-primary/20 transition-all font-medium"
+                className="w-full bg-ds-panel border border-ds-border rounded-xl py-2 px-3 text-ds-text-high text-xs focus:outline-none focus:ring-0 focus:border-ds-primary focus-visible:outline-none focus-visible:ring-0 focus-visible:border-ds-primary transition-all font-medium"
                 placeholder="e.g. Alex Diakov"
               />
             </div>
@@ -414,7 +247,7 @@ export const SidebarFormTab: React.FC<SidebarFormTabProps> = ({
                 type="text" 
                 value={resumeData.title} 
                 onChange={(e) => handleFieldChange('title', e.target.value)}
-                className="w-full bg-ds-panel border border-ds-border rounded-xl py-2 px-3 text-ds-text-high text-xs focus:outline-none focus:border-ds-border-focus focus:ring-1 focus:ring-ds-primary/20 transition-all font-medium"
+                className="w-full bg-ds-panel border border-ds-border rounded-xl py-2 px-3 text-ds-text-high text-xs focus:outline-none focus:ring-0 focus:border-ds-primary focus-visible:outline-none focus-visible:ring-0 focus-visible:border-ds-primary transition-all font-medium"
                 placeholder="e.g. Product Ventures & Innovation"
               />
             </div>
@@ -425,7 +258,7 @@ export const SidebarFormTab: React.FC<SidebarFormTabProps> = ({
                   type="email" 
                   value={resumeData.contact.email} 
                   onChange={(e) => handleFieldChange('contact.email', e.target.value)}
-                  className="w-full bg-ds-panel border border-ds-border rounded-xl py-2 px-3 text-ds-text-high text-xs focus:outline-none focus:border-ds-border-focus focus:ring-1 focus:ring-ds-primary/20 transition-all font-medium"
+                  className="w-full bg-ds-panel border border-ds-border rounded-xl py-2 px-3 text-ds-text-high text-xs focus:outline-none focus:ring-0 focus:border-ds-primary focus-visible:outline-none focus-visible:ring-0 focus-visible:border-ds-primary transition-all font-medium"
                 />
               </div>
               <div>
@@ -434,7 +267,7 @@ export const SidebarFormTab: React.FC<SidebarFormTabProps> = ({
                   type="text" 
                   value={resumeData.contact.location} 
                   onChange={(e) => handleFieldChange('contact.location', e.target.value)}
-                  className="w-full bg-ds-panel border border-ds-border rounded-xl py-2 px-3 text-ds-text-high text-xs focus:outline-none focus:border-ds-border-focus focus:ring-1 focus:ring-ds-primary/20 transition-all font-medium"
+                  className="w-full bg-ds-panel border border-ds-border rounded-xl py-2 px-3 text-ds-text-high text-xs focus:outline-none focus:ring-0 focus:border-ds-primary focus-visible:outline-none focus-visible:ring-0 focus-visible:border-ds-primary transition-all font-medium"
                 />
               </div>
             </div>
@@ -445,7 +278,7 @@ export const SidebarFormTab: React.FC<SidebarFormTabProps> = ({
                   type="text" 
                   value={resumeData.contact.website} 
                   onChange={(e) => handleFieldChange('contact.website', e.target.value)}
-                  className="w-full bg-ds-panel border border-ds-border rounded-xl py-2 px-3 text-ds-text-high text-xs focus:outline-none focus:border-ds-border-focus focus:ring-1 focus:ring-ds-primary/20 transition-all font-medium"
+                  className="w-full bg-ds-panel border border-ds-border rounded-xl py-2 px-3 text-ds-text-high text-xs focus:outline-none focus:ring-0 focus:border-ds-primary focus-visible:outline-none focus-visible:ring-0 focus-visible:border-ds-primary transition-all font-medium"
                 />
               </div>
               <div>
@@ -454,7 +287,7 @@ export const SidebarFormTab: React.FC<SidebarFormTabProps> = ({
                   type="text" 
                   value={resumeData.contact.linkedin} 
                   onChange={(e) => handleFieldChange('contact.linkedin', e.target.value)}
-                  className="w-full bg-ds-panel border border-ds-border rounded-xl py-2 px-3 text-ds-text-high text-xs focus:outline-none focus:border-ds-border-focus focus:ring-1 focus:ring-ds-primary/20 transition-all font-medium"
+                  className="w-full bg-ds-panel border border-ds-border rounded-xl py-2 px-3 text-ds-text-high text-xs focus:outline-none focus:ring-0 focus:border-ds-primary focus-visible:outline-none focus-visible:ring-0 focus-visible:border-ds-primary transition-all font-medium"
                 />
               </div>
             </div>
@@ -470,7 +303,7 @@ export const SidebarFormTab: React.FC<SidebarFormTabProps> = ({
       }`}>
         <button 
           onClick={() => toggleAccordion('summary')}
-          className="w-full flex items-center justify-between p-4.5 text-sm font-semibold text-ds-text-high cursor-pointer"
+          className="w-full flex items-center justify-between p-4.5 text-sm font-semibold text-ds-text-high cursor-pointer focus-visible:outline-none focus-visible:bg-ds-hover rounded-xl"
         >
           <div className="flex items-center gap-3">
             <Maximize2 className={`w-4.5 h-4.5 transition-colors duration-200 ${activeAccordion === 'summary' ? 'text-ds-primary' : 'text-ds-text-muted'}`} />
@@ -486,12 +319,12 @@ export const SidebarFormTab: React.FC<SidebarFormTabProps> = ({
                 <textarea
                   value={para}
                   onChange={(e) => handleUpdateSummaryPara(i, e.target.value)}
-                  className="flex-1 bg-ds-panel border border-ds-border rounded-xl p-3 text-ds-text-high text-xs focus:outline-none focus:border-ds-border-focus focus:ring-1 focus:ring-ds-primary/20 transition-all font-medium min-h-[68px]"
+                  className="flex-1 bg-ds-panel border border-ds-border rounded-xl p-3 text-ds-text-high text-xs focus:outline-none focus:ring-0 focus:border-ds-primary focus-visible:outline-none focus-visible:ring-0 focus-visible:border-ds-primary transition-all font-medium min-h-[68px]"
                   placeholder="Write summary paragraph describing key achievements..."
                 />
                 <button 
                   onClick={() => handleRemoveSummaryPara(i)}
-                  className="p-2.5 text-rose-400 hover:bg-rose-500/10 rounded-xl cursor-pointer transition-colors self-start"
+                  className="p-2.5 text-rose-400 hover:bg-rose-500/10 rounded-xl cursor-pointer transition-colors self-start focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-rose-400/50 focus-visible:ring-offset-1 focus-visible:ring-offset-ds-panel"
                   title="Delete paragraph"
                 >
                   <Trash2 className="w-4 h-4" />
@@ -500,7 +333,7 @@ export const SidebarFormTab: React.FC<SidebarFormTabProps> = ({
             ))}
             <button 
               onClick={handleAddSummaryPara}
-              className="w-full flex items-center justify-center gap-2 bg-ds-active hover:bg-ds-hover border border-ds-border text-ds-text-medium hover:text-ds-text-high py-2.5 rounded-xl text-xs font-semibold uppercase tracking-wider transition-all duration-200 cursor-pointer active:scale-95 shadow-sm"
+              className="w-full flex items-center justify-center gap-2 bg-ds-active hover:bg-ds-hover border border-ds-border text-ds-text-medium hover:text-ds-text-high py-2.5 rounded-xl text-xs font-semibold uppercase tracking-wider transition-all duration-200 cursor-pointer active:scale-95 shadow-sm focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-ds-primary/50 focus-visible:ring-offset-1 focus-visible:ring-offset-ds-panel"
             >
               <Plus className="w-4 h-4" /> Add Paragraph
             </button>
@@ -516,7 +349,7 @@ export const SidebarFormTab: React.FC<SidebarFormTabProps> = ({
       }`}>
         <button 
           onClick={() => toggleAccordion('experience')}
-          className="w-full flex items-center justify-between p-4.5 text-sm font-semibold text-ds-text-high cursor-pointer"
+          className="w-full flex items-center justify-between p-4.5 text-sm font-semibold text-ds-text-high cursor-pointer focus-visible:outline-none focus-visible:bg-ds-hover rounded-xl"
         >
           <div className="flex items-center gap-3">
             <Briefcase className={`w-4.5 h-4.5 transition-colors duration-200 ${activeAccordion === 'experience' ? 'text-ds-primary' : 'text-ds-text-muted'}`} />
@@ -531,7 +364,7 @@ export const SidebarFormTab: React.FC<SidebarFormTabProps> = ({
               <div key={expIdx} className="bg-ds-container rounded-xl p-4.5 border border-ds-border relative animate-fade-in">
                 <button 
                   onClick={() => handleRemoveExperienceItem(expIdx)}
-                  className="absolute top-3.5 right-3.5 p-2 text-rose-400 hover:bg-rose-500/10 rounded-xl cursor-pointer transition-colors"
+                  className="absolute top-3.5 right-3.5 p-2 text-rose-400 hover:bg-rose-500/10 rounded-xl cursor-pointer transition-colors focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-rose-400/50"
                   title="Remove work"
                 >
                   <Trash2 className="w-3.5 h-3.5" />
@@ -545,7 +378,7 @@ export const SidebarFormTab: React.FC<SidebarFormTabProps> = ({
                         type="text" 
                         value={exp.role} 
                         onChange={(e) => handleUpdateExperience(expIdx, 'role', e.target.value)}
-                        className="w-full bg-ds-panel border border-ds-border rounded-xl py-1.5 px-3 text-ds-text-high text-xs focus:outline-none focus:border-ds-border-focus focus:ring-1 focus:ring-ds-primary/20 transition-all font-medium"
+                        className="w-full bg-ds-panel border border-ds-border rounded-xl py-1.5 px-3 text-ds-text-high text-xs focus:outline-none focus:ring-0 focus:border-ds-primary focus-visible:outline-none focus-visible:ring-0 focus-visible:border-ds-primary transition-all font-medium"
                       />
                     </div>
                     <div>
@@ -554,7 +387,7 @@ export const SidebarFormTab: React.FC<SidebarFormTabProps> = ({
                         type="text" 
                         value={exp.company} 
                         onChange={(e) => handleUpdateExperience(expIdx, 'company', e.target.value)}
-                        className="w-full bg-ds-panel border border-ds-border rounded-xl py-1.5 px-3 text-ds-text-high text-xs focus:outline-none focus:border-ds-border-focus focus:ring-1 focus:ring-ds-primary/20 transition-all font-medium"
+                        className="w-full bg-ds-panel border border-ds-border rounded-xl py-1.5 px-3 text-ds-text-high text-xs focus:outline-none focus:ring-0 focus:border-ds-primary focus-visible:outline-none focus-visible:ring-0 focus-visible:border-ds-primary transition-all font-medium"
                       />
                     </div>
                   </div>
@@ -566,7 +399,7 @@ export const SidebarFormTab: React.FC<SidebarFormTabProps> = ({
                         type="text" 
                         value={exp.duration} 
                         onChange={(e) => handleUpdateExperience(expIdx, 'duration', e.target.value)}
-                        className="w-full bg-ds-panel border border-ds-border rounded-xl py-1.5 px-3 text-ds-text-high text-xs focus:outline-none focus:border-ds-border-focus focus:ring-1 focus:ring-ds-primary/20 transition-all font-medium"
+                        className="w-full bg-ds-panel border border-ds-border rounded-xl py-1.5 px-3 text-ds-text-high text-xs focus:outline-none focus:ring-0 focus:border-ds-primary focus-visible:outline-none focus-visible:ring-0 focus-visible:border-ds-primary transition-all font-medium"
                       />
                     </div>
                     <div>
@@ -575,7 +408,7 @@ export const SidebarFormTab: React.FC<SidebarFormTabProps> = ({
                         type="text" 
                         value={exp.type} 
                         onChange={(e) => handleUpdateExperience(expIdx, 'type', e.target.value)}
-                        className="w-full bg-ds-panel border border-ds-border rounded-xl py-1.5 px-3 text-ds-text-high text-xs focus:outline-none focus:border-ds-border-focus focus:ring-1 focus:ring-ds-primary/20 transition-all font-medium"
+                        className="w-full bg-ds-panel border border-ds-border rounded-xl py-1.5 px-3 text-ds-text-high text-xs focus:outline-none focus:ring-0 focus:border-ds-primary focus-visible:outline-none focus-visible:ring-0 focus-visible:border-ds-primary transition-all font-medium"
                       />
                     </div>
                   </div>
@@ -587,7 +420,7 @@ export const SidebarFormTab: React.FC<SidebarFormTabProps> = ({
                       <div key={hIdx} className="bg-[#1c1b21] p-3 rounded-lg border border-[#49454f]/50 space-y-2 relative animate-fade-in">
                         <button 
                           onClick={() => handleRemoveHighlight(expIdx, hIdx)}
-                          className="absolute top-1.5 right-1.5 p-1.5 text-[#f2b8b5] hover:bg-[#8c1d18]/20 rounded-full cursor-pointer"
+                          className="absolute top-1.5 right-1.5 p-1.5 text-[#f2b8b5] hover:bg-[#8c1d18]/20 rounded-full cursor-pointer focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-[#f2b8b5]/50"
                           title="Remove highlight"
                         >
                           <Trash2 className="w-3 h-3" />
@@ -598,7 +431,7 @@ export const SidebarFormTab: React.FC<SidebarFormTabProps> = ({
                             type="text" 
                             value={h.title} 
                             onChange={(e) => handleUpdateHighlight(expIdx, hIdx, 'title', e.target.value)}
-                            className="w-full bg-[#141218] border border-[#49454f] rounded-md px-2.5 py-1 text-white text-xs font-semibold focus:outline-none focus:border-[#bb86fc]"
+                            className="w-full bg-[#141218] border border-[#49454f] rounded-md px-2.5 py-1 text-white text-xs font-semibold focus:outline-none focus-visible:outline-none focus:ring-0 focus-visible:ring-0 focus:border-[#bb86fc]"
                           />
                         </div>
                         <div>
@@ -606,7 +439,7 @@ export const SidebarFormTab: React.FC<SidebarFormTabProps> = ({
                           <textarea
                             value={h.description} 
                             onChange={(e) => handleUpdateHighlight(expIdx, hIdx, 'description', e.target.value)}
-                            className="w-full bg-[#141218] border border-[#49454f] rounded-md p-2 text-[#cac4d0] text-[11px] focus:outline-none focus:border-[#bb86fc]"
+                            className="w-full bg-[#141218] border border-[#49454f] rounded-md p-2 text-[#cac4d0] text-[11px] focus:outline-none focus-visible:outline-none focus:ring-0 focus-visible:ring-0 focus:border-[#bb86fc]"
                             rows={2}
                           />
                         </div>
@@ -614,7 +447,7 @@ export const SidebarFormTab: React.FC<SidebarFormTabProps> = ({
                     ))}
                     <button 
                       onClick={() => handleAddHighlight(expIdx)}
-                      className="w-full flex items-center justify-center gap-1.5 bg-[#1c1b21] hover:bg-[#2b2930] text-[#cac4d0] py-2 rounded-lg text-[10px] uppercase font-bold tracking-wider border border-[#312e39] cursor-pointer"
+                      className="w-full flex items-center justify-center gap-1.5 bg-[#1c1b21] hover:bg-[#2b2930] text-[#cac4d0] py-2 rounded-lg text-[10px] uppercase font-bold tracking-wider border border-[#312e39] cursor-pointer focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-[#bb86fc]/50 focus-visible:ring-offset-1 focus-visible:ring-offset-ds-panel"
                     >
                       <Plus className="w-3 h-3 text-[#bb86fc]" /> Add Metric Highlight
                     </button>
@@ -624,7 +457,7 @@ export const SidebarFormTab: React.FC<SidebarFormTabProps> = ({
             ))}
             <button 
               onClick={handleAddExperienceItem}
-              className="w-full flex items-center justify-center gap-2 bg-ds-active hover:bg-ds-hover border border-ds-border text-ds-text-medium hover:text-ds-text-high py-2.5 rounded-xl text-xs font-semibold uppercase tracking-wider transition-all duration-200 cursor-pointer active:scale-95 shadow-sm"
+              className="w-full flex items-center justify-center gap-2 bg-ds-active hover:bg-ds-hover border border-ds-border text-ds-text-medium hover:text-ds-text-high py-2.5 rounded-xl text-xs font-semibold uppercase tracking-wider transition-all duration-200 cursor-pointer active:scale-95 shadow-sm focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-ds-primary/50 focus-visible:ring-offset-1 focus-visible:ring-offset-ds-panel"
             >
               <Plus className="w-4 h-4" /> Add Experience Node
             </button>
@@ -640,7 +473,7 @@ export const SidebarFormTab: React.FC<SidebarFormTabProps> = ({
       }`}>
         <button 
           onClick={() => toggleAccordion('projects')}
-          className="w-full flex items-center justify-between p-4.5 text-sm font-semibold text-ds-text-high cursor-pointer"
+          className="w-full flex items-center justify-between p-4.5 text-sm font-semibold text-ds-text-high cursor-pointer focus-visible:outline-none focus-visible:bg-ds-hover rounded-xl"
         >
           <div className="flex items-center gap-3">
             <Layers className={`w-4.5 h-4.5 transition-colors duration-200 ${activeAccordion === 'projects' ? 'text-ds-primary' : 'text-ds-text-muted'}`} />
@@ -669,7 +502,7 @@ export const SidebarFormTab: React.FC<SidebarFormTabProps> = ({
                         type="text" 
                         value={proj.title} 
                         onChange={(e) => handleUpdateProject(pIdx, 'title', e.target.value)}
-                        className="w-full bg-[#1c1b21] border border-[#49454f] rounded-lg py-1.5 px-3 text-[#e6e1e5] text-xs focus:outline-none focus:border-[#bb86fc]"
+                        className="w-full bg-[#1c1b21] border border-[#49454f] rounded-lg py-1.5 px-3 text-[#e6e1e5] text-xs focus:outline-none focus-visible:outline-none focus:ring-0 focus-visible:ring-0 focus:border-[#bb86fc]"
                       />
                     </div>
                     <div>
@@ -678,7 +511,7 @@ export const SidebarFormTab: React.FC<SidebarFormTabProps> = ({
                         type="text" 
                         value={proj.role} 
                         onChange={(e) => handleUpdateProject(pIdx, 'role', e.target.value)}
-                        className="w-full bg-[#1c1b21] border border-[#49454f] rounded-lg py-1.5 px-3 text-[#e6e1e5] text-xs focus:outline-none focus:border-[#bb86fc]"
+                        className="w-full bg-[#1c1b21] border border-[#49454f] rounded-lg py-1.5 px-3 text-[#e6e1e5] text-xs focus:outline-none focus-visible:outline-none focus:ring-0 focus-visible:ring-0 focus:border-[#bb86fc]"
                       />
                     </div>
                   </div>
@@ -688,7 +521,7 @@ export const SidebarFormTab: React.FC<SidebarFormTabProps> = ({
                     <textarea
                       value={proj.description} 
                       onChange={(e) => handleUpdateProject(pIdx, 'description', e.target.value)}
-                      className="w-full bg-[#1c1b21] border border-[#49454f] rounded-lg py-2 px-3 text-[#cac4d0] text-xs focus:outline-none focus:border-[#bb86fc]"
+                      className="w-full bg-[#1c1b21] border border-[#49454f] rounded-lg py-2 px-3 text-[#cac4d0] text-xs focus:outline-none focus-visible:outline-none focus:ring-0 focus-visible:ring-0 focus:border-[#bb86fc]"
                       rows={2}
                     />
                   </div>
@@ -702,14 +535,14 @@ export const SidebarFormTab: React.FC<SidebarFormTabProps> = ({
                           type="text" 
                           value={d.label} 
                           onChange={(e) => handleUpdateDetailRow(pIdx, dIdx, 'label', e.target.value)}
-                          className="w-1/3 bg-[#1c1b21] border border-[#49454f] rounded-lg px-3 py-1.5 text-[#bb86fc] text-[11px] focus:outline-none font-bold"
+                          className="w-1/3 bg-[#1c1b21] border border-[#49454f] rounded-lg px-3 py-1.5 text-[#bb86fc] text-[11px] focus:outline-none focus-visible:outline-none focus:ring-0 focus-visible:ring-0 font-bold"
                           placeholder="Label (e.g. Impact)"
                         />
                         <input 
                           type="text" 
                           value={d.value} 
                           onChange={(e) => handleUpdateDetailRow(pIdx, dIdx, 'value', e.target.value)}
-                          className="flex-1 bg-[#1c1b21] border border-[#49454f] rounded-lg px-3 py-1.5 text-[#e6e1e5] text-[11px] focus:outline-none"
+                          className="flex-1 bg-[#1c1b21] border border-[#49454f] rounded-lg px-3 py-1.5 text-[#e6e1e5] text-[11px] focus:outline-none focus-visible:outline-none focus:ring-0 focus-visible:ring-0"
                           placeholder="Details index..."
                         />
                         <button 
@@ -748,7 +581,7 @@ export const SidebarFormTab: React.FC<SidebarFormTabProps> = ({
       }`}>
         <button 
           onClick={() => toggleAccordion('skills')}
-          className="w-full flex items-center justify-between p-4.5 text-sm font-semibold text-ds-text-high cursor-pointer"
+          className="w-full flex items-center justify-between p-4.5 text-sm font-semibold text-ds-text-high cursor-pointer focus-visible:outline-none focus-visible:bg-ds-hover rounded-xl"
         >
           <div className="flex items-center gap-3">
             <Settings className={`w-4.5 h-4.5 transition-colors duration-200 ${activeAccordion === 'skills' ? 'text-ds-primary' : 'text-ds-text-muted'}`} />
@@ -774,7 +607,7 @@ export const SidebarFormTab: React.FC<SidebarFormTabProps> = ({
                     type="text" 
                     defaultValue={category} 
                     onBlur={(e) => handleUpdateSkillCategory(category, e.target.value, skills)}
-                    className="bg-[#1c1b21] border border-[#49454f] rounded-lg py-1.5 px-3 text-[#edd4ff] text-xs focus:outline-none font-bold uppercase tracking-wide"
+                    className="bg-[#1c1b21] border border-[#49454f] rounded-lg py-1.5 px-3 text-[#edd4ff] text-xs focus:outline-none focus-visible:outline-none focus:ring-0 focus-visible:ring-0 font-bold uppercase tracking-wide"
                   />
                 </div>
                 <div>
@@ -782,7 +615,7 @@ export const SidebarFormTab: React.FC<SidebarFormTabProps> = ({
                   <textarea
                     value={skills} 
                     onChange={(e) => handleUpdateSkillCategory(category, category, e.target.value)}
-                    className="w-full bg-[#1c1b21] border border-[#49454f] rounded-lg p-3 text-[#e6e1e5] text-xs focus:outline-none focus:border-[#bb86fc]"
+                    className="w-full bg-[#1c1b21] border border-[#49454f] rounded-lg p-3 text-[#e6e1e5] text-xs focus:outline-none focus-visible:outline-none focus:ring-0 focus-visible:ring-0 focus:border-[#bb86fc]"
                     rows={2}
                   />
                 </div>
@@ -806,7 +639,7 @@ export const SidebarFormTab: React.FC<SidebarFormTabProps> = ({
       }`}>
         <button 
           onClick={() => toggleAccordion('education')}
-          className="w-full flex items-center justify-between p-4.5 text-sm font-semibold text-ds-text-high cursor-pointer"
+          className="w-full flex items-center justify-between p-4.5 text-sm font-semibold text-ds-text-high cursor-pointer focus-visible:outline-none focus-visible:bg-ds-hover rounded-xl"
         >
           <div className="flex items-center gap-3">
             <GraduationCap className={`w-4.5 h-4.5 transition-colors duration-200 ${activeAccordion === 'education' ? 'text-ds-primary' : 'text-ds-text-muted'}`} />
@@ -832,7 +665,7 @@ export const SidebarFormTab: React.FC<SidebarFormTabProps> = ({
                        type="text" 
                        value={edu.certification} 
                        onChange={(e) => handleUpdateEducation(idx, 'certification', e.target.value)}
-                       className="w-full bg-[#1c1b21] border border-[#49454f] rounded-lg py-1.5 px-3 text-[#e6e1e5] text-xs focus:outline-none"
+                       className="w-full bg-[#1c1b21] border border-[#49454f] rounded-lg py-1.5 px-3 text-[#e6e1e5] text-xs focus:outline-none focus-visible:outline-none focus:ring-0 focus-visible:ring-0"
                      />
                    </div>
                    <div>
@@ -841,7 +674,7 @@ export const SidebarFormTab: React.FC<SidebarFormTabProps> = ({
                        type="text" 
                        value={edu.institution} 
                        onChange={(e) => handleUpdateEducation(idx, 'institution', e.target.value)}
-                       className="w-full bg-[#1c1b21] border border-[#49454f] rounded-lg py-1.5 px-3 text-[#e6e1e5] text-xs focus:outline-none"
+                       className="w-full bg-[#1c1b21] border border-[#49454f] rounded-lg py-1.5 px-3 text-[#e6e1e5] text-xs focus:outline-none focus-visible:outline-none focus:ring-0 focus-visible:ring-0"
                      />
                    </div>
                  </div>
@@ -852,7 +685,7 @@ export const SidebarFormTab: React.FC<SidebarFormTabProps> = ({
                       type="text" 
                       value={edu.year} 
                       onChange={(e) => handleUpdateEducation(idx, 'year', e.target.value)}
-                      className="w-1/3 bg-[#1c1b21] border border-[#49454f] rounded-lg py-1.5 px-3 text-[#e6e1e5] text-xs focus:outline-none"
+                      className="w-1/3 bg-[#1c1b21] border border-[#49454f] rounded-lg py-1.5 px-3 text-[#e6e1e5] text-xs focus:outline-none focus-visible:outline-none focus:ring-0 focus-visible:ring-0"
                     />
                   </div>
                </div>
@@ -868,127 +701,144 @@ export const SidebarFormTab: React.FC<SidebarFormTabProps> = ({
       </div>
 
       {/* 7. LAYOUT CALIBRATION CONTROLS */}
-      <div className="border border-dashed border-ds-primary/40 rounded-xl p-4.5 bg-ds-container space-y-4 animate-fade-in shadow-md">
-         <div className="flex items-center justify-between border-b border-ds-border pb-3">
-           <div className="flex items-center gap-2 text-ds-text-high font-bold text-xs uppercase tracking-widest font-sans">
-             <Sliders className="w-4 h-4 text-ds-primary" />
-             <span>Grid Alignment & Tuning</span>
-           </div>
-           
-           <button 
-             onClick={autoFitContent}
-             className="flex items-center gap-1.5 bg-ds-primary hover:bg-ds-primary-hover text-white font-bold text-[11px] px-3.5 py-1.5 rounded-xl shadow-md hover:shadow-glow active:scale-95 transition-all cursor-pointer uppercase tracking-wider"
-             title="Adjust spacing variables automatically so the content flows beautifully under exactly 2 pages"
-           >
-             <Sparkles className="w-3.5 h-3.5 text-white animate-pulse" />
-             <span>Auto-Fit 2 Pages</span>
-           </button>
-         </div>
+      <div className={`border transition-all duration-200 overflow-hidden ${
+        activeAccordion === 'layout' 
+          ? 'border-ds-border-focus bg-ds-active rounded-xl shadow-md shadow-glow' 
+          : 'border-ds-border bg-ds-panel/60 rounded-xl hover:bg-ds-hover'
+      }`}>
+        <button 
+          onClick={() => toggleAccordion('layout')}
+          className="w-full flex items-center justify-between p-4.5 text-sm font-semibold text-ds-text-high cursor-pointer focus-visible:outline-none focus-visible:bg-ds-hover rounded-xl"
+        >
+          <div className="flex items-center gap-3">
+            <Sliders className={`w-4.5 h-4.5 transition-colors duration-200 ${activeAccordion === 'layout' ? 'text-ds-primary' : 'text-ds-text-muted'}`} />
+            <span className="font-display tracking-wide text-ds-text-high">Grid Alignment & Tuning</span>
+          </div>
+          {activeAccordion === 'layout' ? <ChevronDown className="w-4.5 h-4.5 text-ds-primary" /> : <ChevronRight className="w-4.5 h-4.5 text-ds-text-muted" />}
+        </button>
 
-         {/* PRESET PILLS */}
-         <div className="space-y-2">
-            <span className="block text-[10px] text-ds-text-muted font-bold uppercase tracking-wider font-display">Select density preset</span>
-            <div className="grid grid-cols-3 gap-2">
-              {['standard', 'compact', 'super'].map((preset) => (
-                <button
-                  key={preset}
-                  onClick={() => onApplySpacingPreset(preset as any)}
-                  className={`py-2 px-2.5 rounded-xl text-[11px] font-bold transition-all uppercase tracking-wider text-center cursor-pointer select-none border ${
-                    spacingPreset === preset 
-                      ? 'bg-ds-primary text-white border-ds-primary-hover shadow-glow' 
-                      : 'bg-ds-panel text-ds-text-medium border-ds-border hover:bg-ds-hover hover:text-ds-text-high'
-                  }`}
-                >
-                  {preset}
-                </button>
-              ))}
+        {activeAccordion === 'layout' && (
+          <div className="px-5 pb-5 pt-1 space-y-4 bg-transparent border-t border-[#312e39]/50 animate-fade-in font-sans">
+            <div className="flex items-center justify-between pb-2">
+              <span className="text-[10px] text-ds-text-muted font-bold uppercase tracking-wider font-display">Auto-Formatting</span>
+              <button 
+                onClick={autoFitContent}
+                className="flex items-center gap-1.5 bg-ds-primary hover:bg-ds-primary-hover focus-visible:bg-ds-primary-hover focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-ds-primary/50 focus-visible:ring-offset-2 focus-visible:ring-offset-ds-panel text-white font-bold text-[11px] px-3.5 py-1.5 rounded-xl shadow-md hover:shadow-[0_4px_16px_rgba(168,85,247,0.4)] active:scale-95 transition-all cursor-pointer uppercase tracking-wider"
+                title="Adjust spacing variables automatically so the content flows beautifully under exactly 2 pages"
+              >
+                <Sparkles className="w-3.5 h-3.5 text-white animate-pulse" />
+                <span>Auto-Fit 2 Pages</span>
+              </button>
             </div>
-         </div>
 
-          {/* FINE TUNING SLIDERS */}
-          <div className="space-y-4 pt-1 font-sans">
-            <div>
-              <div className="flex justify-between items-baseline mb-1.5">
-                <span className="text-[10px] text-ds-text-medium font-bold uppercase tracking-wider">Padding Top/Bottom</span>
-                <span className="text-sm text-ds-primary font-mono font-bold">{paddingTopBottom}mm</span>
+            {/* PRESET PILLS */}
+            <div className="space-y-2">
+              <span className="block text-[10px] text-ds-text-muted font-bold uppercase tracking-wider font-display">Select density preset</span>
+              <div className="grid grid-cols-3 gap-2">
+                {['standard', 'compact', 'super'].map((preset) => (
+                  <button
+                    key={preset}
+                    onClick={() => onApplySpacingPreset(preset as any)}
+                    className={`py-2 px-2.5 rounded-xl text-[11px] font-bold transition-all uppercase tracking-wider text-center cursor-pointer select-none border focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-ds-primary/50 focus-visible:ring-offset-1 focus-visible:ring-offset-ds-panel ${
+                      spacingPreset === preset 
+                        ? 'bg-ds-primary text-white border-ds-primary-hover shadow-glow' 
+                        : 'bg-ds-panel text-ds-text-medium border-ds-border hover:bg-ds-hover hover:text-ds-text-high'
+                    }`}
+                  >
+                    {preset}
+                  </button>
+                ))}
               </div>
-              <input 
-                type="range" 
-                min="5" 
-                max="20" 
-                step="0.5" 
-                value={paddingTopBottom} 
-                onChange={(e) => setPaddingTopBottom(parseFloat(e.target.value))}
-                className="w-full accent-ds-primary cursor-pointer bg-ds-active rounded-lg appearance-none h-1"
-              />
             </div>
 
-            <div>
-              <div className="flex justify-between items-baseline mb-1.5">
-                <span className="text-[10px] text-ds-text-medium font-bold uppercase tracking-wider">Padding Left/Right</span>
-                <span className="text-sm text-ds-primary font-mono font-bold">{paddingLeftRight}mm</span>
-              </div>
-              <input 
-                type="range" 
-                min="8" 
-                max="20" 
-                step="0.5" 
-                value={paddingLeftRight} 
-                onChange={(e) => setPaddingLeftRight(parseFloat(e.target.value))}
-                className="w-full accent-ds-primary cursor-pointer bg-ds-active rounded-lg appearance-none h-1"
-              />
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
+            {/* FINE TUNING SLIDERS */}
+            <div className="space-y-4 pt-1 font-sans">
               <div>
                 <div className="flex justify-between items-baseline mb-1.5">
-                  <span className="text-[9px] text-ds-text-muted font-bold uppercase tracking-wider">Sections</span>
-                  <span className="text-sm text-ds-primary font-mono font-bold">{Math.round(sectionSpacing * 100)}%</span>
+                  <span className="text-[10px] text-ds-text-medium font-bold uppercase tracking-wider">Padding Top/Bottom</span>
+                  <span className="text-sm text-ds-primary font-mono font-bold">{paddingTopBottom}mm</span>
                 </div>
                 <input 
                   type="range" 
-                  min="0.5" 
-                  max="1.5" 
-                  step="0.05" 
-                  value={sectionSpacing} 
-                  onChange={(e) => setSectionSpacing(parseFloat(e.target.value))}
+                  min="5" 
+                  max="20" 
+                  step="0.5" 
+                  value={paddingTopBottom} 
+                  onChange={(e) => setPaddingTopBottom(parseFloat(e.target.value))}
                   className="w-full accent-ds-primary cursor-pointer bg-ds-active rounded-lg appearance-none h-1"
                 />
               </div>
 
               <div>
                 <div className="flex justify-between items-baseline mb-1.5">
-                  <span className="text-[9px] text-ds-text-muted font-bold uppercase tracking-wider">Blocks Space</span>
-                  <span className="text-sm text-ds-primary font-mono font-bold">{Math.round(itemSpacing * 100)}%</span>
+                  <span className="text-[10px] text-ds-text-medium font-bold uppercase tracking-wider">Padding Left/Right</span>
+                  <span className="text-sm text-ds-primary font-mono font-bold">{paddingLeftRight}mm</span>
                 </div>
                 <input 
                   type="range" 
-                  min="0.4" 
-                  max="1.5" 
-                  step="0.05" 
-                  value={itemSpacing} 
-                  onChange={(e) => setItemSpacing(parseFloat(e.target.value))}
+                  min="8" 
+                  max="20" 
+                  step="0.5" 
+                  value={paddingLeftRight} 
+                  onChange={(e) => setPaddingLeftRight(parseFloat(e.target.value))}
                   className="w-full accent-ds-primary cursor-pointer bg-ds-active rounded-lg appearance-none h-1"
                 />
               </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <div className="flex justify-between items-baseline mb-1.5">
+                    <span className="text-[9px] text-ds-text-muted font-bold uppercase tracking-wider">Sections</span>
+                    <span className="text-sm text-ds-primary font-mono font-bold">{Math.round(sectionSpacing * 100)}%</span>
+                  </div>
+                  <input 
+                    type="range" 
+                    min="0.5" 
+                    max="1.5" 
+                    step="0.05" 
+                    value={sectionSpacing} 
+                    onChange={(e) => setSectionSpacing(parseFloat(e.target.value))}
+                    className="w-full accent-ds-primary cursor-pointer bg-ds-active rounded-lg appearance-none h-1"
+                  />
+                </div>
+
+                <div>
+                  <div className="flex justify-between items-baseline mb-1.5">
+                    <span className="text-[9px] text-ds-text-muted font-bold uppercase tracking-wider">Blocks Space</span>
+                    <span className="text-sm text-ds-primary font-mono font-bold">{Math.round(itemSpacing * 100)}%</span>
+                  </div>
+                  <input 
+                    type="range" 
+                    min="0.4" 
+                    max="1.5" 
+                    step="0.05" 
+                    value={itemSpacing} 
+                    onChange={(e) => setItemSpacing(parseFloat(e.target.value))}
+                    className="w-full accent-ds-primary cursor-pointer bg-ds-active rounded-lg appearance-none h-1"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* PAGE GUIDE TOGGLE */}
+            <div 
+              className="flex items-center justify-between pt-3 border-t border-ds-border font-sans cursor-pointer group"
+              onClick={() => setShowPageGuides(!showPageGuides)}
+            >
+              <span className="text-[10px] text-ds-text-medium font-bold uppercase tracking-wider transition-colors group-hover:text-ds-primary">Show A4 Page Dividers</span>
+              <div className={`relative inline-flex h-5 w-9 shrink-0 items-center rounded-full transition-colors duration-300 ${showPageGuides ? 'bg-ds-primary shadow-[0_0_8px_rgba(255,255,255,0.2)]' : 'bg-ds-border'}`}>
+                <span className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform duration-300 ease-in-out ${showPageGuides ? 'translate-x-4.5' : 'translate-x-1'}`} />
+              </div>
+            </div>
+
+            <div className="text-[10px] text-ds-text-muted/80 text-center leading-normal pt-1.5 border-t border-ds-border/30">
+              Current content density height scale: <strong className="text-ds-primary font-mono">{pageFraction}</strong>
             </div>
           </div>
-
-          {/* PAGE GUIDE TOGGLE */}
-          <div className="flex items-center justify-between pt-3 border-t border-ds-border font-sans">
-             <span className="text-[10px] text-ds-text-medium font-bold uppercase tracking-wider">Show A4 Page Dividers</span>
-             <input
-               type="checkbox"
-               checked={showPageGuides}
-               onChange={(e) => setShowPageGuides(e.target.checked)}
-               className="w-4 h-4 rounded text-ds-primary focus:ring-ds-primary bg-ds-panel border-ds-border cursor-pointer accent-ds-primary"
-             />
-          </div>
-
-          <div className="text-[10px] text-ds-text-muted/80 text-center leading-normal pt-1.5 border-t border-ds-border/30">
-             Current content density height scale: <strong className="text-ds-primary font-mono">{pageFraction}</strong>
-          </div>
+        )}
       </div>
+
+
 
     </div>
   );

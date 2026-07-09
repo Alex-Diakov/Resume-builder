@@ -125,3 +125,9 @@
   }
 }
 
+
+@layer base {
+  *:focus-visible {
+    outline: none !important;
+  }
+}

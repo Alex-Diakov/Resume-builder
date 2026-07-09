@@ -25,6 +25,10 @@ interface ResumeContextType {
   handleApplySpacingPreset: (preset: 'standard' | 'compact' | 'super') => void;
   showPageGuides: boolean;
   setShowPageGuides: (val: boolean) => void;
+  compressPdf: boolean;
+  setCompressPdf: (val: boolean) => void;
+  pdfImageQuality: number;
+  setPdfImageQuality: (val: number) => void;
   
   autoFitContent: () => void;
   resumeHeight: number;
@@ -46,6 +50,8 @@ export const ResumeProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [itemSpacing, setItemSpacing] = useState(1.0);
   const [spacingPreset, setSpacingPreset] = useState<'standard' | 'compact' | 'super'>('standard');
   const [showPageGuides, setShowPageGuides] = useState(true);
+  const [compressPdf, setCompressPdf] = useState(false);
+  const [pdfImageQuality, setPdfImageQuality] = useState(0.8);
   
   const [resumeHeight, setResumeHeight] = useState(0);
 
@@ -138,6 +144,8 @@ export const ResumeProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       itemSpacing, setItemSpacing,
       spacingPreset, handleApplySpacingPreset,
       showPageGuides, setShowPageGuides,
+      compressPdf, setCompressPdf,
+      pdfImageQuality, setPdfImageQuality,
       autoFitContent, resumeHeight, setResumeHeight, pageFraction
     }}>
       {children}
