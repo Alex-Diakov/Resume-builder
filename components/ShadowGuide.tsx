@@ -253,11 +253,11 @@ export const ShadowGuide: React.FC = () => {
               
               <div className="pl-10 space-y-4">
                 <div>
-                  <div className="text-cyan-600 font-bold text-xs uppercase mb-1">Действие:</div>
+                  <div className="text-cyan-600 font-bold text-xs uppercase mb-1">Action:</div>
                   <p className="text-sm text-gray-800">{step.action}</p>
                 </div>
                 <div>
-                  <div className="text-orange-500 font-bold text-xs uppercase mb-1">Зачем:</div>
+                  <div className="text-orange-500 font-bold text-xs uppercase mb-1">Why:</div>
                   <p className="text-sm text-gray-800">{step.why}</p>
                 </div>
               </div>

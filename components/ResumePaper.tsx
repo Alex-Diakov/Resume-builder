@@ -1,6 +1,6 @@
 import React from 'react';
 import { ResumeData } from '../types';
-import { Globe, Linkedin, Mail, MapPin } from 'lucide-react';
+import { Globe, Linkedin, Mail, MapPin, PlayCircle } from 'lucide-react';
 import { formatUrl, highlightText } from '../utils/formatters';
 import { SectionHeader } from './SectionHeader';
 import { ExperienceBlock } from './ExperienceBlock';
@@ -109,6 +109,16 @@ export const ResumePaper: React.FC<ResumePaperProps> = ({
                                 <a href={formatUrl(data.contact.linkedin)} target="_blank" rel="noreferrer" className="flex items-center text-resume-accent font-medium hover:text-resume-primary transition-colors group">
                                   <Linkedin className="w-3.5 h-3.5 mr-1.5 text-resume-muted group-hover:text-resume-accent transition-colors" />
                                   LinkedIn
+                                </a>
+                                <span className="text-resume-border">•</span>
+                              </>
+                            )}
+
+                            {data.contact.videoPitch && (
+                              <>
+                                <a href={formatUrl(data.contact.videoPitch)} target="_blank" rel="noreferrer" className="flex items-center text-resume-accent font-medium hover:text-resume-primary transition-colors group">
+                                  <PlayCircle className="w-3.5 h-3.5 mr-1.5 text-resume-muted group-hover:text-resume-accent transition-colors" />
+                                  Video Pitch
                                 </a>
                                 <span className="text-resume-border">•</span>
                               </>

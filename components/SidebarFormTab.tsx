@@ -19,6 +19,14 @@ import { ResumeData, ExperienceItem, ProjectItem, EducationItem } from '../types
 import { useResumeForm } from '../hooks/useResumeForm';
 import { useResumeContext } from '../contexts/ResumeContext';
 
+import { Slider } from './ui/Slider';
+import { Switch } from './ui/Switch';
+import { Button } from './ui/Button';
+import { Input } from './ui/Input';
+import { Textarea } from './ui/Textarea';
+import { Label } from './ui/Label';
+
+
 interface SidebarFormTabProps {
   resumeData: ResumeData;
   onChangeData: (data: ResumeData) => void;
@@ -103,18 +111,17 @@ export const SidebarFormTab: React.FC<SidebarFormTabProps> = ({
       {/* EXPANDABLE ACCORDIONS FOR SECTIONS */}
       
       {/* 1. PERSONAL DETAILS */}
-      <div className={`border transition-all duration-200 overflow-hidden ${
+      <div className={`border transition-all duration-200 ${
         activeAccordion === 'personal' 
           ? 'border-ds-border-focus bg-ds-active rounded-xl shadow-md shadow-glow' 
           : 'border-ds-border bg-ds-panel/60 rounded-xl hover:bg-ds-hover'
       }`}>
         <button 
           onClick={() => toggleAccordion('personal')}
-          className="w-full flex items-center justify-between p-4.5 text-sm font-semibold text-ds-text-high cursor-pointer focus-visible:outline-none focus-visible:bg-ds-hover rounded-xl"
+          className="sticky top-0 z-10 w-full flex items-center justify-between p-4.5 text-sm font-semibold text-ds-text-high cursor-pointer focus-visible:outline-none focus-visible:bg-ds-hover rounded-xl bg-ds-panel/95 backdrop-blur-md"
         >
           <div className="flex items-center gap-3">
-            <User className={`w-4.5 h-4.5 transition-colors duration-200 ${activeAccordion === 'personal' ? 'text-ds-primary' : 'text-ds-text-muted'}`} />
-            <span className="font-display tracking-wide text-ds-text-high">Personal Coordinates</span>
+            <span className="font-display tracking-wide text-ds-text-high">Personal Details</span>
           </div>
           {activeAccordion === 'personal' ? <ChevronDown className="w-4.5 h-4.5 text-ds-primary" /> : <ChevronRight className="w-4.5 h-4.5 text-ds-text-muted" />}
         </button>
@@ -123,9 +130,9 @@ export const SidebarFormTab: React.FC<SidebarFormTabProps> = ({
           <div className="px-5 pb-5 pt-1 space-y-4 bg-transparent border-t border-[#312e39]/50">
             {/* 1.1 Profile Photo Upload Section */}
             <div className="border border-[#49454f]/40 bg-[#1c1b21]/60 rounded-xl p-4.5 space-y-4">
-              <label className="block text-[10px] uppercase tracking-wider font-semibold text-[#bb86fc]">
+              <Label>
                 Resume Profile Photo
-              </label>
+              </Label>
 
               {photoError && (
                 <div id="photo-error-message" className="text-xs text-[#f2b8b5] bg-[#8c1d18]/15 border border-[#8c1d18]/30 px-3 py-2 rounded-lg font-medium animate-fade-in">
@@ -224,7 +231,7 @@ export const SidebarFormTab: React.FC<SidebarFormTabProps> = ({
                       onClick={() => document.getElementById('photo-upload-input')?.click()}
                       className="w-full py-1.5 px-3 bg-[#eaddff]/10 hover:bg-[#eaddff]/20 text-[#bb86fc] border border-[#49454f] rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all duration-150 cursor-pointer"
                     >
-                      Select Image File
+                      Select Image
                     </button>
                   )}
                 </div>
@@ -232,63 +239,35 @@ export const SidebarFormTab: React.FC<SidebarFormTabProps> = ({
             </div>
 
             <div>
-              <label className="block text-[10px] uppercase tracking-wider font-semibold text-ds-primary mb-1.5">Full Name</label>
-              <input 
-                type="text" 
-                value={resumeData.name} 
-                onChange={(e) => handleFieldChange('name', e.target.value)}
-                className="w-full bg-ds-panel border border-ds-border rounded-xl py-2 px-3 text-ds-text-high text-xs focus:outline-none focus:ring-0 focus:border-ds-primary focus-visible:outline-none focus-visible:ring-0 focus-visible:border-ds-primary transition-all font-medium"
-                placeholder="e.g. Alex Diakov"
-              />
+              <Label>Full Name</Label>
+              <Input type="text" value={resumeData.name} onChange={(e) => handleFieldChange('name', e.target.value)} placeholder="e.g. Alex Diakov" />
             </div>
             <div>
-              <label className="block text-[10px] uppercase tracking-wider font-semibold text-ds-primary mb-1.5">Professional Title</label>
-              <input 
-                type="text" 
-                value={resumeData.title} 
-                onChange={(e) => handleFieldChange('title', e.target.value)}
-                className="w-full bg-ds-panel border border-ds-border rounded-xl py-2 px-3 text-ds-text-high text-xs focus:outline-none focus:ring-0 focus:border-ds-primary focus-visible:outline-none focus-visible:ring-0 focus-visible:border-ds-primary transition-all font-medium"
-                placeholder="e.g. Product Ventures & Innovation"
-              />
+              <Label>Professional Title</Label>
+              <Input type="text" value={resumeData.title} onChange={(e) => handleFieldChange('title', e.target.value)} placeholder="e.g. Product Ventures & Innovation" />
             </div>
             <div className="grid grid-cols-2 gap-3.5">
               <div>
-                <label className="block text-[10px] uppercase tracking-wider font-semibold text-ds-primary mb-1.5">Email Coordinates</label>
-                <input 
-                  type="email" 
-                  value={resumeData.contact.email} 
-                  onChange={(e) => handleFieldChange('contact.email', e.target.value)}
-                  className="w-full bg-ds-panel border border-ds-border rounded-xl py-2 px-3 text-ds-text-high text-xs focus:outline-none focus:ring-0 focus:border-ds-primary focus-visible:outline-none focus-visible:ring-0 focus-visible:border-ds-primary transition-all font-medium"
-                />
+                <Label>Email Address</Label>
+                <Input type="email" value={resumeData.contact.email} onChange={(e) => handleFieldChange('contact.email', e.target.value)}  />
               </div>
               <div>
-                <label className="block text-[10px] uppercase tracking-wider font-semibold text-ds-primary mb-1.5">Location / Residence</label>
-                <input 
-                  type="text" 
-                  value={resumeData.contact.location} 
-                  onChange={(e) => handleFieldChange('contact.location', e.target.value)}
-                  className="w-full bg-ds-panel border border-ds-border rounded-xl py-2 px-3 text-ds-text-high text-xs focus:outline-none focus:ring-0 focus:border-ds-primary focus-visible:outline-none focus-visible:ring-0 focus-visible:border-ds-primary transition-all font-medium"
-                />
+                <Label>Location / City</Label>
+                <Input type="text" value={resumeData.contact.location} onChange={(e) => handleFieldChange('contact.location', e.target.value)}  />
               </div>
             </div>
             <div className="grid grid-cols-2 gap-3.5">
               <div>
-                <label className="block text-[10px] uppercase tracking-wider font-semibold text-ds-primary mb-1.5">Portfolio (Website)</label>
-                <input 
-                  type="text" 
-                  value={resumeData.contact.website} 
-                  onChange={(e) => handleFieldChange('contact.website', e.target.value)}
-                  className="w-full bg-ds-panel border border-ds-border rounded-xl py-2 px-3 text-ds-text-high text-xs focus:outline-none focus:ring-0 focus:border-ds-primary focus-visible:outline-none focus-visible:ring-0 focus-visible:border-ds-primary transition-all font-medium"
-                />
+                <Label>Portfolio URL</Label>
+                <Input type="text" value={resumeData.contact.website} onChange={(e) => handleFieldChange('contact.website', e.target.value)}  />
               </div>
               <div>
-                <label className="block text-[10px] uppercase tracking-wider font-semibold text-ds-primary mb-1.5">LinkedIn URL</label>
-                <input 
-                  type="text" 
-                  value={resumeData.contact.linkedin} 
-                  onChange={(e) => handleFieldChange('contact.linkedin', e.target.value)}
-                  className="w-full bg-ds-panel border border-ds-border rounded-xl py-2 px-3 text-ds-text-high text-xs focus:outline-none focus:ring-0 focus:border-ds-primary focus-visible:outline-none focus-visible:ring-0 focus-visible:border-ds-primary transition-all font-medium"
-                />
+                <Label>LinkedIn URL</Label>
+                <Input type="text" value={resumeData.contact.linkedin} onChange={(e) => handleFieldChange('contact.linkedin', e.target.value)}  />
+              </div>
+              <div>
+                <Label>Video Pitch (Loom / YouTube)</Label>
+                <Input type="text" value={resumeData.contact.videoPitch || ''} onChange={(e) => handleFieldChange('contact.videoPitch', e.target.value)} placeholder="https://loom.com/..." />
               </div>
             </div>
           </div>
@@ -296,14 +275,14 @@ export const SidebarFormTab: React.FC<SidebarFormTabProps> = ({
       </div>
 
       {/* 2. SUMMARY PARAGRAPHS */}
-      <div className={`border transition-all duration-200 overflow-hidden ${
+      <div className={`border transition-all duration-200 ${
         activeAccordion === 'summary' 
           ? 'border-ds-border-focus bg-ds-active rounded-xl shadow-md shadow-glow' 
           : 'border-ds-border bg-ds-panel/60 rounded-xl hover:bg-ds-hover'
       }`}>
         <button 
           onClick={() => toggleAccordion('summary')}
-          className="w-full flex items-center justify-between p-4.5 text-sm font-semibold text-ds-text-high cursor-pointer focus-visible:outline-none focus-visible:bg-ds-hover rounded-xl"
+          className="sticky top-0 z-10 w-full flex items-center justify-between p-4.5 text-sm font-semibold text-ds-text-high cursor-pointer focus-visible:outline-none focus-visible:bg-ds-hover rounded-xl bg-ds-panel/95 backdrop-blur-md"
         >
           <div className="flex items-center gap-3">
             <Maximize2 className={`w-4.5 h-4.5 transition-colors duration-200 ${activeAccordion === 'summary' ? 'text-ds-primary' : 'text-ds-text-muted'}`} />
@@ -316,12 +295,7 @@ export const SidebarFormTab: React.FC<SidebarFormTabProps> = ({
           <div className="px-5 pb-5 pt-1 space-y-4 bg-transparent border-t border-ds-border">
             {(resumeData.summary || []).map((para, i) => (
               <div key={i} className="flex gap-2.5 animate-fade-in">
-                <textarea
-                  value={para}
-                  onChange={(e) => handleUpdateSummaryPara(i, e.target.value)}
-                  className="flex-1 bg-ds-panel border border-ds-border rounded-xl p-3 text-ds-text-high text-xs focus:outline-none focus:ring-0 focus:border-ds-primary focus-visible:outline-none focus-visible:ring-0 focus-visible:border-ds-primary transition-all font-medium min-h-[68px]"
-                  placeholder="Write summary paragraph describing key achievements..."
-                />
+                <Textarea value={para} onChange={(e) => handleUpdateSummaryPara(i, e.target.value)} placeholder="Write summary paragraph describing key achievements..." />
                 <button 
                   onClick={() => handleRemoveSummaryPara(i)}
                   className="p-2.5 text-rose-400 hover:bg-rose-500/10 rounded-xl cursor-pointer transition-colors self-start focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-rose-400/50 focus-visible:ring-offset-1 focus-visible:ring-offset-ds-panel"
@@ -331,28 +305,23 @@ export const SidebarFormTab: React.FC<SidebarFormTabProps> = ({
                 </button>
               </div>
             ))}
-            <button 
-              onClick={handleAddSummaryPara}
-              className="w-full flex items-center justify-center gap-2 bg-ds-active hover:bg-ds-hover border border-ds-border text-ds-text-medium hover:text-ds-text-high py-2.5 rounded-xl text-xs font-semibold uppercase tracking-wider transition-all duration-200 cursor-pointer active:scale-95 shadow-sm focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-ds-primary/50 focus-visible:ring-offset-1 focus-visible:ring-offset-ds-panel"
-            >
-              <Plus className="w-4 h-4" /> Add Paragraph
-            </button>
+            <Button onClick={handleAddSummaryPara} variant="secondary" fullWidth className="gap-2"><Plus className="w-4 h-4" /> Add Paragraph
+            </Button>
           </div>
         )}
       </div>
 
       {/* 3. WORKING EXPERIENCE HISTORY */}
-      <div className={`border transition-all duration-200 overflow-hidden ${
+      <div className={`border transition-all duration-200 ${
         activeAccordion === 'experience' 
           ? 'border-ds-border-focus bg-ds-active rounded-xl shadow-md shadow-glow' 
           : 'border-ds-border bg-ds-panel/60 rounded-xl hover:bg-ds-hover'
       }`}>
         <button 
           onClick={() => toggleAccordion('experience')}
-          className="w-full flex items-center justify-between p-4.5 text-sm font-semibold text-ds-text-high cursor-pointer focus-visible:outline-none focus-visible:bg-ds-hover rounded-xl"
+          className="sticky top-0 z-10 w-full flex items-center justify-between p-4.5 text-sm font-semibold text-ds-text-high cursor-pointer focus-visible:outline-none focus-visible:bg-ds-hover rounded-xl bg-ds-panel/95 backdrop-blur-md"
         >
           <div className="flex items-center gap-3">
-            <Briefcase className={`w-4.5 h-4.5 transition-colors duration-200 ${activeAccordion === 'experience' ? 'text-ds-primary' : 'text-ds-text-muted'}`} />
             <span className="font-display tracking-wide text-ds-text-high">Work Experience ({resumeData.experience?.length || 0})</span>
           </div>
           {activeAccordion === 'experience' ? <ChevronDown className="w-4.5 h-4.5 text-ds-primary" /> : <ChevronRight className="w-4.5 h-4.5 text-ds-text-muted" />}
@@ -373,49 +342,29 @@ export const SidebarFormTab: React.FC<SidebarFormTabProps> = ({
                 <div className="space-y-3 mt-2 pr-6">
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <label className="block text-[9px] text-ds-primary font-semibold tracking-wider uppercase mb-1">Role</label>
-                      <input 
-                        type="text" 
-                        value={exp.role} 
-                        onChange={(e) => handleUpdateExperience(expIdx, 'role', e.target.value)}
-                        className="w-full bg-ds-panel border border-ds-border rounded-xl py-1.5 px-3 text-ds-text-high text-xs focus:outline-none focus:ring-0 focus:border-ds-primary focus-visible:outline-none focus-visible:ring-0 focus-visible:border-ds-primary transition-all font-medium"
-                      />
+                      <Label>Role / Title</Label>
+                      <Input type="text" value={exp.role} onChange={(e) => handleUpdateExperience(expIdx, 'role', e.target.value)}  />
                     </div>
                     <div>
-                      <label className="block text-[9px] text-ds-primary font-semibold tracking-wider uppercase mb-1">Company</label>
-                      <input 
-                        type="text" 
-                        value={exp.company} 
-                        onChange={(e) => handleUpdateExperience(expIdx, 'company', e.target.value)}
-                        className="w-full bg-ds-panel border border-ds-border rounded-xl py-1.5 px-3 text-ds-text-high text-xs focus:outline-none focus:ring-0 focus:border-ds-primary focus-visible:outline-none focus-visible:ring-0 focus-visible:border-ds-primary transition-all font-medium"
-                      />
+                      <Label>Company</Label>
+                      <Input type="text" value={exp.company} onChange={(e) => handleUpdateExperience(expIdx, 'company', e.target.value)}  />
                     </div>
                   </div>
 
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <label className="block text-[9px] text-ds-primary font-semibold tracking-wider uppercase mb-1">Duration</label>
-                      <input 
-                        type="text" 
-                        value={exp.duration} 
-                        onChange={(e) => handleUpdateExperience(expIdx, 'duration', e.target.value)}
-                        className="w-full bg-ds-panel border border-ds-border rounded-xl py-1.5 px-3 text-ds-text-high text-xs focus:outline-none focus:ring-0 focus:border-ds-primary focus-visible:outline-none focus-visible:ring-0 focus-visible:border-ds-primary transition-all font-medium"
-                      />
+                      <Label>Duration (e.g., Jan 2021 - Present)</Label>
+                      <Input type="text" value={exp.duration} onChange={(e) => handleUpdateExperience(expIdx, 'duration', e.target.value)}  />
                     </div>
                     <div>
-                      <label className="block text-[9px] text-ds-primary font-semibold tracking-wider uppercase mb-1">Employment Type</label>
-                      <input 
-                        type="text" 
-                        value={exp.type} 
-                        onChange={(e) => handleUpdateExperience(expIdx, 'type', e.target.value)}
-                        className="w-full bg-ds-panel border border-ds-border rounded-xl py-1.5 px-3 text-ds-text-high text-xs focus:outline-none focus:ring-0 focus:border-ds-primary focus-visible:outline-none focus-visible:ring-0 focus-visible:border-ds-primary transition-all font-medium"
-                      />
+                      <Label>Employment Type</Label>
+                      <Input type="text" value={exp.type} onChange={(e) => handleUpdateExperience(expIdx, 'type', e.target.value)}  />
                     </div>
                   </div>
 
                   {/* Highlights Bullet Rows */}
                   <div className="space-y-3 mt-3 border-t border-[#312e39]/50 pt-3">
-                    <span className="block text-[9px] text-[#cac4d0] font-semibold uppercase tracking-wider">Quantified Achievements:</span>
+                    <span className="block text-[9px] text-[#cac4d0] font-semibold uppercase tracking-wider">Key Achievements:</span>
                     {(exp.highlights || []).map((h, hIdx) => (
                       <div key={hIdx} className="bg-[#1c1b21] p-3 rounded-lg border border-[#49454f]/50 space-y-2 relative animate-fade-in">
                         <button 
@@ -426,58 +375,39 @@ export const SidebarFormTab: React.FC<SidebarFormTabProps> = ({
                           <Trash2 className="w-3 h-3" />
                         </button>
                         <div>
-                          <label className="block text-[8px] text-[#bb86fc] font-bold uppercase tracking-wide">Highlight Title (e.g., Conversion API)</label>
-                          <input 
-                            type="text" 
-                            value={h.title} 
-                            onChange={(e) => handleUpdateHighlight(expIdx, hIdx, 'title', e.target.value)}
-                            className="w-full bg-[#141218] border border-[#49454f] rounded-md px-2.5 py-1 text-white text-xs font-semibold focus:outline-none focus-visible:outline-none focus:ring-0 focus-visible:ring-0 focus:border-[#bb86fc]"
-                          />
+                          <Label>Achievement Title</Label>
+                          <Input type="text" value={h.title} onChange={(e) => handleUpdateHighlight(expIdx, hIdx, 'title', e.target.value)}  />
                         </div>
                         <div>
-                          <label className="block text-[8px] text-[#bb86fc] font-bold uppercase tracking-wide font-sans">Outcome description (numeric highlights are automatically bolded)</label>
-                          <textarea
-                            value={h.description} 
-                            onChange={(e) => handleUpdateHighlight(expIdx, hIdx, 'description', e.target.value)}
-                            className="w-full bg-[#141218] border border-[#49454f] rounded-md p-2 text-[#cac4d0] text-[11px] focus:outline-none focus-visible:outline-none focus:ring-0 focus-visible:ring-0 focus:border-[#bb86fc]"
-                            rows={2}
-                          />
+                          <Label>Outcome Description (numbers are auto-bolded)</Label>
+                          <Textarea value={h.description} onChange={(e) => handleUpdateHighlight(expIdx, hIdx, 'description', e.target.value)} rows={2} />
                         </div>
                       </div>
                     ))}
-                    <button 
-                      onClick={() => handleAddHighlight(expIdx)}
-                      className="w-full flex items-center justify-center gap-1.5 bg-[#1c1b21] hover:bg-[#2b2930] text-[#cac4d0] py-2 rounded-lg text-[10px] uppercase font-bold tracking-wider border border-[#312e39] cursor-pointer focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-[#bb86fc]/50 focus-visible:ring-offset-1 focus-visible:ring-offset-ds-panel"
-                    >
-                      <Plus className="w-3 h-3 text-[#bb86fc]" /> Add Metric Highlight
-                    </button>
+                    <Button onClick={() => handleAddHighlight(expIdx)} variant="secondary" size="sm" fullWidth className="gap-1.5"><Plus className="w-3 h-3 text-ds-primary" /> Add Highlight
+                    </Button>
                   </div>
                 </div>
               </div>
             ))}
-            <button 
-              onClick={handleAddExperienceItem}
-              className="w-full flex items-center justify-center gap-2 bg-ds-active hover:bg-ds-hover border border-ds-border text-ds-text-medium hover:text-ds-text-high py-2.5 rounded-xl text-xs font-semibold uppercase tracking-wider transition-all duration-200 cursor-pointer active:scale-95 shadow-sm focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-ds-primary/50 focus-visible:ring-offset-1 focus-visible:ring-offset-ds-panel"
-            >
-              <Plus className="w-4 h-4" /> Add Experience Node
-            </button>
+            <Button onClick={handleAddExperienceItem} variant="secondary" fullWidth className="gap-2"><Plus className="w-4 h-4" /> Add Experience
+            </Button>
           </div>
         )}
       </div>
 
       {/* 4. PRODUCT VENTURES & PROJECTS */}
-      <div className={`border transition-all duration-200 overflow-hidden ${
+      <div className={`border transition-all duration-200 ${
         activeAccordion === 'projects' 
           ? 'border-ds-border-focus bg-ds-active rounded-xl shadow-md shadow-glow' 
           : 'border-ds-border bg-ds-panel/60 rounded-xl hover:bg-ds-hover'
       }`}>
         <button 
           onClick={() => toggleAccordion('projects')}
-          className="w-full flex items-center justify-between p-4.5 text-sm font-semibold text-ds-text-high cursor-pointer focus-visible:outline-none focus-visible:bg-ds-hover rounded-xl"
+          className="sticky top-0 z-10 w-full flex items-center justify-between p-4.5 text-sm font-semibold text-ds-text-high cursor-pointer focus-visible:outline-none focus-visible:bg-ds-hover rounded-xl bg-ds-panel/95 backdrop-blur-md"
         >
           <div className="flex items-center gap-3">
-            <Layers className={`w-4.5 h-4.5 transition-colors duration-200 ${activeAccordion === 'projects' ? 'text-ds-primary' : 'text-ds-text-muted'}`} />
-            <span className="font-display tracking-wide text-ds-text-high">Projects & Innovation ({resumeData.projects?.length || 0})</span>
+            <span className="font-display tracking-wide text-ds-text-high">Projects & Innovations ({resumeData.projects?.length || 0})</span>
           </div>
           {activeAccordion === 'projects' ? <ChevronDown className="w-4.5 h-4.5 text-ds-primary" /> : <ChevronRight className="w-4.5 h-4.5 text-ds-text-muted" />}
         </button>
@@ -497,54 +427,27 @@ export const SidebarFormTab: React.FC<SidebarFormTabProps> = ({
                 <div className="space-y-3 mt-2 pr-6 font-sans">
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <label className="block text-[9px] text-[#bb86fc] font-bold uppercase mb-1">Venture Name</label>
-                      <input 
-                        type="text" 
-                        value={proj.title} 
-                        onChange={(e) => handleUpdateProject(pIdx, 'title', e.target.value)}
-                        className="w-full bg-[#1c1b21] border border-[#49454f] rounded-lg py-1.5 px-3 text-[#e6e1e5] text-xs focus:outline-none focus-visible:outline-none focus:ring-0 focus-visible:ring-0 focus:border-[#bb86fc]"
-                      />
+                      <Label>Project Name</Label>
+                      <Input type="text" value={proj.title} onChange={(e) => handleUpdateProject(pIdx, 'title', e.target.value)}  />
                     </div>
                     <div>
-                      <label className="block text-[9px] text-[#bb86fc] font-bold uppercase mb-1">Leadership Role</label>
-                      <input 
-                        type="text" 
-                        value={proj.role} 
-                        onChange={(e) => handleUpdateProject(pIdx, 'role', e.target.value)}
-                        className="w-full bg-[#1c1b21] border border-[#49454f] rounded-lg py-1.5 px-3 text-[#e6e1e5] text-xs focus:outline-none focus-visible:outline-none focus:ring-0 focus-visible:ring-0 focus:border-[#bb86fc]"
-                      />
+                      <Label>Your Role</Label>
+                      <Input type="text" value={proj.role} onChange={(e) => handleUpdateProject(pIdx, 'role', e.target.value)}  />
                     </div>
                   </div>
 
                   <div>
-                    <label className="block text-[9px] text-[#bb86fc] font-bold uppercase mb-1">Brief Executive Description</label>
-                    <textarea
-                      value={proj.description} 
-                      onChange={(e) => handleUpdateProject(pIdx, 'description', e.target.value)}
-                      className="w-full bg-[#1c1b21] border border-[#49454f] rounded-lg py-2 px-3 text-[#cac4d0] text-xs focus:outline-none focus-visible:outline-none focus:ring-0 focus-visible:ring-0 focus:border-[#bb86fc]"
-                      rows={2}
-                    />
+                    <Label>Brief Description</Label>
+                    <Textarea value={proj.description} onChange={(e) => handleUpdateProject(pIdx, 'description', e.target.value)} rows={2} />
                   </div>
 
                   {/* Detail Label/Values */}
                   <div className="space-y-3 mt-3 border-t border-[#312e39]/50 pt-3">
-                    <span className="block text-[9px] text-[#cac4d0] font-semibold uppercase tracking-wider">Key Metrics & Scope:</span>
+                    <span className="block text-[9px] text-[#cac4d0] font-semibold uppercase tracking-wider">Project Details:</span>
                     {(proj.details || []).map((d, dIdx) => (
                       <div key={dIdx} className="flex gap-2 items-center animate-fade-in font-sans">
-                        <input 
-                          type="text" 
-                          value={d.label} 
-                          onChange={(e) => handleUpdateDetailRow(pIdx, dIdx, 'label', e.target.value)}
-                          className="w-1/3 bg-[#1c1b21] border border-[#49454f] rounded-lg px-3 py-1.5 text-[#bb86fc] text-[11px] focus:outline-none focus-visible:outline-none focus:ring-0 focus-visible:ring-0 font-bold"
-                          placeholder="Label (e.g. Impact)"
-                        />
-                        <input 
-                          type="text" 
-                          value={d.value} 
-                          onChange={(e) => handleUpdateDetailRow(pIdx, dIdx, 'value', e.target.value)}
-                          className="flex-1 bg-[#1c1b21] border border-[#49454f] rounded-lg px-3 py-1.5 text-[#e6e1e5] text-[11px] focus:outline-none focus-visible:outline-none focus:ring-0 focus-visible:ring-0"
-                          placeholder="Details index..."
-                        />
+                        <Input type="text" value={d.label} onChange={(e) => handleUpdateDetailRow(pIdx, dIdx, 'label', e.target.value)} placeholder="Label (e.g. Impact)" />
+                        <Input type="text" value={d.value} onChange={(e) => handleUpdateDetailRow(pIdx, dIdx, 'value', e.target.value)} placeholder="Details index..." />
                         <button 
                           onClick={() => handleRemoveDetailRow(pIdx, dIdx)}
                           className="p-1.5 text-[#f2b8b5] hover:bg-[#8c1d18]/15 rounded-full cursor-pointer"
@@ -553,39 +456,30 @@ export const SidebarFormTab: React.FC<SidebarFormTabProps> = ({
                         </button>
                       </div>
                     ))}
-                    <button 
-                      onClick={() => handleAddDetailRow(pIdx)}
-                      className="w-full flex items-center justify-center gap-1.5 bg-[#1c1b21] hover:bg-[#2b2930] text-[#cac4d0] py-2 rounded-lg text-[10px] uppercase font-bold tracking-wider border border-[#312e39] cursor-pointer"
-                    >
-                      <Plus className="w-3 h-3 text-[#bb86fc]" /> Add Detail Metric
-                    </button>
+                    <Button onClick={() => handleAddDetailRow(pIdx)} variant="secondary" size="sm" fullWidth className="gap-1.5"><Plus className="w-3 h-3 text-ds-primary" /> Add Detail
+                    </Button>
                   </div>
                 </div>
               </div>
             ))}
-            <button 
-              onClick={handleAddProjectItem}
-              className="w-full flex items-center justify-center gap-2 bg-ds-active hover:bg-ds-hover border border-ds-border text-ds-text-medium hover:text-ds-text-high py-2.5 rounded-xl text-xs font-semibold uppercase tracking-wider transition-all duration-200 cursor-pointer active:scale-95 shadow-sm"
-            >
-              <Plus className="w-4 h-4" /> Add Project Node
-            </button>
+            <Button onClick={handleAddProjectItem} variant="secondary" fullWidth className="gap-2"><Plus className="w-4 h-4" /> Add Project
+            </Button>
           </div>
         )}
       </div>
 
       {/* 5. CORE COMPETENCIES / SKILLS */}
-      <div className={`border transition-all duration-200 overflow-hidden ${
+      <div className={`border transition-all duration-200 ${
         activeAccordion === 'skills' 
           ? 'border-ds-border-focus bg-ds-active rounded-xl shadow-md shadow-glow' 
           : 'border-ds-border bg-ds-panel/60 rounded-xl hover:bg-ds-hover'
       }`}>
         <button 
           onClick={() => toggleAccordion('skills')}
-          className="w-full flex items-center justify-between p-4.5 text-sm font-semibold text-ds-text-high cursor-pointer focus-visible:outline-none focus-visible:bg-ds-hover rounded-xl"
+          className="sticky top-0 z-10 w-full flex items-center justify-between p-4.5 text-sm font-semibold text-ds-text-high cursor-pointer focus-visible:outline-none focus-visible:bg-ds-hover rounded-xl bg-ds-panel/95 backdrop-blur-md"
         >
           <div className="flex items-center gap-3">
-            <Settings className={`w-4.5 h-4.5 transition-colors duration-200 ${activeAccordion === 'skills' ? 'text-ds-primary' : 'text-ds-text-muted'}`} />
-            <span className="font-display tracking-wide text-ds-text-high">Core Competencies (Skills)</span>
+            <span className="font-display tracking-wide text-ds-text-high">Skills & Competencies</span>
           </div>
           {activeAccordion === 'skills' ? <ChevronDown className="w-4.5 h-4.5 text-ds-primary" /> : <ChevronRight className="w-4.5 h-4.5 text-ds-text-muted" />}
         </button>
@@ -602,48 +496,33 @@ export const SidebarFormTab: React.FC<SidebarFormTabProps> = ({
                 </button>
                 
                 <div className="pr-6">
-                  <label className="block text-[9px] text-[#bb86fc] font-bold uppercase mb-1">Sector Category</label>
-                  <input 
-                    type="text" 
-                    defaultValue={category} 
-                    onBlur={(e) => handleUpdateSkillCategory(category, e.target.value, skills)}
-                    className="bg-[#1c1b21] border border-[#49454f] rounded-lg py-1.5 px-3 text-[#edd4ff] text-xs focus:outline-none focus-visible:outline-none focus:ring-0 focus-visible:ring-0 font-bold uppercase tracking-wide"
-                  />
+                  <Label>Category (e.g., Frontend, Backend)</Label>
+                  <Input type="text" defaultValue={category} onBlur={(e) => handleUpdateSkillCategory(category, e.target.value, skills)} />
                 </div>
                 <div>
-                  <label className="block text-[9px] text-[#cac4d0] font-bold uppercase mb-1">Skill Keywords (comma-separated)</label>
-                  <textarea
-                    value={skills} 
-                    onChange={(e) => handleUpdateSkillCategory(category, category, e.target.value)}
-                    className="w-full bg-[#1c1b21] border border-[#49454f] rounded-lg p-3 text-[#e6e1e5] text-xs focus:outline-none focus-visible:outline-none focus:ring-0 focus-visible:ring-0 focus:border-[#bb86fc]"
-                    rows={2}
-                  />
+                  <Label>Skills (comma-separated)</Label>
+                  <Textarea value={skills} onChange={(e) => handleUpdateSkillCategory(category, category, e.target.value)} rows={2} />
                 </div>
               </div>
             ))}
-            <button 
-              onClick={handleAddSkillCategory}
-              className="w-full flex items-center justify-center gap-2 bg-ds-active hover:bg-ds-hover border border-ds-border text-ds-text-medium hover:text-ds-text-high py-2.5 rounded-xl text-xs font-semibold uppercase tracking-wider transition-all duration-200 cursor-pointer active:scale-95 shadow-sm"
-            >
-              <Plus className="w-4 h-4" /> Add Skill Category
-            </button>
+            <Button onClick={handleAddSkillCategory} variant="secondary" fullWidth className="gap-2"><Plus className="w-4 h-4" /> Add Skill Category
+            </Button>
           </div>
         )}
       </div>
 
       {/* 6. EDUCATION HISTORY */}
-      <div className={`border transition-all duration-200 overflow-hidden ${
+      <div className={`border transition-all duration-200 ${
         activeAccordion === 'education' 
           ? 'border-ds-border-focus bg-ds-active rounded-xl shadow-md shadow-glow' 
           : 'border-ds-border bg-ds-panel/60 rounded-xl hover:bg-ds-hover'
       }`}>
         <button 
           onClick={() => toggleAccordion('education')}
-          className="w-full flex items-center justify-between p-4.5 text-sm font-semibold text-ds-text-high cursor-pointer focus-visible:outline-none focus-visible:bg-ds-hover rounded-xl"
+          className="sticky top-0 z-10 w-full flex items-center justify-between p-4.5 text-sm font-semibold text-ds-text-high cursor-pointer focus-visible:outline-none focus-visible:bg-ds-hover rounded-xl bg-ds-panel/95 backdrop-blur-md"
         >
           <div className="flex items-center gap-3">
-            <GraduationCap className={`w-4.5 h-4.5 transition-colors duration-200 ${activeAccordion === 'education' ? 'text-ds-primary' : 'text-ds-text-muted'}`} />
-            <span className="font-display tracking-wide text-ds-text-high">Academic Credentials ({resumeData.education?.length || 0})</span>
+            <span className="font-display tracking-wide text-ds-text-high">Education ({resumeData.education?.length || 0})</span>
           </div>
           {activeAccordion === 'education' ? <ChevronDown className="w-4.5 h-4.5 text-ds-primary" /> : <ChevronRight className="w-4.5 h-4.5 text-ds-text-muted" />}
         </button>
@@ -660,59 +539,39 @@ export const SidebarFormTab: React.FC<SidebarFormTabProps> = ({
 
                  <div className="grid grid-cols-2 gap-3 pr-6">
                    <div>
-                     <label className="block text-[9px] text-ds-primary font-bold">Certification / Degree</label>
-                     <input 
-                       type="text" 
-                       value={edu.certification} 
-                       onChange={(e) => handleUpdateEducation(idx, 'certification', e.target.value)}
-                       className="w-full bg-[#1c1b21] border border-[#49454f] rounded-lg py-1.5 px-3 text-[#e6e1e5] text-xs focus:outline-none focus-visible:outline-none focus:ring-0 focus-visible:ring-0"
-                     />
+                     <Label>Degree / Certification</Label>
+                     <Input type="text" value={edu.certification} onChange={(e) => handleUpdateEducation(idx, 'certification', e.target.value)}  />
                    </div>
                    <div>
-                     <label className="block text-[9px] text-ds-primary font-bold">Institution Name</label>
-                     <input 
-                       type="text" 
-                       value={edu.institution} 
-                       onChange={(e) => handleUpdateEducation(idx, 'institution', e.target.value)}
-                       className="w-full bg-[#1c1b21] border border-[#49454f] rounded-lg py-1.5 px-3 text-[#e6e1e5] text-xs focus:outline-none focus-visible:outline-none focus:ring-0 focus-visible:ring-0"
-                     />
+                     <Label>Institution Name</Label>
+                     <Input type="text" value={edu.institution} onChange={(e) => handleUpdateEducation(idx, 'institution', e.target.value)}  />
                    </div>
                  </div>
 
                  <div className="font-sans">
-                    <label className="block text-[9px] text-ds-primary font-bold">Graduation Year</label>
-                    <input 
-                      type="text" 
-                      value={edu.year} 
-                      onChange={(e) => handleUpdateEducation(idx, 'year', e.target.value)}
-                      className="w-1/3 bg-[#1c1b21] border border-[#49454f] rounded-lg py-1.5 px-3 text-[#e6e1e5] text-xs focus:outline-none focus-visible:outline-none focus:ring-0 focus-visible:ring-0"
-                    />
+                    <Label>Graduation Year</Label>
+                    <Input type="text" value={edu.year} onChange={(e) => handleUpdateEducation(idx, 'year', e.target.value)}  />
                   </div>
                </div>
             ))}
-            <button 
-              onClick={handleAddEducationItem}
-              className="w-full flex items-center justify-center gap-2 bg-ds-active hover:bg-ds-hover border border-ds-border text-ds-text-medium hover:text-ds-text-high py-2.5 rounded-xl text-xs font-semibold uppercase tracking-wider transition-all duration-200 cursor-pointer active:scale-95 shadow-sm"
-            >
-              <Plus className="w-4 h-4" /> Add Academic Node
-            </button>
+            <Button onClick={handleAddEducationItem} variant="secondary" fullWidth className="gap-2"><Plus className="w-4 h-4" /> Add Education
+            </Button>
           </div>
         )}
       </div>
 
       {/* 7. LAYOUT CALIBRATION CONTROLS */}
-      <div className={`border transition-all duration-200 overflow-hidden ${
+      <div className={`border transition-all duration-200 ${
         activeAccordion === 'layout' 
           ? 'border-ds-border-focus bg-ds-active rounded-xl shadow-md shadow-glow' 
           : 'border-ds-border bg-ds-panel/60 rounded-xl hover:bg-ds-hover'
       }`}>
         <button 
           onClick={() => toggleAccordion('layout')}
-          className="w-full flex items-center justify-between p-4.5 text-sm font-semibold text-ds-text-high cursor-pointer focus-visible:outline-none focus-visible:bg-ds-hover rounded-xl"
+          className="sticky top-0 z-10 w-full flex items-center justify-between p-4.5 text-sm font-semibold text-ds-text-high cursor-pointer focus-visible:outline-none focus-visible:bg-ds-hover rounded-xl bg-ds-panel/95 backdrop-blur-md"
         >
           <div className="flex items-center gap-3">
-            <Sliders className={`w-4.5 h-4.5 transition-colors duration-200 ${activeAccordion === 'layout' ? 'text-ds-primary' : 'text-ds-text-muted'}`} />
-            <span className="font-display tracking-wide text-ds-text-high">Grid Alignment & Tuning</span>
+            <span className="font-display tracking-wide text-ds-text-high">Layout & Formatting</span>
           </div>
           {activeAccordion === 'layout' ? <ChevronDown className="w-4.5 h-4.5 text-ds-primary" /> : <ChevronRight className="w-4.5 h-4.5 text-ds-text-muted" />}
         </button>
@@ -721,28 +580,24 @@ export const SidebarFormTab: React.FC<SidebarFormTabProps> = ({
           <div className="px-5 pb-5 pt-1 space-y-4 bg-transparent border-t border-[#312e39]/50 animate-fade-in font-sans">
             <div className="flex items-center justify-between pb-2">
               <span className="text-[10px] text-ds-text-muted font-bold uppercase tracking-wider font-display">Auto-Formatting</span>
-              <button 
-                onClick={autoFitContent}
-                className="flex items-center gap-1.5 bg-ds-primary hover:bg-ds-primary-hover focus-visible:bg-ds-primary-hover focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-ds-primary/50 focus-visible:ring-offset-2 focus-visible:ring-offset-ds-panel text-white font-bold text-[11px] px-3.5 py-1.5 rounded-xl shadow-md hover:shadow-[0_4px_16px_rgba(168,85,247,0.4)] active:scale-95 transition-all cursor-pointer uppercase tracking-wider"
-                title="Adjust spacing variables automatically so the content flows beautifully under exactly 2 pages"
-              >
+              <Button onClick={autoFitContent} title="Automatically adjust spacing so the content flows beautifully into exactly 2 pages" className="h-auto py-1.5 px-3 text-[10px] gap-1.5 rounded-xl shadow-glow">
                 <Sparkles className="w-3.5 h-3.5 text-white animate-pulse" />
                 <span>Auto-Fit 2 Pages</span>
-              </button>
+              </Button>
             </div>
 
             {/* PRESET PILLS */}
             <div className="space-y-2">
-              <span className="block text-[10px] text-ds-text-muted font-bold uppercase tracking-wider font-display">Select density preset</span>
+              <span className="block text-[10px] text-ds-text-muted font-bold uppercase tracking-wider font-display">Content Density</span>
               <div className="grid grid-cols-3 gap-2">
                 {['standard', 'compact', 'super'].map((preset) => (
                   <button
                     key={preset}
                     onClick={() => onApplySpacingPreset(preset as any)}
-                    className={`py-2 px-2.5 rounded-xl text-[11px] font-bold transition-all uppercase tracking-wider text-center cursor-pointer select-none border focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-ds-primary/50 focus-visible:ring-offset-1 focus-visible:ring-offset-ds-panel ${
+                    className={`py-2 px-2.5 rounded-xl text-[11px] font-bold transition-all uppercase tracking-wider text-center cursor-pointer select-none border focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ds-primary/50 focus-visible:ring-offset-1 focus-visible:ring-offset-ds-panel ${
                       spacingPreset === preset 
-                        ? 'bg-ds-primary text-white border-ds-primary-hover shadow-glow' 
-                        : 'bg-ds-panel text-ds-text-medium border-ds-border hover:bg-ds-hover hover:text-ds-text-high'
+                        ? 'bg-ds-primary text-white border-ds-primary-hover shadow-md' 
+                        : 'bg-ds-active text-ds-text-medium border-ds-border hover:bg-ds-hover hover:text-ds-text-high'
                     }`}
                   >
                     {preset}
@@ -755,84 +610,70 @@ export const SidebarFormTab: React.FC<SidebarFormTabProps> = ({
             <div className="space-y-4 pt-1 font-sans">
               <div>
                 <div className="flex justify-between items-baseline mb-1.5">
-                  <span className="text-[10px] text-ds-text-medium font-bold uppercase tracking-wider">Padding Top/Bottom</span>
-                  <span className="text-sm text-ds-primary font-mono font-bold">{paddingTopBottom}mm</span>
+                  <span className="text-[10px] text-ds-text-medium font-bold uppercase tracking-wider">Top/Bottom Padding</span>
+                  <span className="text-sm text-ds-text-high font-mono font-bold">{paddingTopBottom}mm</span>
                 </div>
-                <input 
-                  type="range" 
-                  min="5" 
-                  max="20" 
-                  step="0.5" 
+                <Slider 
+                  min={5} 
+                  max={20} 
+                  step={0.5} 
                   value={paddingTopBottom} 
                   onChange={(e) => setPaddingTopBottom(parseFloat(e.target.value))}
-                  className="w-full accent-ds-primary cursor-pointer bg-ds-active rounded-lg appearance-none h-1"
                 />
               </div>
 
               <div>
                 <div className="flex justify-between items-baseline mb-1.5">
-                  <span className="text-[10px] text-ds-text-medium font-bold uppercase tracking-wider">Padding Left/Right</span>
-                  <span className="text-sm text-ds-primary font-mono font-bold">{paddingLeftRight}mm</span>
+                  <span className="text-[10px] text-ds-text-medium font-bold uppercase tracking-wider">Left/Right Padding</span>
+                  <span className="text-sm text-ds-text-high font-mono font-bold">{paddingLeftRight}mm</span>
                 </div>
-                <input 
-                  type="range" 
-                  min="8" 
-                  max="20" 
-                  step="0.5" 
+                <Slider 
+                  min={8} 
+                  max={20} 
+                  step={0.5} 
                   value={paddingLeftRight} 
                   onChange={(e) => setPaddingLeftRight(parseFloat(e.target.value))}
-                  className="w-full accent-ds-primary cursor-pointer bg-ds-active rounded-lg appearance-none h-1"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <div className="flex justify-between items-baseline mb-1.5">
-                    <span className="text-[9px] text-ds-text-muted font-bold uppercase tracking-wider">Sections</span>
-                    <span className="text-sm text-ds-primary font-mono font-bold">{Math.round(sectionSpacing * 100)}%</span>
+                    <span className="text-[9px] text-ds-text-muted font-bold uppercase tracking-wider">Section Spacing</span>
+                    <span className="text-sm text-ds-text-high font-mono font-bold">{Math.round(sectionSpacing * 100)}%</span>
                   </div>
-                  <input 
-                    type="range" 
-                    min="0.5" 
-                    max="1.5" 
-                    step="0.05" 
+                  <Slider 
+                    min={0.5} 
+                    max={1.5} 
+                    step={0.05} 
                     value={sectionSpacing} 
                     onChange={(e) => setSectionSpacing(parseFloat(e.target.value))}
-                    className="w-full accent-ds-primary cursor-pointer bg-ds-active rounded-lg appearance-none h-1"
                   />
                 </div>
 
                 <div>
                   <div className="flex justify-between items-baseline mb-1.5">
-                    <span className="text-[9px] text-ds-text-muted font-bold uppercase tracking-wider">Blocks Space</span>
-                    <span className="text-sm text-ds-primary font-mono font-bold">{Math.round(itemSpacing * 100)}%</span>
+                    <span className="text-[9px] text-ds-text-muted font-bold uppercase tracking-wider">Item Spacing</span>
+                    <span className="text-sm text-ds-text-high font-mono font-bold">{Math.round(itemSpacing * 100)}%</span>
                   </div>
-                  <input 
-                    type="range" 
-                    min="0.4" 
-                    max="1.5" 
-                    step="0.05" 
+                  <Slider 
+                    min={0.4} 
+                    max={1.5} 
+                    step={0.05} 
                     value={itemSpacing} 
                     onChange={(e) => setItemSpacing(parseFloat(e.target.value))}
-                    className="w-full accent-ds-primary cursor-pointer bg-ds-active rounded-lg appearance-none h-1"
                   />
                 </div>
               </div>
             </div>
 
             {/* PAGE GUIDE TOGGLE */}
-            <div 
-              className="flex items-center justify-between pt-3 border-t border-ds-border font-sans cursor-pointer group"
-              onClick={() => setShowPageGuides(!showPageGuides)}
-            >
-              <span className="text-[10px] text-ds-text-medium font-bold uppercase tracking-wider transition-colors group-hover:text-ds-primary">Show A4 Page Dividers</span>
-              <div className={`relative inline-flex h-5 w-9 shrink-0 items-center rounded-full transition-colors duration-300 ${showPageGuides ? 'bg-ds-primary shadow-[0_0_8px_rgba(255,255,255,0.2)]' : 'bg-ds-border'}`}>
-                <span className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform duration-300 ease-in-out ${showPageGuides ? 'translate-x-4.5' : 'translate-x-1'}`} />
-              </div>
+            <div className="flex items-center justify-between pt-3 border-t border-ds-border font-sans">
+              <span className="text-[10px] text-ds-text-medium font-bold uppercase tracking-wider transition-colors">Show A4 Page Guides</span>
+              <Switch checked={showPageGuides} onCheckedChange={setShowPageGuides} />
             </div>
-
             <div className="text-[10px] text-ds-text-muted/80 text-center leading-normal pt-1.5 border-t border-ds-border/30">
-              Current content density height scale: <strong className="text-ds-primary font-mono">{pageFraction}</strong>
+              Content density scale: <strong className="text-ds-primary font-mono">{pageFraction}</strong>
             </div>
           </div>
         )}

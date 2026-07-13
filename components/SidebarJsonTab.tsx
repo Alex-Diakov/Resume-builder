@@ -1,4 +1,5 @@
 import React, { useState, useRef } from 'react';
+import { Button } from './ui/Button';
 import { 
   Check, 
   Copy, 
@@ -67,24 +68,16 @@ export const SidebarJsonTab: React.FC<SidebarJsonTabProps> = ({
         
         <div className="flex items-center gap-3.5">
           {/* PASTE FROM CLIPBOARD ACTION BUTTON */}
-          <button 
-            onClick={handlePaste}
-            className="flex items-center gap-1.5 text-xs text-ds-text-muted hover:text-ds-text-high transition-colors cursor-pointer focus-visible:outline-none focus-visible:text-ds-text-high focus-visible:underline"
-            title="Paste JSON from system clipboard"
-          >
+          <Button variant="ghost" size="sm" onClick={handlePaste} title="Paste JSON from clipboard" className="gap-1.5 text-ds-text-muted">
             {pasted ? <Check className="w-4 h-4 text-emerald-400" /> : <Clipboard className="w-4 h-4 text-ds-primary" />}
-            <span className="text-[11px] font-bold uppercase tracking-wider">{pasted ? 'Pasted!' : 'Paste'}</span>
-          </button>
+            <span>{pasted ? 'Pasted!' : 'Paste'}</span>
+          </Button>
 
           {/* COPY TO CLIPBOARD ACTION BUTTON */}
-          <button 
-            onClick={handleCopy}
-            className="flex items-center gap-1.5 text-xs text-ds-text-muted hover:text-ds-text-high transition-colors cursor-pointer border-l border-ds-border pl-3.5 focus-visible:outline-none focus-visible:text-ds-text-high focus-visible:underline"
-            title="Copy JSON Code"
-          >
+          <Button variant="ghost" size="sm" onClick={handleCopy} title="Copy JSON" className="gap-1.5 text-ds-text-muted border-l border-ds-border rounded-none pl-3.5 hover:bg-transparent">
             {copied ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4 text-ds-primary" />}
-            <span className="text-[11px] font-bold uppercase tracking-wider">{copied ? 'Copied' : 'Copy'}</span>
-          </button>
+            <span>{copied ? 'Copied' : 'Copy'}</span>
+          </Button>
         </div>
       </div>
       

@@ -124,9 +124,9 @@ export const usePdfExport = (
     const opt = {
       margin: 0,
       filename: fileName,
-      image: { type: 'jpeg', quality: compressPdf ? pdfImageQuality : 1.0 }, 
+      image: { type: compressPdf ? 'jpeg' : 'png', quality: compressPdf ? pdfImageQuality : 1.0 }, 
       html2canvas: { 
-        scale: compressPdf ? (pdfImageQuality <= 0.5 ? 0.75 : 1.0) : 2.0, 
+        scale: compressPdf ? (pdfImageQuality <= 0.4 ? 1.5 : 2.0) : 2.0, 
         useCORS: true, 
         scrollY: 0,
         scrollX: 0,
@@ -135,7 +135,7 @@ export const usePdfExport = (
         unit: 'mm', 
         format: 'a4', 
         orientation: 'portrait',
-        compress: compressPdf
+        compress: true // always compress PDF structure losslessly
       },
       pagebreak: { mode: ['css', 'legacy'], avoid: '.break-inside-avoid' }
     };

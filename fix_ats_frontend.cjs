@@ -1,4 +1,6 @@
+const fs = require('fs');
 
+const frontendCode = `
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
 import { Textarea } from './ui/Textarea';
@@ -141,3 +143,7 @@ export const SidebarAtsTab = ({ resumeData, onChangeData, atsInput, setAtsInput 
     </div>
   );
 };
+`;
+
+fs.writeFileSync('components/SidebarAtsTab.tsx', frontendCode);
+console.log('Fixed ATS Tab');

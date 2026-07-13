@@ -51,7 +51,7 @@ export const ResumeProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [spacingPreset, setSpacingPreset] = useState<'standard' | 'compact' | 'super'>('standard');
   const [showPageGuides, setShowPageGuides] = useState(true);
   const [compressPdf, setCompressPdf] = useState(false);
-  const [pdfImageQuality, setPdfImageQuality] = useState(0.8);
+  const [pdfImageQuality, setPdfImageQuality] = useState(0.7);
   
   const [resumeHeight, setResumeHeight] = useState(0);
 

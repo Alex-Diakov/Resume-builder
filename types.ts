@@ -4,6 +4,7 @@ export interface ContactInfo {
   telegram?: string; // Made optional
   email: string;
   location: string;
+  videoPitch?: string;
 }
 
 export interface ExperienceItem {

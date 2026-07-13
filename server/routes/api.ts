@@ -25,4 +25,25 @@ router.post("/analyze", async (req: Request, res: Response, next: NextFunction) 
   }
 });
 
+
+router.post("/ats", async (req: Request, res: Response) => {
+  try {
+    const { resumeData, jobDescription } = req.body;
+    if (!resumeData || !jobDescription) {
+      return res.status(400).json({ error: "Missing resumeData or jobDescription." });
+    }
+    const result = await geminiService.analyzeAts(resumeData, jobDescription);
+    return res.json(result);
+  } catch (apiError: any) {
+    console.error("Gemini API Error in /ats:", apiError);
+    return res.json({
+      score: 50,
+      found: [],
+      missing: ["Failed to connect to API"],
+      improvements: ["Check your API key"],
+      warning: "Error connecting to AI service. Ensure you have GEMINI_API_KEY set."
+    });
+  }
+});
+
 export default router;

@@ -112,16 +112,47 @@ export const SidebarCognitiveTab: React.FC<SidebarCognitiveTabProps> = ({
   };
 
   return (
-    <div className="flex flex-col h-full bg-[#110f15] pb-16 font-sans text-left">
+    <div className="flex flex-col pb-16 font-sans text-left">
+      {/* COGNITIVE SUB-TABS (STICKY AT TOP) */}
+      {!analyzing && analysisResult && (
+        <div className="sticky top-0 z-30 bg-ds-container/95 backdrop-blur-md pt-4 pb-3 px-5 mb-2 mt-0 border-b border-ds-border/50 shadow-sm">
+          <div className="flex bg-ds-panel/95 backdrop-blur-md p-1.5 rounded-xl border border-ds-border shadow-lg">
+          <button
+            onClick={() => setActiveSubTab('overview')}
+            className={`flex-1 py-2.5 px-3 rounded-lg text-[10px] uppercase font-extrabold tracking-wider transition-all duration-300 cursor-pointer text-center focus-visible:outline-none ${
+              activeSubTab === 'overview' ? 'bg-ds-primary text-white shadow-[0_0_12px_rgba(168,85,247,0.4)] scale-[1.02]' : 'bg-transparent text-ds-text-medium hover:text-ds-text-high hover:bg-ds-hover'
+            }`}
+          >
+            Overview
+          </button>
+          <button
+            onClick={() => setActiveSubTab('laws')}
+            className={`flex-1 py-2.5 px-3 rounded-lg text-[10px] uppercase font-extrabold tracking-wider transition-all duration-300 cursor-pointer text-center focus-visible:outline-none ${
+              activeSubTab === 'laws' ? 'bg-ds-primary text-white shadow-[0_0_12px_rgba(168,85,247,0.4)] scale-[1.02]' : 'bg-transparent text-ds-text-medium hover:text-ds-text-high hover:bg-ds-hover'
+            }`}
+          >
+            UX Laws
+          </button>
+          <button
+            onClick={() => setActiveSubTab('frames')}
+            className={`flex-1 py-2.5 px-3 rounded-lg text-[10px] uppercase font-extrabold tracking-wider transition-all duration-300 cursor-pointer text-center focus-visible:outline-none ${
+              activeSubTab === 'frames' ? 'bg-ds-primary text-white shadow-[0_0_12px_rgba(168,85,247,0.4)] scale-[1.02]' : 'bg-transparent text-ds-text-medium hover:text-ds-text-high hover:bg-ds-hover'
+            }`}
+          >
+            Models
+          </button>
+          </div>
+        </div>
+      )}
 
       {/* OFFLINE RESILIENCE INTEROP WARNING */}
       {isOffline && (
         <div className="mx-4.5 my-3.5 p-3 bg-rose-500/10 border border-rose-500/30 rounded-xl text-rose-100 text-xs flex gap-3 leading-relaxed animate-fade-in relative overflow-hidden">
           <WifiOff className="w-4.5 h-4.5 text-rose-400 shrink-0 mt-0.5 animate-pulse" />
           <div className="space-y-1">
-            <strong className="font-bold text-rose-200 block uppercase tracking-wider text-[10px]">Active Networking Offline</strong>
+            <strong className="font-bold text-rose-200 block uppercase tracking-wider text-[10px]">Offline Mode Active</strong>
             <p className="text-ds-text-medium">
-              Offline environment detected. Relax — we've safely engaged our built-in local heuristic AI model, maintaining 100% productivity with zero downtime!
+              Offline environment detected. Using local heuristic AI model. Productivity maintained!
             </p>
           </div>
         </div>
@@ -139,15 +170,15 @@ export const SidebarCognitiveTab: React.FC<SidebarCognitiveTabProps> = ({
       )}
 
       {/* BODY CONTENT CONTAINER */}
-      <div className="flex-1 overflow-y-auto px-5 py-4 space-y-5">
+      <div className="px-5 py-4 space-y-5">
         
         {/* RUNNING ANALYSIS STATE */}
         {analyzing && (
           <div className="bg-[#1a1820] rounded-2xl p-7 border border-[#2d2a33] text-center space-y-4 animate-pulse shadow-md">
             <Brain className="w-10 h-10 mx-auto text-purple-400 animate-spin" />
             <div className="space-y-2">
-              <h5 className="text-sm font-bold text-[#f3edff] uppercase tracking-wider">Evaluating reading gravity ...</h5>
-              <p className="text-xs text-[#d1cad8]">Mapping visual load, cognitive processing limits, and scanning anchors.</p>
+              <h5 className="text-sm font-bold text-[#f3edff] uppercase tracking-wider">Evaluating visual load...</h5>
+              <p className="text-xs text-[#d1cad8]">Mapping text density, readability, and focal points.</p>
             </div>
           </div>
         )}
@@ -159,9 +190,9 @@ export const SidebarCognitiveTab: React.FC<SidebarCognitiveTabProps> = ({
               <Sparkles className="w-6 h-6 text-purple-400" />
             </div>
             <div className="space-y-2.5">
-              <h4 className="text-xs font-extrabold uppercase tracking-wider text-ds-text-high">Audit Reading Friction</h4>
+              <h4 className="text-xs font-extrabold uppercase tracking-wider text-ds-text-high">Resume UX Audit</h4>
               <p className="text-xs text-ds-text-medium leading-relaxed">
-                Scan your layout structure, measure information density, spot heat-zones, and unlock 1-click semantic rewriting cards designed for C-level value framing.
+                Scan layout structure, measure density, and get AI recommendations to sound more executive.
               </p>
             </div>
             <button
@@ -169,7 +200,7 @@ export const SidebarCognitiveTab: React.FC<SidebarCognitiveTabProps> = ({
               className="w-full py-2.5 bg-ds-primary hover:bg-ds-primary-hover text-white rounded-xl text-xs font-bold tracking-wider uppercase transition-all duration-200 cursor-pointer shadow-md hover:shadow-glow active:scale-95 flex items-center justify-center gap-2 border border-ds-border focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-ds-primary/50 focus-visible:ring-offset-2 focus-visible:ring-offset-ds-panel"
             >
               <RefreshCw className="w-4 h-4" />
-              <span>Perform Cognitive Scan</span>
+              <span>Run UX Audit</span>
             </button>
           </div>
         )}
@@ -178,59 +209,7 @@ export const SidebarCognitiveTab: React.FC<SidebarCognitiveTabProps> = ({
         {!analyzing && analysisResult && (
           <div className="space-y-5 animate-fade-in text-left">
             
-            {/* COGNITIVE SUB-TABS WITH GLIDE SLIDER EFFECT */}
-            <div className="flex bg-ds-container p-1.5 rounded-xl border border-ds-border gap-1 shrink-0 relative">
-              <button
-                onClick={() => setActiveSubTab('overview')}
-                className={`flex-grow relative py-2.5 px-3 rounded-xl text-xs uppercase font-bold tracking-wider transition-all duration-300 cursor-pointer flex items-center justify-center gap-2 z-10 focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-ds-primary/50 focus-visible:ring-offset-1 focus-visible:ring-offset-ds-panel ${
-                  activeSubTab === 'overview' ? 'text-white' : 'text-ds-text-medium hover:text-ds-text-high'
-                }`}
-              >
-                {activeSubTab === 'overview' && (
-                  <motion.div 
-                    layoutId="activeSubTabBg"
-                    className="absolute inset-0 bg-ds-primary rounded-xl -z-10 shadow-sm shadow-glow border border-ds-border"
-                    transition={{ type: "spring", stiffness: 350, damping: 28 }}
-                  />
-                )}
-                <Eye className="w-4 h-4" />
-                <span>Overview</span>
-              </button>
-
-              <button
-                onClick={() => setActiveSubTab('laws')}
-                className={`flex-grow relative py-2.5 px-3 rounded-xl text-xs uppercase font-bold tracking-wider transition-all duration-300 cursor-pointer flex items-center justify-center gap-2 z-10 focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-ds-primary/50 focus-visible:ring-offset-1 focus-visible:ring-offset-ds-panel ${
-                  activeSubTab === 'laws' ? 'text-white' : 'text-ds-text-medium hover:text-ds-text-high'
-                }`}
-              >
-                {activeSubTab === 'laws' && (
-                  <motion.div 
-                    layoutId="activeSubTabBg"
-                    className="absolute inset-0 bg-ds-primary rounded-xl -z-10 shadow-sm shadow-glow border border-ds-border"
-                    transition={{ type: "spring", stiffness: 350, damping: 28 }}
-                  />
-                )}
-                <BookOpen className="w-4 h-4" />
-                <span>Laws</span>
-              </button>
-
-              <button
-                onClick={() => setActiveSubTab('frames')}
-                className={`flex-grow relative py-2.5 px-3 rounded-xl text-xs uppercase font-bold tracking-wider transition-all duration-300 cursor-pointer flex items-center justify-center gap-2 z-10 focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-ds-primary/50 focus-visible:ring-offset-1 focus-visible:ring-offset-ds-panel ${
-                  activeSubTab === 'frames' ? 'text-white' : 'text-ds-text-medium hover:text-ds-text-high'
-                }`}
-              >
-                {activeSubTab === 'frames' && (
-                  <motion.div 
-                    layoutId="activeSubTabBg"
-                    className="absolute inset-0 bg-ds-primary rounded-xl -z-10 shadow-sm shadow-glow border border-ds-border"
-                    transition={{ type: "spring", stiffness: 350, damping: 28 }}
-                  />
-                )}
-                <Zap className="w-4 h-4" />
-                <span>Frames</span>
-              </button>
-            </div>
+            
 
             {/* TAB CONTENT: OVERVIEW */}
             {activeSubTab === 'overview' && (
@@ -240,7 +219,7 @@ export const SidebarCognitiveTab: React.FC<SidebarCognitiveTabProps> = ({
                 <div className="bg-ds-panel p-5 rounded-2xl border border-ds-border space-y-5 shadow-lg">
                   <div className="flex items-center justify-between gap-5 border-b border-ds-border/50 pb-4">
                     <div className="space-y-1.5 min-w-0 flex-1">
-                      <span className="text-[10px] font-black uppercase text-ds-primary tracking-wider block">Recruiter Reading Gravity</span>
+                      <span className="text-[10px] font-black uppercase text-ds-primary tracking-wider block">Readability Score (UX)</span>
                       <p className="text-xs text-ds-text-medium leading-relaxed font-sans">
                         {analysisResult.summaryFeedback || "Cognitive scanning assessments completed. Implement recommendations below to maximize structural and linguistic impact."}
                       </p>
@@ -344,10 +323,10 @@ export const SidebarCognitiveTab: React.FC<SidebarCognitiveTabProps> = ({
                       <div className="bg-[#121015] border border-cyan-800/30 p-3.5 rounded-xl text-xs text-cyan-100 space-y-2 leading-relaxed font-sans">
                         <strong className="font-bold text-cyan-300 flex items-center gap-1">✨ How Recruiters Web-Scan:</strong>
                         <p>
-                          According to professional eye-tracking researches, recruiters scan resumes under an <strong className="text-white">F-shaped pattern</strong> in about 6 seconds, locking gaze only on prominent anchors.
+                          According to eye-tracking research, recruiters scan resumes in an <strong className="text-white">F-shaped pattern</strong> in about 6 seconds, locking gaze only on prominent anchors.
                         </p>
                         <p className="opacity-90">
-                          <strong className="text-cyan-300 font-semibold">• Active Anchor Focus:</strong> If these hotspots exhibit low-status terms, use the <strong className="text-white font-bold">Frames Tab</strong> to automatically upgrade passive experience elements into systemic value statements.
+                          <strong className="text-cyan-300 font-semibold">• Active Anchor Focus:</strong> If these hotspots exhibit low-status terms, use the <strong className="text-white font-bold">Frames Tab</strong> tab to automatically upgrade passive statements.
                         </p>
                       </div>
                     )}
@@ -407,14 +386,14 @@ export const SidebarCognitiveTab: React.FC<SidebarCognitiveTabProps> = ({
                           <div className="text-xs text-cyan-200 bg-[#121015]/80 px-3 py-2.5 rounded-xl flex items-start gap-2.5 border border-cyan-800/30 font-sans leading-relaxed">
                             <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-cyan-400" />
                             <div>
-                              <span className="font-bold block text-cyan-300 text-[10px] uppercase tracking-wider mb-0.5">Psychological Foundation:</span>
-                              <span className="opacity-95">{diag.psychologicalBasis || "Human UI Processing Law"}</span>
+                              <span className="font-bold block text-cyan-300 text-[10px] uppercase tracking-wider mb-0.5">Psychological Basis:</span>
+                              <span className="opacity-95">{diag.psychologicalBasis || "Human UI Processing Laws"}</span>
                             </div>
                           </div>
 
                           {/* Action Plan */}
                           <div className="text-emerald-200 bg-[#121015]/80 p-3.5 rounded-xl border border-emerald-800/30 text-xs leading-relaxed">
-                            <strong className="font-bold block text-[10px] uppercase tracking-wider mb-1 text-emerald-400">Actionable Restructure Fix:</strong>
+                            <strong className="font-bold block text-[10px] uppercase tracking-wider mb-1 text-emerald-400">Actionable Fix:</strong>
                             <p className="font-sans leading-relaxed">{diag.suggestion}</p>
                           </div>
                         </div>
@@ -453,13 +432,13 @@ export const SidebarCognitiveTab: React.FC<SidebarCognitiveTabProps> = ({
                         <div className="space-y-3.5 text-xs leading-relaxed">
                           {/* Original */}
                           <div className="text-rose-200 bg-[#1d1417]/80 p-3.5 rounded-xl border border-rose-950/30 leading-relaxed">
-                            <span className="block text-[9px] uppercase tracking-wider font-extrabold text-rose-300 mb-1">Junior / Subordinate Task-Description:</span>
+                            <span className="block text-[9px] uppercase tracking-wider font-extrabold text-rose-300 mb-1">Before (Task-based):</span>
                             <p className="line-through italic opacity-75 font-sans">{rw.original}</p>
                           </div>
                           
                           {/* Recommended Rewrite */}
                           <div className="text-emerald-100 bg-[#121815]/80 p-3.5 rounded-xl border border-emerald-950/30 leading-relaxed font-semibold">
-                            <span className="block text-[9px] uppercase tracking-wider font-extrabold text-emerald-300 mb-1">C-Level Value-Driven Action Formula:</span>
+                            <span className="block text-[9px] uppercase tracking-wider font-extrabold text-emerald-300 mb-1">After (Value-driven):</span>
                             <p className="font-sans font-bold leading-relaxed">{rw.replacement}</p>
                           </div>
                         </div>
@@ -467,7 +446,7 @@ export const SidebarCognitiveTab: React.FC<SidebarCognitiveTabProps> = ({
                         {/* Action trigger footer */}
                         <div className="pt-3 flex items-center justify-between gap-4 border-t border-ds-border/60">
                           <div className="text-xs text-ds-text-medium leading-relaxed pr-2 font-sans flex-1">
-                            <strong className="text-ds-primary font-bold">Strategic Benefit: </strong> {rw.benefit}
+                            <strong className="text-ds-primary font-bold">Business Value: </strong> {rw.benefit}
                           </div>
                           <button
                             onClick={() => handleApplyRewrite(rw.original, rw.replacement)}
