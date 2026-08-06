@@ -1,14 +1,16 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Switch } from "./ui/Switch";
-import { Download, Loader2, PanelLeftClose, PanelLeftOpen, ChevronDown, FileDown } from 'lucide-react';
+import { Download, Loader2, PanelLeftClose, PanelLeftOpen, ChevronDown, FileDown, FileText, FileType, Printer } from 'lucide-react';
 import { useResumeContext } from '../contexts/ResumeContext';
 import { motion, AnimatePresence } from 'motion/react';
 
 interface ToolbarProps {
   onFileUpload: (event: React.ChangeEvent<HTMLInputElement>) => void;
   onDownloadPdf: () => void;
+  onDownloadDocx: () => void;
   onPrint: () => void;
   isGenerating: boolean;
+  isGeneratingDoc?: boolean;
   sidebarOpen: boolean;
   onToggleSidebar: () => void;
 }
@@ -16,8 +18,10 @@ interface ToolbarProps {
 export const Toolbar: React.FC<ToolbarProps> = ({
   onFileUpload,
   onDownloadPdf,
+  onDownloadDocx,
   onPrint,
   isGenerating,
+  isGeneratingDoc = false,
   sidebarOpen,
   onToggleSidebar
 }) => {
@@ -85,11 +89,26 @@ export const Toolbar: React.FC<ToolbarProps> = ({
         
         <div className="flex items-center gap-3">
           
+          {/* Quick Word DOCX Export Button */}
+          <button
+            onClick={onDownloadDocx}
+            disabled={isGeneratingDoc || isGenerating}
+            className="hidden sm:flex items-center gap-2 bg-ds-panel hover:bg-ds-hover border border-ds-border hover:border-ds-border-focus text-ds-text-high px-3.5 py-2.5 rounded-xl font-semibold text-xs transition-all duration-200 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed font-sans cursor-pointer uppercase tracking-wider shadow-sm"
+            title="Export as Microsoft Word (.docx)"
+          >
+            {isGeneratingDoc ? (
+              <Loader2 className="w-4 h-4 animate-spin text-cyan-400" />
+            ) : (
+              <FileType className="w-4 h-4 text-cyan-400" />
+            )}
+            <span>Export DOCX</span>
+          </button>
+
           <div className="relative" ref={dropdownRef}>
             <div className="flex group">
               <button
                 onClick={onDownloadPdf}
-                disabled={isGenerating}
+                disabled={isGenerating || isGeneratingDoc}
                 className="flex items-center gap-2 bg-ds-primary hover:bg-ds-primary-hover focus-visible:bg-ds-primary-hover focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-2 focus-visible:ring-offset-ds-panel disabled:bg-ds-active text-white pl-5 pr-4 py-2.5 rounded-l-xl font-semibold text-xs transition-all duration-200 shadow-[0_4px_12px_rgba(168,85,247,0.25)] group-hover:shadow-[0_4px_16px_rgba(168,85,247,0.4)] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed font-sans cursor-pointer uppercase tracking-wider border-r border-ds-primary-hover/50 relative z-10"
               >
                 {isGenerating ? (
@@ -97,12 +116,12 @@ export const Toolbar: React.FC<ToolbarProps> = ({
                 ) : (
                   <Download className="w-4 h-4 text-white" />
                 )}
-                <span>Export Document</span>
+                <span>Export PDF</span>
               </button>
               
               <button 
                 onClick={() => setDropdownOpen(!dropdownOpen)}
-                disabled={isGenerating}
+                disabled={isGenerating || isGeneratingDoc}
                 className="bg-ds-primary hover:bg-ds-primary-hover focus-visible:bg-ds-primary-hover focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-2 focus-visible:ring-offset-ds-panel disabled:bg-ds-active text-white px-2 rounded-r-xl transition-all duration-200 flex items-center justify-center cursor-pointer group-hover:shadow-[0_4px_16px_rgba(168,85,247,0.4)] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed relative z-10"
                 aria-label="Export settings"
                 aria-expanded={dropdownOpen}
@@ -120,13 +139,75 @@ export const Toolbar: React.FC<ToolbarProps> = ({
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: -10, scale: 0.95 }}
                   transition={{ duration: 0.15, ease: 'easeOut' }}
-                  className="absolute top-full right-0 mt-3 w-72 bg-ds-container border border-ds-border rounded-xl shadow-[0_12px_40px_rgba(0,0,0,0.4)] p-4 z-[100] origin-top-right"
+                  className="absolute top-full right-0 mt-3 w-80 bg-ds-container border border-ds-border rounded-xl shadow-[0_12px_40px_rgba(0,0,0,0.4)] p-4 z-[100] origin-top-right"
                 >
-                  <div className="flex items-center justify-between mb-4 pb-3 border-b border-[#312e39]/50">
+                  <div className="flex items-center justify-between mb-3 pb-3 border-b border-[#312e39]/50">
                      <div className="flex items-center gap-2">
                        <FileDown className="w-4 h-4 text-ds-primary" />
-                       <span className="font-bold text-[10px] uppercase tracking-wider text-ds-text-high font-display">Export Settings</span>
+                       <span className="font-bold text-[10px] uppercase tracking-wider text-ds-text-high font-display">Export Formats & Options</span>
                      </div>
+                  </div>
+
+                  {/* FORMAT ACTIONS */}
+                  <div className="space-y-2 mb-4 pb-3 border-b border-[#312e39]/50">
+                    <button
+                      onClick={() => {
+                        setDropdownOpen(false);
+                        onDownloadDocx();
+                      }}
+                      disabled={isGeneratingDoc}
+                      className="w-full flex items-center justify-between p-2.5 rounded-xl bg-ds-panel hover:bg-ds-hover border border-ds-border hover:border-cyan-500/50 transition-all text-left group cursor-pointer"
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <div className="p-1.5 rounded-lg bg-cyan-500/10 text-cyan-400 group-hover:bg-cyan-500/20">
+                          <FileType className="w-4 h-4" />
+                        </div>
+                        <div>
+                          <span className="block text-xs font-bold text-ds-text-high group-hover:text-cyan-300">Microsoft Word (.docx)</span>
+                          <span className="block text-[10px] text-ds-text-muted">Editable & ATS Recruiter Ready</span>
+                        </div>
+                      </div>
+                      <Download className="w-3.5 h-3.5 text-ds-text-muted group-hover:text-cyan-300" />
+                    </button>
+
+                    <button
+                      onClick={() => {
+                        setDropdownOpen(false);
+                        onDownloadPdf();
+                      }}
+                      disabled={isGenerating}
+                      className="w-full flex items-center justify-between p-2.5 rounded-xl bg-ds-panel hover:bg-ds-hover border border-ds-border hover:border-ds-primary/50 transition-all text-left group cursor-pointer"
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <div className="p-1.5 rounded-lg bg-ds-primary/10 text-ds-primary group-hover:bg-ds-primary/20">
+                          <FileText className="w-4 h-4" />
+                        </div>
+                        <div>
+                          <span className="block text-xs font-bold text-ds-text-high group-hover:text-ds-primary">PDF Document (.pdf)</span>
+                          <span className="block text-[10px] text-ds-text-muted">Vector layout & pixel perfect</span>
+                        </div>
+                      </div>
+                      <Download className="w-3.5 h-3.5 text-ds-text-muted group-hover:text-ds-primary" />
+                    </button>
+
+                    <button
+                      onClick={() => {
+                        setDropdownOpen(false);
+                        onPrint();
+                      }}
+                      className="w-full flex items-center justify-between p-2.5 rounded-xl bg-ds-panel hover:bg-ds-hover border border-ds-border hover:border-purple-500/50 transition-all text-left group cursor-pointer"
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <div className="p-1.5 rounded-lg bg-purple-500/10 text-purple-400 group-hover:bg-purple-500/20">
+                          <Printer className="w-4 h-4" />
+                        </div>
+                        <div>
+                          <span className="block text-xs font-bold text-ds-text-high group-hover:text-purple-300">Direct Print</span>
+                          <span className="block text-[10px] text-ds-text-muted">Send straight to printer</span>
+                        </div>
+                      </div>
+                      <Printer className="w-3.5 h-3.5 text-ds-text-muted group-hover:text-purple-300" />
+                    </button>
                   </div>
 
                   {/* PDF COMPRESSION TOGGLE */}
@@ -136,7 +217,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({
                   >
                     <div>
                       <span className="block text-[11px] text-ds-text-high font-bold uppercase tracking-wider transition-colors group-hover:text-ds-primary">Compress PDF</span>
-                      <span className="block text-[10px] text-ds-text-muted mt-0.5 transition-colors group-hover:text-ds-text-high">Reduce output file size</span>
+                      <span className="block text-[10px] text-ds-text-muted mt-0.5 transition-colors group-hover:text-ds-text-high">Reduce PDF file size</span>
                     </div>
                     <button
                       type="button"
@@ -158,7 +239,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({
                       className="pt-3 border-t border-[#312e39]/50 space-y-4"
                     >
                       <div>
-                        <span className="block text-[10px] text-ds-text-medium font-bold uppercase tracking-wider mb-2">Compression Level</span>
+                        <span className="block text-[10px] text-ds-text-medium font-bold uppercase tracking-wider mb-2">PDF Compression Level</span>
                         <div className="grid grid-cols-3 gap-2">
                           {[
                             { id: 'small', label: 'Smallest', value: 0.4 },
@@ -193,7 +274,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({
 
                   <div className="mt-4 border border-[#312e39]/50 bg-[#1c1b21]/60 rounded-xl p-3.5 flex flex-col gap-2 shadow-inner">
                      <div className="flex justify-between items-center">
-                       <span className="text-[10px] text-ds-text-muted font-bold uppercase tracking-wider">Estimated Size</span>
+                       <span className="text-[10px] text-ds-text-muted font-bold uppercase tracking-wider">Estimated PDF Size</span>
                        <span className="text-xs font-mono font-bold text-ds-text-high">{estimate.size}</span>
                      </div>
                      <div className="flex justify-between items-center">
@@ -211,3 +292,4 @@ export const Toolbar: React.FC<ToolbarProps> = ({
     </nav>
   );
 };
+

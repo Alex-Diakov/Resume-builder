@@ -6,6 +6,7 @@ import { IntroAnimation } from './components/IntroAnimation';
 import { INITIAL_RESUME_DATA } from './constants';
 import { useResumeContext } from './contexts/ResumeContext';
 import { usePdfExport } from './hooks/usePdfExport';
+import { useDocExport } from './hooks/useDocExport';
 
 // Declare html2pdf on window
 declare global {
@@ -82,6 +83,7 @@ const App: React.FC = () => {
   }, []);
 
   const { isGenerating, handleDownloadPdf } = usePdfExport(resumeData, paddingTopBottom, paddingLeftRight, compressPdf, pdfImageQuality);
+  const { isGeneratingDoc, handleDownloadDocx } = useDocExport(resumeData);
 
   if (showIntro) {
     return (
@@ -101,8 +103,10 @@ const App: React.FC = () => {
       <Toolbar 
         onFileUpload={handleFileUpload}
         onDownloadPdf={handleDownloadPdf}
+        onDownloadDocx={handleDownloadDocx}
         onPrint={handlePrint}
         isGenerating={isGenerating}
+        isGeneratingDoc={isGeneratingDoc}
         sidebarOpen={sidebarOpen}
         onToggleSidebar={() => setSidebarOpen(!sidebarOpen)}
       />
