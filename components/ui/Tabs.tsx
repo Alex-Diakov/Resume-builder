@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useState } from 'react';
 import { cn } from '../../utils/cn';
-import { motion } from 'motion/react';
 
 interface TabsContextValue {
   value: string;
@@ -33,7 +32,7 @@ export function Tabs({
   };
 
   return (
-    <TabsContext.Provider value={{ value: value || tab, onValueChange: handleValueChange }}>
+    <TabsContext.Provider value={{ value: value !== undefined ? value : tab, onValueChange: handleValueChange }}>
       <div className={cn("w-full", className)}>{children}</div>
     </TabsContext.Provider>
   );
@@ -41,7 +40,7 @@ export function Tabs({
 
 export function TabsList({ children, className }: { children: React.ReactNode; className?: string }) {
   return (
-    <div className={cn("flex bg-ds-panel/95 backdrop-blur-md p-1.5 rounded-xl border border-ds-border shadow-md gap-1", className)}>
+    <div className={cn("flex bg-ds-panel/95 backdrop-blur-md p-1 rounded-ds-lg border border-ds-border shadow-ds-sm gap-1", className)}>
       {children}
     </div>
   );
@@ -51,12 +50,14 @@ export function TabsTrigger({
   value, 
   children, 
   className,
-  icon: Icon
+  icon: Icon,
+  badge
 }: { 
   value: string; 
   children: React.ReactNode; 
   className?: string;
   icon?: any;
+  badge?: React.ReactNode;
 }) {
   const context = useContext(TabsContext);
   if (!context) throw new Error("TabsTrigger must be used within Tabs");
@@ -65,17 +66,19 @@ export function TabsTrigger({
 
   return (
     <button
+      type="button"
       onClick={() => context.onValueChange(value)}
       className={cn(
-        "flex-1 relative py-2.5 px-3 rounded-lg text-[10px] uppercase font-extrabold tracking-wider transition-all duration-300 cursor-pointer text-center focus-visible:outline-none flex items-center justify-center gap-2",
+        "flex-1 relative py-2 px-3 rounded-ds-md text-xs uppercase font-semibold tracking-wider transition-all duration-200 cursor-pointer select-none text-center focus-visible:outline-none flex items-center justify-center gap-1.5",
         isActive 
-          ? "bg-ds-primary text-white shadow-[0_0_12px_rgba(168,85,247,0.4)] scale-[1.02] z-10" 
+          ? "bg-ds-primary text-white shadow-ds-sm z-10" 
           : "bg-transparent text-ds-text-medium hover:text-ds-text-high hover:bg-ds-hover",
         className
       )}
     >
-      {Icon && <Icon className="w-3.5 h-3.5" />}
+      {Icon && <Icon className="w-3.5 h-3.5 shrink-0" />}
       <span>{children}</span>
+      {badge && <span className="ml-1 shrink-0">{badge}</span>}
     </button>
   );
 }
@@ -87,7 +90,7 @@ export function TabsContent({ value, children, className }: { value: string; chi
   if (context.value !== value) return null;
 
   return (
-    <div className={cn("mt-4 animate-fade-in", className)}>
+    <div className={cn("mt-3 animate-fade-in", className)}>
       {children}
     </div>
   );

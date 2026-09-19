@@ -1,5 +1,5 @@
 import { GoogleGenAI, Type } from "@google/genai";
-import { serializeResume, generateHeuristicBackupAnalysis } from "../../utils/heuristicEngine";
+import { serializeResume, generateHeuristicBackupAnalysis } from "../../services/heuristic/heuristicEngine";
 
 const SYSTEM_INSTRUCTION = `You are a World-Class Executive Career Architect, Neuro-Cognitive Usability specialist, and C-Level Negotiator. You evaluate professional resume presentations based on scientific laws of attention, cognitive load, and visual processing, and you rewrite elements using elite strategic framing:
 
@@ -220,6 +220,42 @@ Identify which keywords/skills are found in the resume, which ones from the job 
             }
           },
           required: ["score", "found", "missing", "improvements"]
+        }
+      }
+    });
+
+    return JSON.parse(response.text.trim());
+  }
+
+  async analyzeAnalytics(resumeData: any) {
+    if (!this.isConfigured()) {
+      return {
+        detectedRole: "Lead Architect",
+        detectedIndustry: "Enterprise Cloud & Systems",
+        warning: "GEMINI_API_KEY is not configured in Secrets. Showing baseline heuristics."
+      };
+    }
+
+    const prompt = `
+You are an AI resume analytics engine. Analyze the provided resume JSON and return a structured assessment containing:
+1. "detectedRole": A short string (1-3 words) defining the primary role of the candidate (e.g., "Product Manager", "Frontend Engineer").
+2. "detectedIndustry": A short string (1-3 words) defining the primary industry/niche (e.g., "B2B SaaS", "FinTech", "E-commerce").
+
+Resume Data:
+${JSON.stringify(resumeData, null, 2)}`;
+
+    const response = await this.ai.models.generateContent({
+      model: "gemini-2.5-flash",
+      contents: prompt,
+      config: {
+        responseMimeType: "application/json",
+        responseSchema: {
+          type: Type.OBJECT,
+          properties: {
+            detectedRole: { type: Type.STRING },
+            detectedIndustry: { type: Type.STRING }
+          },
+          required: ["detectedRole", "detectedIndustry"]
         }
       }
     });

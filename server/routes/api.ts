@@ -1,6 +1,6 @@
 import { Router, Request, Response, NextFunction } from "express";
 import { geminiService } from "../services/geminiService";
-import { generateHeuristicBackupAnalysis } from "../../utils/heuristicEngine";
+import { generateHeuristicBackupAnalysis } from "../../services/heuristic/heuristicEngine";
 
 const router = Router();
 
@@ -42,6 +42,24 @@ router.post("/ats", async (req: Request, res: Response) => {
       missing: ["Failed to connect to API"],
       improvements: ["Check your API key"],
       warning: "Error connecting to AI service. Ensure you have GEMINI_API_KEY set."
+    });
+  }
+});
+
+router.post("/analytics", async (req: Request, res: Response) => {
+  try {
+    const { resumeData } = req.body;
+    if (!resumeData) {
+      return res.status(400).json({ error: "Missing resumeData in request body." });
+    }
+    const result = await geminiService.analyzeAnalytics(resumeData);
+    return res.json(result);
+  } catch (apiError: any) {
+    console.error("Gemini API Error in /analytics:", apiError);
+    return res.json({
+      detectedRole: "General",
+      detectedIndustry: "General",
+      warning: "Error connecting to AI service."
     });
   }
 });

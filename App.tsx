@@ -1,8 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { ResumePaper } from './components/ResumePaper';
-import { Toolbar } from './components/Toolbar';
-import { SidebarEditor } from './components/SidebarEditor';
-import { IntroAnimation } from './components/IntroAnimation';
+import { ResumePaper } from './components/resume';
+import { Toolbar, IntroAnimation, DesignSystemPage } from './components/layout';
+import { SidebarEditor } from './components/sidebar';
 import { INITIAL_RESUME_DATA } from './constants';
 import { useResumeContext } from './contexts/ResumeContext';
 import { usePdfExport } from './hooks/usePdfExport';
@@ -23,8 +22,9 @@ const App: React.FC = () => {
       return true;
     }
   });
-  const [activeTab, setActiveTab] = useState<'form' | 'json' | 'cognitive' | 'ats'>('form');
+  const [activeTab, setActiveTab] = useState<'form' | 'json' | 'cognitive' | 'ats' | 'analytics'>('analytics');
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [showDesignSystem, setShowDesignSystem] = useState(false);
 
   const {
     resumeData,
@@ -35,27 +35,12 @@ const App: React.FC = () => {
     sectionSpacing,
     itemSpacing,
     showPageGuides,
-    // Add these so they are accessible
-    jsonInput,
-    atsInput,
-    jsonError,
-    handleUpdateResumeData,
-    setPaddingTopBottom,
-    setPaddingLeftRight,
-    setSectionSpacing,
-    setItemSpacing,
-    spacingPreset,
-    handleApplySpacingPreset,
-    setShowPageGuides,
-    autoFitContent,
-    pageFraction,
-    resumeHeight,
     compressPdf,
     pdfImageQuality,
   } = useResumeContext();
 
   useEffect(() => {
-    document.title = "Resume Builder Pro";
+    document.title = "Cognitive Resume Analyzer & Builder";
   }, []);
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -109,13 +94,14 @@ const App: React.FC = () => {
         isGeneratingDoc={isGeneratingDoc}
         sidebarOpen={sidebarOpen}
         onToggleSidebar={() => setSidebarOpen(!sidebarOpen)}
+        onOpenDesignSystem={() => setShowDesignSystem(true)}
       />
 
       <div className="flex flex-1 overflow-hidden relative print:overflow-visible print:block">
         {/* Sidebar Panel */}
         <div 
           className={`shrink-0 transition-all duration-300 ease-in-out z-20 print:hidden ${
-            sidebarOpen ? 'w-full md:w-96 lg:w-[450px] border-r border-slate-700' : 'w-0 border-r-0'
+            sidebarOpen ? 'w-full md:w-96 lg:w-[450px] border-r border-ds-border' : 'w-0 border-r-0'
           }`}
         >
           <div className="w-full md:w-96 lg:w-[450px] shrink-0 h-full overflow-hidden animate-fade-in">
@@ -127,11 +113,8 @@ const App: React.FC = () => {
         </div>
 
         {/* Main Resume Canvas Area */}
-        <main className="flex-1 overflow-y-auto w-full bg-ds-bg/85 p-4 md:p-8 flex justify-center print:p-0 print:block print:overflow-visible relative">
+        <main className="flex-1 overflow-y-auto w-full bg-ds-bg p-4 md:p-8 flex justify-center print:p-0 print:block print:overflow-visible relative">
           <div className="w-full max-w-[210mm] transition-all duration-300 ease-in-out print:max-w-none print:w-full min-h-full">
-            
-
-
             <ResumePaper 
               data={resumeData} 
               paddingTopBottom={paddingTopBottom}
@@ -140,8 +123,8 @@ const App: React.FC = () => {
               itemSpacing={itemSpacing}
               showPageGuides={showPageGuides}
             />
-            <footer className="mt-8 mb-4 text-center text-slate-500 text-xs print:hidden">
-               <p>&copy; {new Date().getFullYear()} Resume Builder Pro. Optimized for Recruiter delivery & print consistency.</p>
+            <footer className="mt-8 mb-4 text-center text-ds-text-disabled text-xs print:hidden">
+               <p>&copy; {new Date().getFullYear()} Cognitive Resume Analyzer &amp; Builder. Optimized for recruiter attention &amp; print consistency.</p>
             </footer>
           </div>
         </main>
@@ -150,9 +133,14 @@ const App: React.FC = () => {
       {/* Mobile Overlay */}
       {sidebarOpen && (
         <div 
-           className="md:hidden fixed inset-0 z-10 bg-black/60 print:hidden" 
+           className="md:hidden fixed inset-0 z-10 bg-ds-scrim/80 backdrop-blur-sm print:hidden" 
            onClick={() => setSidebarOpen(false)}
         />
+      )}
+
+      {/* Material 3 (2026 Edition) Design System Modal */}
+      {showDesignSystem && (
+        <DesignSystemPage onClose={() => setShowDesignSystem(false)} />
       )}
     </div>
   );

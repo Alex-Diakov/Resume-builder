@@ -19,6 +19,14 @@ export const usePdfExport = (
     setIsGenerating(true);
     await document.fonts.ready;
 
+    try {
+      const currentCount = parseInt(localStorage.getItem('resume_download_count') || '0', 10);
+      localStorage.setItem('resume_download_count', (currentCount + 1).toString());
+      window.dispatchEvent(new Event('resume_downloaded'));
+    } catch (e) {
+      console.error(e);
+    }
+
     const element = document.getElementById('resume-content');
     if (!element) return;
 

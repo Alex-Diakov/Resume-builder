@@ -20,6 +20,11 @@ async function startServer() {
     next();
   });
 
+  // Core Health Check routes (required by container ingress and control-plane)
+  app.get(["/api/health", "/health"], (req, res) => {
+    res.status(200).json({ status: "ok", timestamp: new Date().toISOString() });
+  });
+
   // Mount API modular routes
   app.use("/api", apiRouter);
 
