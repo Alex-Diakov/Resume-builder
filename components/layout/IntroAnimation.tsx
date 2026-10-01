@@ -25,7 +25,7 @@ export const IntroAnimation: React.FC<IntroAnimationProps> = ({ onComplete }) =>
           initial={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.5 }}
-          className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-ds-canvas text-ds-text-high overflow-hidden font-mono"
+          className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-md-surface-container-lowest text-md-on-surface overflow-hidden font-mono"
         >
           {/* Background subtle grid */}
           <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:3.5rem_3.5rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_50%,#000_70%,transparent_100%)] opacity-30 pointer-events-none" />
@@ -42,23 +42,23 @@ export const IntroAnimation: React.FC<IntroAnimationProps> = ({ onComplete }) =>
                 initial={{ rotate: -90, scale: 0 }}
                 animate={{ rotate: 0, scale: 1 }}
                 transition={{ delay: 0.2, type: "spring", stiffness: 200, damping: 20 }}
-                className="w-20 h-20 bg-ds-panel shrink-0 flex items-center justify-center rounded-ds-xl shadow-ds-glow mb-6 border border-ds-border"
+                className="w-20 h-20 bg-md-surface-container shrink-0 flex items-center justify-center rounded-md-xl shadow-md-elevation-2 mb-6 border border-md-outline-variant/30"
               >
-                <ScanLine className="w-10 h-10 text-ds-primary" />
+                <ScanLine className="w-10 h-10 text-md-primary" />
               </motion.div>
               <motion.div 
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay: 0.4 }}
-                className="text-5xl md:text-7xl font-bold font-sans tracking-tight text-ds-text-high mb-4"
+                className="text-5xl md:text-7xl font-bold font-sans tracking-tight text-md-on-surface mb-4"
               >
-                Resume Pro
+                Cognitive<span className="text-md-primary ml-2">Resume</span>
               </motion.div>
               <motion.div 
                 initial={{ y: 10, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay: 0.6 }}
-                className="text-xs md:text-sm text-ds-text-muted font-mono tracking-[0.3em] uppercase"
+                className="text-xs md:text-sm text-md-on-surface-variant font-mono tracking-[0.2em]"
               >
                 Neuro-Cognitive Executive Platform
               </motion.div>

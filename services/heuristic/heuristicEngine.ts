@@ -272,3 +272,79 @@ export function generateHeuristicBackupAnalysis(data: ResumeData) {
     rewrites
   };
 }
+
+/**
+ * Deterministic fallback analyzer for ATS keyword matching
+ * Ensures offline stability and graceful fallback when AI API is unavailable.
+ */
+export function generateHeuristicAtsAnalysis(resumeData: ResumeData, jobDescription: string) {
+  const resumeText = serializeResume(resumeData).toLowerCase();
+  
+  // Extract potential keywords from job description: tokens with length >= 3, excluding common stop words
+  const stopWords = new Set([
+    "and", "the", "for", "with", "that", "this", "from", "have", "will", "your",
+    "must", "should", "ability", "experience", "skills", "work", "team", "role", "years"
+  ]);
+
+  const rawWords = jobDescription
+    .replace(/[^\w\s+#.-]/g, " ")
+    .split(/\s+/)
+    .map(w => w.trim().toLowerCase())
+    .filter(w => w.length >= 3 && !stopWords.has(w));
+
+  const uniqueKeywords = Array.from(new Set(rawWords)).slice(0, 25);
+
+  const found: string[] = [];
+  const missing: string[] = [];
+
+  for (const kw of uniqueKeywords) {
+    if (resumeText.includes(kw)) {
+      found.push(kw);
+    } else {
+      missing.push(kw);
+    }
+  }
+
+  const matchRatio = uniqueKeywords.length > 0 ? found.length / uniqueKeywords.length : 0.7;
+  const score = Math.round(Math.min(100, Math.max(20, matchRatio * 100)));
+
+  const improvements: string[] = [];
+  if (missing.length > 0) {
+    improvements.push(`Incorporate high-priority missing terms (${missing.slice(0, 3).join(", ")}) into your Skills or Experience bullet points.`);
+  }
+  improvements.push("Ensure your job titles and header reflect the specific role naming convention in the job description.");
+  improvements.push("Quantify results associated with matched core competencies with clear numerical indicators.");
+
+  return {
+    score,
+    found,
+    missing: missing.slice(0, 8),
+    improvements
+  };
+}
+
+/**
+ * Deterministic fallback analyzer for role and industry profiling
+ */
+export function generateHeuristicAnalytics(resumeData: ResumeData) {
+  const title = resumeData.title || "Specialist";
+  let detectedRole = title;
+  let detectedIndustry = "Technology & Product";
+
+  const lowerTitle = title.toLowerCase();
+  if (lowerTitle.includes("design") || lowerTitle.includes("ux") || lowerTitle.includes("ui") || lowerTitle.includes("product designer")) {
+    detectedRole = "Product / UX Designer";
+    detectedIndustry = "Digital Design & Human Interfaces";
+  } else if (lowerTitle.includes("engineer") || lowerTitle.includes("developer") || lowerTitle.includes("architect")) {
+    detectedRole = "Software Engineer / Architect";
+    detectedIndustry = "Software Systems & Cloud";
+  } else if (lowerTitle.includes("product manager") || lowerTitle.includes("pm") || lowerTitle.includes("owner")) {
+    detectedRole = "Product Manager";
+    detectedIndustry = "Digital Products & Strategy";
+  }
+
+  return {
+    detectedRole,
+    detectedIndustry
+  };
+}

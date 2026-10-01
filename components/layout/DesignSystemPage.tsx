@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { 
   ArrowLeft, 
   Check, 
@@ -10,26 +10,25 @@ import {
   Layers, 
   FileText, 
   Code2, 
-  ExternalLink, 
-  Sliders, 
-  ToggleLeft, 
-  ToggleRight, 
-  Download, 
-  Loader2, 
-  Info, 
-  ShieldCheck, 
-  Maximize2, 
-  Eye, 
+  RotateCcw,
   Search,
-  Sparkle
+  Sliders,
+  ShieldCheck,
+  CheckCircle2,
+  ExternalLink,
+  SlidersHorizontal,
+  Wand2,
+  Eye
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import { useTheme } from '../../contexts/ThemeContext';
 import { 
-  COLOR_TOKENS, 
-  RADIUS_TOKENS, 
-  SHADOW_TOKENS, 
-  TYPOGRAPHY_TOKENS,
-  ColorToken 
+  DEFAULT_RADIUS_TOKENS, 
+  DEFAULT_SHADOW_TOKENS, 
+  DEFAULT_TYPOGRAPHY_TOKENS,
+  ColorToken,
+  getContrastRatio,
+  getWCAGRating
 } from '../../theme/tokens';
 import { 
   Button, 
@@ -51,13 +50,30 @@ interface DesignSystemPageProps {
   onClose: () => void;
 }
 
-type TabType = 'overview' | 'colors' | 'typography' | 'components' | 'elevation' | 'ats' | 'tokens';
+type TabType = 'overview' | 'studio' | 'colors' | 'typography' | 'components' | 'elevation' | 'code';
 
 export const DesignSystemPage: React.FC<DesignSystemPageProps> = ({ onClose }) => {
+  const { 
+    tokens, 
+    presets, 
+    activePresetId, 
+    isCustomized, 
+    updateColorToken, 
+    applyPreset, 
+    resetToDefaults,
+    exportRootCss,
+    exportJsonTokens
+  } = useTheme();
+
   const [activeTab, setActiveTab] = useState<TabType>('overview');
   const [copiedText, setCopiedText] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
   
+  // Selected token for fine-tuning editor
+  const [editingToken, setEditingToken] = useState<ColorToken | null>(null);
+  const [customHexInput, setCustomHexInput] = useState<string>('');
+
   // Interactive component states for playground
   const [sampleToggle, setSampleToggle] = useState(true);
   const [sampleSlider, setSampleSlider] = useState(78);
@@ -82,25 +98,48 @@ export const DesignSystemPage: React.FC<DesignSystemPageProps> = ({ onClose }) =
     setTimeout(() => setCopiedText(null), 2500);
   };
 
+  // Sync token editor input when an item is selected
+  const handleSelectTokenToEdit = (token: ColorToken) => {
+    setEditingToken(token);
+    setCustomHexInput(token.hex);
+  };
+
+  const handleApplyCustomHex = (variable: string, hex: string) => {
+    updateColorToken(variable, hex);
+    setCustomHexInput(hex);
+    if (editingToken && editingToken.variable === variable) {
+      setEditingToken({ ...editingToken, hex });
+    }
+  };
+
   const navItems: { id: TabType; label: string; icon: React.ReactNode; badge?: string }[] = [
     { id: 'overview', label: 'Architecture', icon: <Sparkles className="w-4 h-4" /> },
-    { id: 'colors', label: 'Color Tokens', icon: <Palette className="w-4 h-4" />, badge: `${COLOR_TOKENS.length}` },
+    { id: 'studio', label: 'Live Theme Studio', icon: <Wand2 className="w-4 h-4" />, badge: 'Live Tuner' },
+    { id: 'colors', label: 'Color Tokens (SSOT)', icon: <Palette className="w-4 h-4" />, badge: `${tokens.length}` },
     { id: 'typography', label: 'Typography', icon: <Type className="w-4 h-4" /> },
     { id: 'components', label: 'Components', icon: <Component className="w-4 h-4" /> },
     { id: 'elevation', label: 'Surfaces & Elevation', icon: <Layers className="w-4 h-4" /> },
-    { id: 'ats', label: 'ATS & Print Rules', icon: <FileText className="w-4 h-4" /> },
-    { id: 'tokens', label: 'Code & Variables', icon: <Code2 className="w-4 h-4" /> },
+    { id: 'code', label: 'Code & Variables', icon: <Code2 className="w-4 h-4" /> },
   ];
 
-  const filteredColors = COLOR_TOKENS.filter(c => 
-    c.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    c.hex.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    c.tailwind.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    c.usage.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredColors = useMemo(() => {
+    return tokens.filter(c => {
+      const matchesSearch = 
+        c.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        c.hex.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        c.variable.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        c.tailwind.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        c.usage.toLowerCase().includes(searchQuery.toLowerCase());
+      
+      const matchesCategory = selectedCategory === 'all' || c.category === selectedCategory;
+      return matchesSearch && matchesCategory;
+    });
+  }, [tokens, searchQuery, selectedCategory]);
+
+  const activePreset = presets.find(p => p.id === activePresetId);
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col bg-ds-bg text-ds-text-high overflow-hidden font-sans">
+    <div className="fixed inset-0 z-50 flex flex-col bg-md-surface text-md-on-surface overflow-hidden font-sans select-none">
       {/* Toast Notification for Clipboard */}
       <AnimatePresence>
         {copiedText && (
@@ -108,63 +147,74 @@ export const DesignSystemPage: React.FC<DesignSystemPageProps> = ({ onClose }) =
             initial={{ opacity: 0, y: -20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -20, scale: 0.95 }}
-            className="fixed top-5 left-1/2 -translate-x-1/2 z-[100] bg-ds-panel border border-ds-primary/40 text-ds-text-high px-4 py-2 rounded-xl shadow-[0_8px_24px_rgba(0,0,0,0.7)] flex items-center gap-2.5 text-xs font-medium"
+            className="fixed top-5 left-1/2 -translate-x-1/2 z-[100] bg-md-surface-container-high border border-md-primary/40 text-md-on-surface px-4 py-2.5 rounded-full shadow-2xl flex items-center gap-2.5 text-xs font-medium"
           >
-            <div className="w-5 h-5 rounded-full bg-ds-primary/20 text-ds-border-focus flex items-center justify-center">
+            <div className="w-5 h-5 rounded-full bg-md-primary/20 text-md-primary flex items-center justify-center">
               <Check className="w-3 h-3" />
             </div>
-            <span>Copied to clipboard: <code className="text-ds-border-focus font-mono">{copiedText}</code></span>
+            <span>Copied: <code className="text-md-primary font-mono">{copiedText}</code></span>
           </motion.div>
         )}
       </AnimatePresence>
 
       {/* Top Header Bar */}
-      <header className="h-16 shrink-0 border-b border-ds-border bg-ds-panel/90 backdrop-blur-md px-4 sm:px-6 flex items-center justify-between z-20">
-        <div className="flex items-center gap-3">
+      <header className="h-16 shrink-0 border-b border-white/[0.08] bg-md-surface-container-low/95 backdrop-blur-xl px-4 sm:px-6 flex items-center justify-between z-20">
+        <div className="flex items-center gap-3.5">
           <button
             onClick={onClose}
-            className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-ds-container hover:bg-ds-hover border border-ds-border hover:border-ds-border-focus text-ds-text-medium hover:text-ds-text-high transition-all text-xs font-medium group cursor-pointer active:scale-95"
+            className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] hover:border-white/[0.16] text-md-on-surface-variant hover:text-md-on-surface transition-all text-xs font-medium group cursor-pointer active:scale-95"
             title="Press ESC to return"
           >
             <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
             <span>Back to Editor</span>
-            <kbd className="hidden sm:inline-block px-1.5 py-0.5 text-[9px] font-mono bg-ds-bg rounded border border-ds-border text-ds-text-muted">ESC</kbd>
+            <kbd className="hidden sm:inline-block px-1.5 py-0.5 text-[9px] font-mono bg-white/[0.06] rounded border border-white/[0.1] text-md-on-surface-variant">ESC</kbd>
           </button>
 
-          <div className="h-4 w-px bg-ds-border hidden sm:block" />
+          <div className="h-4 w-px bg-white/[0.08] hidden sm:block" />
 
           <div className="flex items-center gap-2.5">
-            <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-ds-primary to-purple-600 flex items-center justify-center text-white font-black text-sm shadow-[0_2px_10px_rgba(168,85,247,0.35)]">
+            <div className="h-8 w-8 rounded-md-md bg-md-primary text-md-on-primary flex items-center justify-center font-bold text-sm shadow-sm">
               M3
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h1 className="text-sm font-bold tracking-tight text-ds-text-high font-display">Material 3 (2026 Edition)</h1>
-                <span className="bg-ds-primary/20 text-ds-border-focus text-[9px] px-2 py-0.5 rounded-full font-mono font-medium border border-ds-primary/30">
-                  v3.2 Spec
+                <h1 className="text-sm font-bold tracking-tight text-md-on-surface font-display">Material 3 Design System</h1>
+                <span className="bg-md-primary/15 text-md-primary text-[10px] px-2 py-0.5 rounded-full font-mono font-semibold border border-md-primary/30">
+                  {isCustomized ? 'Custom Tuned' : (activePreset?.name || 'SSOT Active')}
                 </span>
               </div>
-              <p className="text-[10.5px] text-ds-text-muted -mt-0.5">Resume Studio Precision Design System</p>
+              <p className="text-[11px] text-md-on-surface-variant -mt-0.5">Unified Token Source of Truth & Live Studio</p>
             </div>
           </div>
         </div>
 
         {/* Global actions */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2.5">
+          {isCustomized && (
+            <button
+              onClick={resetToDefaults}
+              className="flex items-center gap-1.5 text-xs text-md-on-surface-variant hover:text-md-error px-3 py-1.5 rounded-full bg-white/[0.03] hover:bg-md-error-container/20 border border-white/[0.08] hover:border-md-error/30 transition-all cursor-pointer"
+              title="Reset all tokens back to default Material 3 specifications"
+            >
+              <RotateCcw className="w-3.5 h-3.5" />
+              <span>Reset Defaults</span>
+            </button>
+          )}
+
           <button
-            onClick={() => copyToClipboard(':root { --color-surface-bg: #0d0c11; --color-brand-primary: #a855f7; }', 'Root CSS')}
-            className="hidden md:flex items-center gap-1.5 text-xs text-ds-text-muted hover:text-ds-text-high px-3 py-1.5 rounded-lg border border-ds-border hover:border-ds-border-focus transition-colors cursor-pointer"
+            onClick={() => copyToClipboard(exportRootCss(), ':root CSS')}
+            className="hidden sm:flex items-center gap-1.5 text-xs text-md-on-surface-variant hover:text-md-on-surface px-3 py-1.5 rounded-full bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] hover:border-white/[0.16] transition-colors cursor-pointer"
+            title="Copy current live tokens as CSS variables"
           >
-            <Copy className="w-3.5 h-3.5 text-ds-primary" />
-            <span>Copy Quick Tokens</span>
+            <Copy className="w-3.5 h-3.5 text-md-primary" />
+            <span>Copy CSS</span>
           </button>
 
           <button
             onClick={onClose}
-            className="p-2 text-ds-text-muted hover:text-ds-text-high hover:bg-ds-hover rounded-lg transition-colors cursor-pointer"
+            className="p-2 text-md-on-surface-variant hover:text-md-on-surface hover:bg-white/[0.06] rounded-full transition-colors cursor-pointer"
             aria-label="Close Design System"
           >
-            <span className="sr-only">Close</span>
             <div className="w-5 h-5 flex items-center justify-center font-bold text-sm">✕</div>
           </button>
         </div>
@@ -173,9 +223,9 @@ export const DesignSystemPage: React.FC<DesignSystemPageProps> = ({ onClose }) =
       {/* Main Layout: Subnavigation Sidebar + Scrollable Content */}
       <div className="flex flex-1 overflow-hidden">
         {/* Navigation Sidebar */}
-        <nav className="w-56 shrink-0 border-r border-ds-border bg-ds-panel/60 p-3 hidden md:flex flex-col justify-between">
+        <nav className="w-58 shrink-0 border-r border-white/[0.08] bg-md-surface-container-low/60 p-3 hidden md:flex flex-col justify-between select-none">
           <div className="space-y-1">
-            <div className="px-3 py-2 text-[10px] font-bold uppercase tracking-wider text-ds-text-muted font-mono">
+            <div className="px-3 py-2 text-[10px] font-bold uppercase tracking-wider text-md-on-surface-variant font-mono">
               System Foundations
             </div>
             {navItems.map((item) => {
@@ -184,10 +234,10 @@ export const DesignSystemPage: React.FC<DesignSystemPageProps> = ({ onClose }) =
                 <button
                   key={item.id}
                   onClick={() => setActiveTab(item.id)}
-                  className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium transition-all cursor-pointer ${
+                  className={`w-full flex items-center justify-between px-3 py-2 rounded-full text-xs font-medium transition-all cursor-pointer ${
                     isActive
-                      ? 'bg-ds-primary text-white font-semibold shadow-[0_2px_10px_rgba(168,85,247,0.3)]'
-                      : 'text-ds-text-medium hover:text-ds-text-high hover:bg-ds-hover'
+                      ? 'bg-md-primary text-md-on-primary font-semibold shadow-sm'
+                      : 'text-md-on-surface-variant hover:text-md-on-surface hover:bg-white/[0.04]'
                   }`}
                 >
                   <div className="flex items-center gap-2.5">
@@ -195,8 +245,8 @@ export const DesignSystemPage: React.FC<DesignSystemPageProps> = ({ onClose }) =
                     <span>{item.label}</span>
                   </div>
                   {item.badge && (
-                    <span className={`text-[9px] px-1.5 py-0.5 rounded-full font-mono ${
-                      isActive ? 'bg-white/20 text-white' : 'bg-ds-container text-ds-text-muted'
+                    <span className={`text-[9.5px] px-1.5 py-0.2 rounded-full font-mono font-medium ${
+                      isActive ? 'bg-md-on-primary/20 text-md-on-primary' : 'bg-white/[0.06] text-md-on-surface-variant'
                     }`}>
                       {item.badge}
                     </span>
@@ -206,27 +256,27 @@ export const DesignSystemPage: React.FC<DesignSystemPageProps> = ({ onClose }) =
             })}
           </div>
 
-          <div className="p-3 bg-ds-container rounded-xl border border-ds-border text-[11px] space-y-1.5">
-            <div className="flex items-center gap-1.5 text-ds-border-focus font-semibold">
-              <ShieldCheck className="w-3.5 h-3.5" />
-              <span>WCAG 2.1 AAA</span>
+          <div className="p-3.5 bg-md-surface-container rounded-md-lg border border-white/[0.06] text-[11px] space-y-2">
+            <div className="flex items-center gap-1.5 text-md-primary font-semibold">
+              <ShieldCheck className="w-4 h-4" />
+              <span>Real-Time SSOT</span>
             </div>
-            <p className="text-ds-text-muted text-[10px] leading-relaxed">
-              Every token is rigorously calculated against pure black and print page boundaries.
+            <p className="text-md-on-surface-variant text-[10.5px] leading-relaxed">
+              Every token edited in this studio automatically writes to runtime CSS variables and reflects across the entire application instantly.
             </p>
           </div>
         </nav>
 
         {/* Mobile Horizontal Navigation Pills */}
-        <div className="md:hidden flex overflow-x-auto gap-1 p-2 border-b border-ds-border bg-ds-panel shrink-0 no-scrollbar">
+        <div className="md:hidden flex overflow-x-auto gap-1 p-2 border-b border-white/[0.08] bg-md-surface-container-low shrink-0 no-scrollbar">
           {navItems.map((item) => (
             <button
               key={item.id}
               onClick={() => setActiveTab(item.id)}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium shrink-0 ${
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium shrink-0 ${
                 activeTab === item.id
-                  ? 'bg-ds-primary text-white'
-                  : 'bg-ds-container text-ds-text-medium'
+                  ? 'bg-md-primary text-md-on-primary font-semibold'
+                  : 'bg-white/[0.04] text-md-on-surface-variant'
               }`}
             >
               {item.icon}
@@ -236,187 +286,401 @@ export const DesignSystemPage: React.FC<DesignSystemPageProps> = ({ onClose }) =
         </div>
 
         {/* Scrollable Main Content Area */}
-        <main className="flex-1 overflow-y-auto p-4 sm:p-8 bg-ds-bg/60">
-          <div className="max-w-5xl mx-auto space-y-8 pb-16">
+        <main className="flex-1 overflow-y-auto p-4 sm:p-8 bg-md-surface">
+          <div className="max-w-5xl mx-auto space-y-8 pb-20 select-text">
 
-            {/* TAB: OVERVIEW */}
+            {/* TAB: ARCHITECTURE OVERVIEW */}
             {activeTab === 'overview' && (
               <div className="space-y-8 animate-fade-in">
                 {/* Hero Banner */}
-                <div className="relative overflow-hidden rounded-2xl border border-ds-border bg-gradient-to-br from-ds-panel via-ds-container to-ds-panel p-6 sm:p-8">
-                  <div className="absolute top-0 right-0 w-80 h-80 bg-ds-primary/10 rounded-full blur-3xl pointer-events-none" />
-                  <div className="absolute bottom-0 right-1/4 w-60 h-60 bg-ds-secondary/10 rounded-full blur-2xl pointer-events-none" />
+                <div className="relative overflow-hidden rounded-md-xl border border-white/[0.08] bg-md-surface-container-low p-6 sm:p-8">
+                  <div className="absolute top-0 right-0 w-80 h-80 bg-md-primary/10 rounded-full blur-3xl pointer-events-none" />
+                  <div className="absolute bottom-0 right-1/4 w-60 h-60 bg-md-tertiary/10 rounded-full blur-2xl pointer-events-none" />
                   
-                  <div className="relative z-10 max-w-2xl space-y-4">
-                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-ds-primary/15 border border-ds-primary/30 text-ds-border-focus text-xs font-mono">
-                      <Sparkles className="w-3.5 h-3.5" />
-                      <span>Material You &bull; Evolution 2026</span>
-                    </div>
+                  <div className="relative z-10 max-w-2xl space-y-3.5">
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-mono font-medium bg-md-primary/15 text-md-primary border border-md-primary/30">
+                      <Sparkles className="w-3 h-3" />
+                      Single Source of Truth Architecture
+                    </span>
 
-                    <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-ds-text-high font-display">
-                      Purpose-Built Design System for High-Stakes Career Portfolios
+                    <h2 className="text-2xl sm:text-3xl font-bold font-display tracking-tight text-md-on-surface">
+                      One Unified Token System. Zero Desynchronization.
                     </h2>
 
-                    <p className="text-sm text-ds-text-medium leading-relaxed">
-                      Resume Studio M3 2026 synthesizes Google's Material 3 adaptive design guidelines with stringent recruiter eye-tracking science and automated ATS (Applicant Tracking System) parsing benchmarks.
+                    <p className="text-sm text-md-on-surface-variant leading-relaxed">
+                      All visual dimensions — tonal surfaces, interactive accents, translucent hairline strokes, typography, and paper physics — are mapped to semantic CSS tokens. Changing a token here updates the live application in real-time.
                     </p>
 
-                    <div className="pt-2 flex flex-wrap gap-3">
-                      <button
-                        onClick={() => setActiveTab('components')}
-                        className="px-4 py-2 rounded-xl bg-ds-primary hover:bg-ds-primary-hover text-white text-xs font-semibold shadow-[0_4px_14px_rgba(168,85,247,0.3)] transition-all cursor-pointer"
+                    <div className="flex flex-wrap items-center gap-3 pt-2">
+                      <Button 
+                        variant="primary" 
+                        leftIcon={<Wand2 className="w-4 h-4" />}
+                        onClick={() => setActiveTab('studio')}
                       >
-                        Explore Interactive Components
-                      </button>
-                      <button
+                        Open Live Theme Studio
+                      </Button>
+                      <Button 
+                        variant="secondary"
+                        leftIcon={<Palette className="w-4 h-4" />}
                         onClick={() => setActiveTab('colors')}
-                        className="px-4 py-2 rounded-xl bg-ds-container hover:bg-ds-hover border border-ds-border text-ds-text-high text-xs font-semibold transition-all cursor-pointer"
                       >
-                        Browse Color Tokens ({COLOR_TOKENS.length})
-                      </button>
+                        Explore All 24 Tokens
+                      </Button>
                     </div>
                   </div>
                 </div>
 
-                {/* Core Pillars Grid */}
-                <div>
-                  <h3 className="text-xs font-bold uppercase tracking-wider text-ds-text-muted font-mono mb-4">
-                    Architectural Pillars
+                {/* 1-Click Preset Switcher Banner */}
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h3 className="text-sm font-semibold text-md-on-surface font-display">Curated Production Presets</h3>
+                      <p className="text-xs text-md-on-surface-variant">Switch the entire application mood with a single click.</p>
+                    </div>
+                    {isCustomized && (
+                      <button 
+                        onClick={resetToDefaults}
+                        className="text-xs text-md-primary hover:underline cursor-pointer flex items-center gap-1"
+                      >
+                        <RotateCcw className="w-3 h-3" />
+                        <span>Restore Factory Defaults</span>
+                      </button>
+                    )}
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
+                    {presets.map((preset) => {
+                      const isActive = activePresetId === preset.id;
+                      return (
+                        <div
+                          key={preset.id}
+                          onClick={() => applyPreset(preset.id)}
+                          className={`p-4 rounded-md-lg border transition-all cursor-pointer text-left space-y-3 relative group ${
+                            isActive
+                              ? 'bg-md-primary/10 border-md-primary/40 ring-1 ring-md-primary/30 shadow-md-elevation-1'
+                              : 'bg-md-surface-container-low border-white/[0.06] hover:border-white/[0.14] hover:bg-md-surface-container'
+                          }`}
+                        >
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                              {/* Swatch Trio */}
+                              <div className="flex -space-x-1.5 overflow-hidden">
+                                {preset.previewColors.map((color, idx) => (
+                                  <div
+                                    key={idx}
+                                    className="w-5 h-5 rounded-full border border-md-surface shadow-xs"
+                                    style={{ backgroundColor: color }}
+                                  />
+                                ))}
+                              </div>
+                              <h4 className="text-xs font-semibold text-md-on-surface">{preset.name}</h4>
+                            </div>
+
+                            {isActive && (
+                              <CheckCircle2 className="w-4 h-4 text-md-primary shrink-0" />
+                            )}
+                          </div>
+
+                          <p className="text-[11px] text-md-on-surface-variant leading-relaxed line-clamp-2">
+                            {preset.tagline}
+                          </p>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Core Architectural Foundations */}
+                <div className="space-y-3">
+                  <h3 className="text-xs font-bold uppercase tracking-wider text-md-on-surface-variant font-mono">
+                    System Foundations
                   </h3>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
                     {[
                       {
-                        title: 'Perceptual Contrast',
-                        tag: 'WCAG AAA',
-                        desc: 'Dark canvas (#0D0C11) paired with calibrated lavender text tiers guarantees zero optical glare during prolonged editing sessions.',
-                        icon: <Eye className="w-5 h-5 text-ds-primary" />,
+                        title: 'Tonal Elevation',
+                        tag: 'M3 2026',
+                        desc: 'Five-tier container hierarchy (lowest to highest) provides natural depth without optical glare.',
+                        icon: <Layers className="w-4 h-4 text-md-primary" />,
                       },
                       {
-                        title: 'ATS Parser Strictness',
-                        tag: 'Machine Friendly',
-                        desc: 'Single-stream linear layout geometry ensures zero parsing friction across Taleo, Workday, and Greenhouse scanners.',
-                        icon: <ShieldCheck className="w-5 h-5 text-emerald-400" />,
+                        title: 'Subtle Hairlines',
+                        tag: 'color-mix',
+                        desc: 'Translucent borders dynamically blend with parent surface colors, eliminating harsh chalky wireframes.',
+                        icon: <SlidersHorizontal className="w-4 h-4 text-md-tertiary" />,
                       },
                       {
-                        title: 'A4 Page Budgeting',
+                        title: 'WCAG AAA Contrast',
+                        tag: 'Accessible',
+                        desc: 'Every headline, body copy, and badge is verified for maximum legibility in low and high ambient light.',
+                        icon: <Eye className="w-4 h-4 text-md-success" />,
+                      },
+                      {
+                        title: 'A4 Physical Budget',
                         tag: '210 × 297 mm',
-                        desc: 'Mathematical vertical rhythm guarantees exact 1-page or 2-page fit with micro-gap spacing and zero page-overflow spills.',
-                        icon: <FileText className="w-5 h-5 text-cyan-400" />,
-                      },
-                      {
-                        title: 'Sub-Millisecond Speed',
-                        tag: 'Zero Lag',
-                        desc: 'Optimized utility CSS tree-shaken down to 53KB with native hardware-accelerated CSS variables and zero runtime overhead.',
-                        icon: <Sparkle className="w-5 h-5 text-amber-400" />,
+                        desc: 'Mathematical vertical rhythm locks page height to prevent trailing blank page spills.',
+                        icon: <FileText className="w-4 h-4 text-md-warning" />,
                       },
                     ].map((pillar, i) => (
-                      <div key={i} className="p-5 rounded-xl border border-ds-border bg-ds-panel hover:border-ds-border-focus/50 transition-colors space-y-3">
+                      <div key={i} className="p-4 rounded-md-lg border border-white/[0.06] bg-md-surface-container-low space-y-2.5">
                         <div className="flex items-center justify-between">
-                          <div className="p-2 rounded-lg bg-ds-container border border-ds-border">
+                          <div className="p-2 rounded-md-sm bg-white/[0.04] border border-white/[0.06]">
                             {pillar.icon}
                           </div>
-                          <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-ds-container text-ds-text-muted border border-ds-border">
+                          <span className="text-[9.5px] font-mono px-2 py-0.5 rounded-full bg-white/[0.04] text-md-on-surface-variant border border-white/[0.06]">
                             {pillar.tag}
                           </span>
                         </div>
                         <div>
-                          <h4 className="font-bold text-sm text-ds-text-high">{pillar.title}</h4>
-                          <p className="text-xs text-ds-text-muted mt-1 leading-relaxed">{pillar.desc}</p>
+                          <h4 className="font-semibold text-xs text-md-on-surface">{pillar.title}</h4>
+                          <p className="text-[11px] text-md-on-surface-variant mt-1 leading-relaxed">{pillar.desc}</p>
                         </div>
                       </div>
                     ))}
                   </div>
                 </div>
+              </div>
+            )}
 
-                {/* Live System Metrics */}
-                <div className="p-6 rounded-xl border border-ds-border bg-ds-container">
-                  <h3 className="text-xs font-bold uppercase tracking-wider text-ds-text-muted font-mono mb-4">
-                    System Telemetry & Standards
-                  </h3>
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                    <div className="p-4 rounded-lg bg-ds-panel border border-ds-border">
-                      <div className="text-2xl font-black text-ds-primary font-display">24</div>
-                      <div className="text-xs font-semibold text-ds-text-high mt-0.5">Color Tokens</div>
-                      <div className="text-[10px] text-ds-text-muted">Semantic variable bindings</div>
+            {/* TAB: LIVE THEME STUDIO / TUNER */}
+            {activeTab === 'studio' && (
+              <div className="space-y-8 animate-fade-in">
+                <div>
+                  <h2 className="text-xl font-bold text-md-on-surface font-display">Live Token Tuner & Studio</h2>
+                  <p className="text-xs text-md-on-surface-variant mt-0.5">
+                    Click any key token to edit its color live. Your changes instantly propagate across the entire editor and document workspace.
+                  </p>
+                </div>
+
+                {/* Preset Fast Switcher */}
+                <div className="p-4 rounded-md-xl border border-white/[0.08] bg-md-surface-container-low space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-semibold text-md-on-surface">Select Base Palette:</span>
+                    <span className="text-[11px] font-mono text-md-primary">
+                      {isCustomized ? 'Custom Overrides Active' : activePreset?.name}
+                    </span>
+                  </div>
+
+                  <div className="flex flex-wrap gap-2">
+                    {presets.map((preset) => {
+                      const isActive = activePresetId === preset.id;
+                      return (
+                        <button
+                          key={preset.id}
+                          onClick={() => applyPreset(preset.id)}
+                          className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium transition-all cursor-pointer ${
+                            isActive
+                              ? 'bg-md-primary text-md-on-primary font-semibold shadow-sm'
+                              : 'bg-white/[0.04] text-md-on-surface-variant hover:text-md-on-surface hover:bg-white/[0.08] border border-white/[0.06]'
+                          }`}
+                        >
+                          <div 
+                            className="w-3 h-3 rounded-full border border-white/20" 
+                            style={{ backgroundColor: preset.previewColors[0] }} 
+                          />
+                          <span>{preset.name}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Active Key Token Tuners */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {[
+                    { label: 'Primary Brand Color', variable: '--md-sys-color-primary', desc: 'Main interactive elements, active rail icons, focus rings' },
+                    { label: 'Primary Container', variable: '--md-sys-color-primary-container', desc: 'Active headers, tonal button fills, selection highlight' },
+                    { label: 'Secondary Accent', variable: '--md-sys-color-secondary', desc: 'Secondary buttons, filter chips, navigation indicators' },
+                    { label: 'Tertiary / Tech Color', variable: '--md-sys-color-tertiary', desc: 'ATS keyword anchors, skill tags, diagnostic metrics' },
+                    { label: 'Base Canvas Background', variable: '--md-sys-color-surface', desc: 'Root background behind document canvas and sidebar' },
+                    { label: 'Sidebar & Panel Surface', variable: '--md-sys-color-surface-container-low', desc: 'Toolbar, navigation rail, inactive accordion headers' },
+                    { label: 'Expanded Container Surface', variable: '--md-sys-color-surface-container', desc: 'Accordion bodies, tool drawers, form card groups' },
+                    { label: 'Subtle Hairline Outline', variable: '--md-sys-color-outline-variant', desc: 'Panel dividers, card outlines, subtle separators' },
+                  ].map((item) => {
+                    const currentToken = tokens.find(t => t.variable === item.variable);
+                    const currentHex = currentToken?.hex || '#ffffff';
+                    
+                    return (
+                      <div
+                        key={item.variable}
+                        className="p-4 rounded-md-lg border border-white/[0.06] bg-md-surface-container-low hover:border-white/[0.12] transition-colors space-y-3"
+                      >
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <h4 className="text-xs font-semibold text-md-on-surface">{item.label}</h4>
+                            <code className="text-[10px] font-mono text-md-on-surface-variant">{item.variable}</code>
+                          </div>
+                          
+                          {/* Live Color Picker Trigger */}
+                          <div className="flex items-center gap-2">
+                            <label className="relative cursor-pointer flex items-center">
+                              <input
+                                type="color"
+                                value={currentHex.startsWith('#') && currentHex.length === 7 ? currentHex : '#d0bcff'}
+                                onChange={(e) => handleApplyCustomHex(item.variable, e.target.value)}
+                                className="sr-only"
+                              />
+                              <div
+                                className="w-8 h-8 rounded-md-sm border border-white/20 shadow-sm cursor-pointer hover:scale-105 transition-transform"
+                                style={{ backgroundColor: `var(${item.variable})` }}
+                                title="Click to open color picker"
+                              />
+                            </label>
+                            
+                            <input
+                              type="text"
+                              value={currentHex}
+                              onChange={(e) => handleApplyCustomHex(item.variable, e.target.value)}
+                              className="w-24 px-2 py-1 rounded bg-white/[0.04] border border-white/[0.1] text-xs font-mono text-md-on-surface focus:outline-none focus:border-md-primary"
+                            />
+                          </div>
+                        </div>
+
+                        <p className="text-[11px] text-md-on-surface-variant leading-relaxed">
+                          {item.desc}
+                        </p>
+
+                        <div className="flex items-center justify-between text-[10.5px] font-mono pt-1 border-t border-white/[0.04]">
+                          <span className="text-md-on-surface-variant">Live contrast:</span>
+                          <span className="font-semibold text-md-primary">{currentToken?.contrast || 'AA'}</span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Live Preview Playground */}
+                <div className="p-6 rounded-md-xl border border-white/[0.08] bg-md-surface-container space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h3 className="text-sm font-semibold text-md-on-surface font-display">Live Reactive Playground</h3>
+                      <p className="text-xs text-md-on-surface-variant">These controls use the exact tokens you tune above.</p>
                     </div>
-                    <div className="p-4 rounded-lg bg-ds-panel border border-ds-border">
-                      <div className="text-2xl font-black text-cyan-400 font-display">3</div>
-                      <div className="text-xs font-semibold text-ds-text-high mt-0.5">Type Families</div>
-                      <div className="text-[10px] text-ds-text-muted">Outfit &bull; Plus Jakarta &bull; Fira</div>
+                    <Badge variant="primary" dot>Live Synced</Badge>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
+                    <div className="space-y-2">
+                      <span className="text-[11px] text-md-on-surface-variant font-medium">Buttons & Actions</span>
+                      <div className="flex flex-col gap-2">
+                        <Button variant="primary" fullWidth leftIcon={<Check className="w-3.5 h-3.5" />}>Primary Button</Button>
+                        <Button variant="secondary" fullWidth>Secondary Button</Button>
+                        <Button variant="outline" fullWidth>Outline Button</Button>
+                      </div>
                     </div>
-                    <div className="p-4 rounded-lg bg-ds-panel border border-ds-border">
-                      <div className="text-2xl font-black text-emerald-400 font-display">100%</div>
-                      <div className="text-xs font-semibold text-ds-text-high mt-0.5">WCAG 2.1 AA</div>
-                      <div className="text-[10px] text-ds-text-muted">Contrast verified text</div>
+
+                    <div className="space-y-2">
+                      <span className="text-[11px] text-md-on-surface-variant font-medium">Form Input & Badges</span>
+                      <div className="space-y-2.5">
+                        <Input placeholder="Type to test focus rings..." defaultValue="Live token testing" />
+                        <div className="flex flex-wrap gap-1.5">
+                          <Badge variant="primary">Primary</Badge>
+                          <Badge variant="secondary">Secondary</Badge>
+                          <Badge variant="success" dot>98% ATS</Badge>
+                        </div>
+                      </div>
                     </div>
-                    <div className="p-4 rounded-lg bg-ds-panel border border-ds-border">
-                      <div className="text-2xl font-black text-amber-400 font-display">296mm</div>
-                      <div className="text-xs font-semibold text-ds-text-high mt-0.5">Print Height Lock</div>
-                      <div className="text-[10px] text-ds-text-muted">Prevents trailing blanks</div>
+
+                    <div className="space-y-2">
+                      <span className="text-[11px] text-md-on-surface-variant font-medium">Sliders & Toggles</span>
+                      <div className="p-3 bg-md-surface-container-low rounded-md-md border border-white/[0.06] space-y-3">
+                        <div className="flex items-center justify-between text-xs">
+                          <span>Adaptive Fit</span>
+                          <Switch checked={sampleToggle} onCheckedChange={setSampleToggle} size="sm" />
+                        </div>
+                        <Slider value={sampleSlider} min={0} max={100} onChange={setSampleSlider} />
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
             )}
 
-            {/* TAB: COLOR TOKENS */}
+            {/* TAB: COLOR TOKENS SWATCHES */}
             {activeTab === 'colors' && (
               <div className="space-y-6 animate-fade-in">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                   <div>
-                    <h2 className="text-xl font-bold text-ds-text-high font-display">Color Palette & Tokens</h2>
-                    <p className="text-xs text-ds-text-muted mt-0.5">Click any card to copy the hex code or CSS variable directly to your clipboard.</p>
+                    <h2 className="text-xl font-bold text-md-on-surface font-display">Color Palette & Tokens (SSOT)</h2>
+                    <p className="text-xs text-md-on-surface-variant mt-0.5">Click any token to copy its CSS variable or hex value.</p>
                   </div>
 
+                  {/* Search filter */}
                   <div className="relative w-full sm:w-64">
-                    <Search className="w-4 h-4 text-ds-text-muted absolute left-3 top-1/2 -translate-y-1/2" />
+                    <Search className="w-4 h-4 text-md-on-surface-variant absolute left-3 top-1/2 -translate-y-1/2" />
                     <input
                       type="text"
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      placeholder="Filter tokens..."
-                      className="w-full bg-ds-container border border-ds-border rounded-xl pl-9 pr-3 py-1.5 text-xs text-ds-text-high placeholder-ds-text-muted focus:outline-none focus:border-ds-border-focus"
+                      placeholder="Filter tokens by name, hex, tailwind..."
+                      className="w-full bg-md-surface-container-low border border-white/[0.08] rounded-full pl-9 pr-3 py-1.5 text-xs text-md-on-surface placeholder:text-md-on-surface-variant focus:outline-none focus:border-md-primary"
                     />
                   </div>
                 </div>
 
+                {/* Category Filter Pills */}
+                <div className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar">
+                  {[
+                    { id: 'all', label: 'All Tokens' },
+                    { id: 'brand', label: 'Brand & Accents' },
+                    { id: 'surface', label: 'Tonal Surfaces' },
+                    { id: 'content', label: 'Typography & Content' },
+                    { id: 'outline', label: 'Outlines & Dividers' },
+                    { id: 'status', label: 'Status & Badges' },
+                    { id: 'print', label: 'Print & Canvas' },
+                  ].map((cat) => (
+                    <button
+                      key={cat.id}
+                      onClick={() => setSelectedCategory(cat.id)}
+                      className={`px-3 py-1 rounded-full text-xs font-medium transition-all cursor-pointer shrink-0 ${
+                        selectedCategory === cat.id
+                          ? 'bg-md-primary text-md-on-primary font-semibold'
+                          : 'bg-white/[0.04] text-md-on-surface-variant hover:text-md-on-surface hover:bg-white/[0.08]'
+                      }`}
+                    >
+                      {cat.label}
+                    </button>
+                  ))}
+                </div>
+
                 {/* Swatches Grid */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {filteredColors.map((color, idx) => (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
+                  {filteredColors.map((color) => (
                     <div
-                      key={idx}
-                      onClick={() => copyToClipboard(color.hex, color.name)}
-                      className="group p-4 rounded-xl border border-ds-border bg-ds-panel hover:border-ds-border-focus/70 transition-all cursor-pointer shadow-sm hover:shadow-[0_4px_16px_rgba(0,0,0,0.5)] flex flex-col justify-between space-y-3"
+                      key={color.variable}
+                      onClick={() => copyToClipboard(color.variable, color.name)}
+                      className="group p-4 rounded-md-lg border border-white/[0.06] bg-md-surface-container-low hover:border-md-primary/40 transition-all cursor-pointer shadow-sm flex flex-col justify-between space-y-3"
                     >
                       <div>
                         <div className="flex items-center justify-between mb-3">
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-2.5">
+                            {/* Live CSS variable driven swatch */}
                             <div 
-                              className="w-7 h-7 rounded-lg border border-white/20 shadow-sm"
-                              style={{ backgroundColor: color.hex }}
+                              className="w-8 h-8 rounded-md-sm border border-white/20 shadow-sm shrink-0"
+                              style={{ backgroundColor: `var(${color.variable})` }}
                             />
-                            <div>
-                              <h4 className="text-xs font-bold text-ds-text-high group-hover:text-ds-border-focus transition-colors">
+                            <div className="min-w-0">
+                              <h4 className="text-xs font-bold text-md-on-surface group-hover:text-md-primary transition-colors truncate">
                                 {color.name}
                               </h4>
-                              <code className="text-[10px] font-mono text-ds-text-muted">{color.tailwind}</code>
+                              <code className="text-[10px] font-mono text-md-on-surface-variant">{color.tailwind}</code>
                             </div>
                           </div>
-                          <span className="text-[9px] font-mono px-2 py-0.5 rounded bg-ds-container text-ds-text-medium border border-ds-border">
+                          <span className="text-[9px] font-mono px-2 py-0.5 rounded-full bg-white/[0.04] text-md-on-surface-variant border border-white/[0.06]">
                             {color.contrast}
                           </span>
                         </div>
 
-                        <p className="text-[11px] text-ds-text-muted leading-relaxed">
+                        <p className="text-[11px] text-md-on-surface-variant leading-relaxed line-clamp-2">
                           {color.usage}
                         </p>
                       </div>
 
-                      <div className="pt-2 border-t border-ds-border/60 flex items-center justify-between text-[10.5px] font-mono">
-                        <span className="text-ds-text-high font-semibold">{color.hex}</span>
-                        <div className="flex items-center gap-1 text-ds-text-muted group-hover:text-ds-border-focus transition-colors">
+                      <div className="pt-2 border-t border-white/[0.04] flex items-center justify-between text-[10.5px] font-mono">
+                        <span className="text-md-on-surface font-semibold">{color.hex}</span>
+                        <div className="flex items-center gap-1 text-md-on-surface-variant group-hover:text-md-primary transition-colors">
                           <Copy className="w-3 h-3" />
-                          <span>Copy</span>
+                          <span>Copy var</span>
                         </div>
                       </div>
                     </div>
@@ -429,131 +693,52 @@ export const DesignSystemPage: React.FC<DesignSystemPageProps> = ({ onClose }) =
             {activeTab === 'typography' && (
               <div className="space-y-8 animate-fade-in">
                 <div>
-                  <h2 className="text-xl font-bold text-ds-text-high font-display">Typographic Hierarchy & Scales</h2>
-                  <p className="text-xs text-ds-text-muted mt-0.5">Three complementary font families harmonized for readability and scanning ergonomics.</p>
+                  <h2 className="text-xl font-bold text-md-on-surface font-display">Typographic Hierarchy & Scales</h2>
+                  <p className="text-xs text-md-on-surface-variant mt-0.5">Plus Jakarta Sans & Fira Code calibrated for readability and fast parsing ergonomics.</p>
                 </div>
 
-                {/* Font Families Breakdown */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="p-5 rounded-xl border border-ds-border bg-ds-panel space-y-2">
-                    <span className="text-[10px] font-mono text-ds-border-focus uppercase tracking-wider font-bold">Display & Headings</span>
-                    <h3 className="text-2xl font-extrabold text-ds-text-high font-display">Outfit</h3>
-                    <p className="text-xs text-ds-text-muted leading-relaxed">
-                      Modern geometric sans with distinctive open apertures. Used for candidate names, primary document titles, and hero badges.
+                {/* Font Families */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="p-5 rounded-md-lg border border-white/[0.06] bg-md-surface-container-low space-y-2">
+                    <span className="text-[10px] font-mono text-md-primary uppercase tracking-wider font-bold">Display & Interface</span>
+                    <h3 className="text-2xl font-bold text-md-on-surface font-display">Plus Jakarta Sans</h3>
+                    <p className="text-xs text-md-on-surface-variant leading-relaxed">
+                      Clean geometric sans designed specifically for high-density document reading, UI headers, and recruiter evaluation speed.
                     </p>
-                    <div className="text-[11px] font-mono text-ds-text-muted pt-2 border-t border-ds-border">
-                      font-display &bull; 300 to 800 weight
+                    <div className="text-[11px] font-mono text-md-on-surface-variant pt-2 border-t border-white/[0.04]">
+                      font-sans, font-display &bull; 400 to 700 weight
                     </div>
                   </div>
 
-                  <div className="p-5 rounded-xl border border-ds-border bg-ds-panel space-y-2">
-                    <span className="text-[10px] font-mono text-cyan-400 uppercase tracking-wider font-bold">Interface & Body</span>
-                    <h3 className="text-2xl font-extrabold text-ds-text-high font-sans">Plus Jakarta Sans</h3>
-                    <p className="text-xs text-ds-text-muted leading-relaxed">
-                      Precision corporate geometric typeface with tall x-height. Engineered for maximum legibility in resume body bullets and form inputs.
+                  <div className="p-5 rounded-md-lg border border-white/[0.06] bg-md-surface-container-low space-y-2">
+                    <span className="text-[10px] font-mono text-md-tertiary uppercase tracking-wider font-bold">Code & Data</span>
+                    <h3 className="text-2xl font-bold text-md-on-surface font-mono">Fira Code</h3>
+                    <p className="text-xs text-md-on-surface-variant leading-relaxed">
+                      High-legibility monospace with programming ligatures for JSON schemas, token variable names, and ATS metadata strings.
                     </p>
-                    <div className="text-[11px] font-mono text-ds-text-muted pt-2 border-t border-ds-border">
-                      font-sans &bull; 400, 500, 600, 700
-                    </div>
-                  </div>
-
-                  <div className="p-5 rounded-xl border border-ds-border bg-ds-panel space-y-2">
-                    <span className="text-[10px] font-mono text-emerald-400 uppercase tracking-wider font-bold">Code & Keywords</span>
-                    <h3 className="text-2xl font-extrabold text-ds-text-high font-mono">Fira Code</h3>
-                    <p className="text-xs text-ds-text-muted leading-relaxed">
-                      Monospace typeface with programming ligatures. Used for ATS token counters, version pills, and technical skill lists.
-                    </p>
-                    <div className="text-[11px] font-mono text-ds-text-muted pt-2 border-t border-ds-border">
-                      font-mono &bull; 400, 500 weight
+                    <div className="text-[11px] font-mono text-md-on-surface-variant pt-2 border-t border-white/[0.04]">
+                      font-mono &bull; 400 to 600 weight
                     </div>
                   </div>
                 </div>
 
-                {/* Interactive Live Font Tester */}
-                <div className="p-5 rounded-xl border border-ds-border bg-ds-container space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold uppercase tracking-wider text-ds-text-muted font-mono">
-                      Interactive Live Specimen Tester
-                    </span>
-                    <button 
-                      onClick={() => setTypographySample('Alex Diakov — Lead System Architect')}
-                      className="text-[11px] text-ds-border-focus hover:underline cursor-pointer"
-                    >
-                      Reset text
-                    </button>
-                  </div>
-                  <input
-                    type="text"
-                    value={typographySample}
-                    onChange={(e) => setTypographySample(e.target.value)}
-                    className="w-full bg-ds-panel border border-ds-border rounded-xl px-4 py-2.5 text-sm text-ds-text-high focus:outline-none focus:border-ds-border-focus"
-                    placeholder="Type custom text to preview font scale..."
-                  />
-                </div>
-
-                {/* Type Scale Showcase */}
-                <div className="space-y-4">
-                  <h3 className="text-xs font-bold uppercase tracking-wider text-ds-text-muted font-mono">
-                    Print & Interface Scale Specs
+                {/* Typography Hierarchy Table */}
+                <div className="space-y-3">
+                  <h3 className="text-xs font-bold uppercase tracking-wider text-md-on-surface-variant font-mono">
+                    Type Scales
                   </h3>
-
-                  <div className="space-y-3">
-                    {[
-                      {
-                        name: 'Candidate Full Name',
-                        token: 'text-resume-name (28pt / 37px)',
-                        style: 'font-display font-extrabold tracking-tight',
-                        sample: typographySample || 'Alex Diakov',
-                        specs: 'Letter-spacing: -0.03em | Line-height: 1.1'
-                      },
-                      {
-                        name: 'Job Title / Subheading',
-                        token: 'text-resume-title (13pt / 17.3px)',
-                        style: 'font-sans font-medium text-ds-text-medium tracking-wide',
-                        sample: 'Staff Cloud Infrastructure Architect & Team Lead',
-                        specs: 'Letter-spacing: +0.01em | Line-height: 1.2'
-                      },
-                      {
-                        name: 'Section Title',
-                        token: 'text-resume-section (10.5pt / 14px)',
-                        style: 'font-sans font-bold uppercase tracking-wider text-ds-text-high',
-                        sample: 'WORK EXPERIENCE & KEY ACHIEVEMENTS',
-                        specs: 'Letter-spacing: +0.06em | Line-height: 1.2 | Uppercase'
-                      },
-                      {
-                        name: 'Job Description / Bullet',
-                        token: 'text-resume-body (10pt / 13.3px)',
-                        style: 'font-sans font-normal text-ds-text-medium leading-relaxed',
-                        sample: 'Architected distributed multi-region Kubernetes clusters handling 45,000 requests per second with 99.995% SLA and automated disaster failover.',
-                        specs: 'Line-height: 1.5 | Max 75ch per line for recruiter reading velocity'
-                      },
-                      {
-                        name: 'Metadata / Date / Location',
-                        token: 'text-resume-meta (9.5pt / 12.6px)',
-                        style: 'font-sans font-normal text-ds-text-muted',
-                        sample: 'Kyiv, Ukraine • Jan 2021 – Present • Full-time Remote',
-                        specs: 'Line-height: 1.5 | Light slate high-contrast readability'
-                      },
-                      {
-                        name: 'Keyword & Version Pill',
-                        token: 'text-[9.5px] font-mono',
-                        style: 'font-mono font-medium text-ds-border-focus',
-                        sample: 'DOCKER • TERRAFORM • POSTGRESQL • GO • REACT',
-                        specs: 'Monospace tabular numerals | Micro-tag spacing'
-                      },
-                    ].map((spec, i) => (
-                      <div key={i} className="p-5 rounded-xl border border-ds-border bg-ds-panel space-y-2">
-                        <div className="flex flex-wrap items-center justify-between gap-2">
-                          <span className="text-xs font-bold text-ds-text-high">{spec.name}</span>
-                          <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-ds-container text-ds-border-focus border border-ds-border">
-                            {spec.token}
-                          </span>
+                  <div className="space-y-2.5">
+                    {DEFAULT_TYPOGRAPHY_TOKENS.map((token, i) => (
+                      <div key={i} className="p-4 rounded-md-lg border border-white/[0.06] bg-md-surface-container-low space-y-1.5">
+                        <div className="flex items-center justify-between text-xs">
+                          <span className="font-semibold text-md-on-surface">{token.name} ({token.role})</span>
+                          <span className="font-mono text-[10px] text-md-primary">{token.fontSize} &bull; {token.lineHeight}</span>
                         </div>
-                        <div className={`text-ds-text-high ${spec.style}`}>
-                          {spec.sample}
+                        <div className={token.tailwind}>
+                          {token.name} — Quick brown fox jumps over the lazy dog
                         </div>
-                        <div className="text-[10px] font-mono text-ds-text-muted pt-1">
-                          {spec.specs}
+                        <div className="text-[10px] font-mono text-md-on-surface-variant">
+                          {token.usage}
                         </div>
                       </div>
                     ))}
@@ -566,8 +751,8 @@ export const DesignSystemPage: React.FC<DesignSystemPageProps> = ({ onClose }) =
             {activeTab === 'components' && (
               <div className="space-y-8 animate-fade-in">
                 <div>
-                  <h2 className="text-xl font-bold text-ds-text-high font-display">Interactive Component Showcase</h2>
-                  <p className="text-xs text-ds-text-muted mt-0.5">All UI primitives follow unified design tokens, WCAG AA compliance, and smooth micro-interactions.</p>
+                  <h2 className="text-xl font-bold text-md-on-surface font-display">Interactive Component Showcase</h2>
+                  <p className="text-xs text-md-on-surface-variant mt-0.5">Every UI primitive is linked to the active tokens in real-time.</p>
                 </div>
 
                 {/* Section: Buttons */}
@@ -575,61 +760,22 @@ export const DesignSystemPage: React.FC<DesignSystemPageProps> = ({ onClose }) =
                   <CardHeader>
                     <div className="flex items-center justify-between">
                       <CardTitle>Button Hierarchy & States</CardTitle>
-                      <Badge variant="surface" size="sm">7 Variants &bull; 3 Sizes</Badge>
+                      <Badge variant="surface" size="sm">7 Variants</Badge>
                     </div>
                     <CardDescription>
-                      Unified action buttons with tokenized heights, focus rings, active scaling, and loading state slots.
+                      M3 compliant button variants with tokenized focus rings, active scaling, and loading state slots.
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="flex flex-wrap items-center gap-3">
-                      <Button variant="primary" leftIcon={<Download className="w-3.5 h-3.5" />}>
-                        Primary Action
-                      </Button>
-
-                      <Button variant="secondary" leftIcon={<Sparkles className="w-3.5 h-3.5 text-ds-secondary" />}>
-                        Secondary Tech
-                      </Button>
-
-                      <Button variant="outline">
-                        Outline Button
-                      </Button>
-
-                      <Button variant="ghost">
-                        Ghost Action
-                      </Button>
-
-                      <Button variant="success" leftIcon={<Check className="w-3.5 h-3.5" />}>
-                        Success
-                      </Button>
-
-                      <Button variant="danger">
-                        Destructive
-                      </Button>
-
-                      <Button 
-                        variant="secondary"
-                        loading={sampleLoading}
-                        onClick={() => setSampleLoading(!sampleLoading)}
-                        leftIcon={<Sliders className="w-3.5 h-3.5 text-ds-primary" />}
-                      >
-                        {sampleLoading ? 'Simulating...' : 'Toggle Loading'}
-                      </Button>
-
-                      <Button variant="primary" disabled>
-                        Disabled
-                      </Button>
-
-                      <Button variant="outline" size="icon" aria-label="Quick Search">
-                        <Search className="w-3.5 h-3.5" />
-                      </Button>
-                    </div>
-
-                    <div className="flex items-center gap-2 pt-2 border-t border-ds-border text-[11px] font-mono text-ds-text-muted">
-                      <span>Sizes:</span>
-                      <Button variant="outline" size="sm">Small (h-7.5)</Button>
-                      <Button variant="outline" size="default">Default (h-9)</Button>
-                      <Button variant="outline" size="lg">Large (h-11)</Button>
+                      <Button variant="primary">Primary Action</Button>
+                      <Button variant="secondary">Secondary Action</Button>
+                      <Button variant="tonal">Tonal Button</Button>
+                      <Button variant="elevated">Elevated Button</Button>
+                      <Button variant="outline">Outline Button</Button>
+                      <Button variant="ghost">Ghost Button</Button>
+                      <Button variant="success">Success Action</Button>
+                      <Button variant="danger">Destructive Action</Button>
                     </div>
                   </CardContent>
                 </Card>
@@ -642,42 +788,19 @@ export const DesignSystemPage: React.FC<DesignSystemPageProps> = ({ onClose }) =
                       <Badge variant="surface" size="sm">Live Indicators</Badge>
                     </div>
                     <CardDescription>
-                      Pills and metadata tags with optional animated pulse dots, high contrast ratios, and semantic status colors.
+                      Metadata chips and indicator tags with semantic status roles.
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
                     <div className="flex flex-wrap items-center gap-2.5">
-                      <Badge variant="primary" dot>
-                        Primary Badge
-                      </Badge>
-
-                      <Badge variant="secondary">
-                        Tech: TypeScript 5.8
-                      </Badge>
-
-                      <Badge variant="success" dot>
-                        ATS Score: 96%
-                      </Badge>
-
-                      <Badge variant="warning" dot>
-                        Cognitive Load: Moderate
-                      </Badge>
-
-                      <Badge variant="danger" dot>
-                        Page Overflow Alert
-                      </Badge>
-
-                      <Badge variant="info" dot>
-                        Auto-Format Ready
-                      </Badge>
-
-                      <Badge variant="surface">
-                        Surface Neutral
-                      </Badge>
-
-                      <Badge variant="outline">
-                        Outline Minimal
-                      </Badge>
+                      <Badge variant="primary" dot>Primary Badge</Badge>
+                      <Badge variant="secondary">Secondary: TypeScript 5.8</Badge>
+                      <Badge variant="success" dot>ATS Score: 98%</Badge>
+                      <Badge variant="warning" dot>Moderate Load</Badge>
+                      <Badge variant="danger" dot>Overflow Notice</Badge>
+                      <Badge variant="info" dot>Realtime Synced</Badge>
+                      <Badge variant="surface">Surface Container</Badge>
+                      <Badge variant="outline">Outline Stroke</Badge>
                     </div>
                   </CardContent>
                 </Card>
@@ -685,14 +808,13 @@ export const DesignSystemPage: React.FC<DesignSystemPageProps> = ({ onClose }) =
                 {/* Section: Form Controls & Inputs */}
                 <Card variant="panel">
                   <CardHeader>
-                    <CardTitle>Form Controls & Precision Sliders</CardTitle>
+                    <CardTitle>Form Controls & Sliders</CardTitle>
                     <CardDescription>
-                      Engineered for high data entry speed, clear visual focus boundaries, and validation indicators.
+                      Interactive inputs, switches, and sliders tuned for high-velocity resume creation.
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-5">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                      {/* Text Input - Standard */}
                       <div>
                         <Label htmlFor="sample-title" required>Job Title Target</Label>
                         <Input
@@ -700,148 +822,78 @@ export const DesignSystemPage: React.FC<DesignSystemPageProps> = ({ onClose }) =
                           type="text"
                           value={sampleInput}
                           onChange={(e) => setSampleInput(e.target.value)}
-                          placeholder="e.g. Senior Cloud Architect"
+                          placeholder="e.g. Senior Staff Architect"
                         />
                       </div>
 
-                      {/* Text Input - Validated */}
-                      <div>
-                        <Label htmlFor="sample-salary" optional>Expected Compensation</Label>
-                        <Input
-                          id="sample-salary"
-                          type="text"
-                          defaultValue="$180,000 – $220,000 / year"
-                          status="success"
-                        />
-                      </div>
-
-                      {/* Textarea */}
-                      <div className="sm:col-span-2">
-                        <Label htmlFor="sample-summary" required>Executive Summary Bullet</Label>
-                        <Textarea
-                          id="sample-summary"
-                          rows={2}
-                          defaultValue="Principal systems engineer with 10+ years specializing in low-latency event-driven microservices, multi-cloud Kubernetes deployments, and automated CI/CD pipelines."
-                        />
-                      </div>
-
-                      {/* Interactive Slider */}
-                      <div className="space-y-1.5">
+                      <div className="space-y-3">
                         <div className="flex items-center justify-between">
-                          <Label>Print Typography Budget</Label>
-                          <span className="font-mono text-xs text-ds-primary font-bold">{sampleSlider}%</span>
+                          <Label htmlFor="sample-switch">Adaptive Anti-Void Micro-Compression</Label>
+                          <Switch
+                            id="sample-switch"
+                            checked={sampleToggle}
+                            onCheckedChange={setSampleToggle}
+                          />
                         </div>
-                        <Slider
-                          min={10}
-                          max={100}
-                          value={sampleSlider}
-                          onChange={(e) => setSampleSlider(Number(e.target.value))}
-                        />
-                      </div>
-
-                      {/* Interactive Switch */}
-                      <div className="flex items-center justify-between p-3 rounded-ds-md border border-ds-border bg-ds-container">
-                        <div>
-                          <div className="text-xs font-semibold text-ds-text-high">Visual Page Boundary Guides</div>
-                          <div className="text-[11px] text-ds-text-muted">Display red dotted break lines at exact 296mm A4 cutoffs</div>
+                        <div className="space-y-1">
+                          <div className="flex items-center justify-between text-xs">
+                            <span className="text-md-on-surface-variant">Section Spacing:</span>
+                            <span className="font-mono text-md-primary font-medium">{sampleSlider}%</span>
+                          </div>
+                          <Slider
+                            value={sampleSlider}
+                            min={0}
+                            max={100}
+                            onChange={setSampleSlider}
+                          />
                         </div>
-                        <Switch
-                          checked={sampleToggle}
-                          onCheckedChange={setSampleToggle}
-                        />
                       </div>
                     </div>
                   </CardContent>
                 </Card>
-
-                {/* Section: Card Containers */}
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                  <Card variant="panel">
-                    <CardHeader>
-                      <CardTitle>Panel Card</CardTitle>
-                      <CardDescription>Elevation 1 container with subtle border</CardDescription>
-                    </CardHeader>
-                    <CardContent className="text-xs text-ds-text-medium">
-                      Used for sidebars, inspectors, and primary dialog surfaces.
-                    </CardContent>
-                  </Card>
-
-                  <Card variant="container">
-                    <CardHeader>
-                      <CardTitle>Container Card</CardTitle>
-                      <CardDescription>Elevation 2 nested group</CardDescription>
-                    </CardHeader>
-                    <CardContent className="text-xs text-ds-text-medium">
-                      Used for nested form groups, metric cards, and list item wrappers.
-                    </CardContent>
-                  </Card>
-
-                  <Card variant="interactive">
-                    <CardHeader>
-                      <CardTitle className="flex items-center justify-between">
-                        <span>Interactive Card</span>
-                        <ArrowLeft className="w-3.5 h-3.5 rotate-180 text-ds-primary" />
-                      </CardTitle>
-                      <CardDescription>Hover & active feedback</CardDescription>
-                    </CardHeader>
-                    <CardContent className="text-xs text-ds-text-medium">
-                      Subtle hover glow and border lighting for clickable cards and templates.
-                    </CardContent>
-                  </Card>
-                </div>
               </div>
             )}
 
-            {/* TAB: ELEVATION & SURFACES */}
+            {/* TAB: SURFACES & ELEVATION */}
             {activeTab === 'elevation' && (
-              <div className="space-y-6 animate-fade-in">
+              <div className="space-y-8 animate-fade-in">
                 <div>
-                  <h2 className="text-xl font-bold text-ds-text-high font-display">Surfaces, Radii & Depth</h2>
-                  <p className="text-xs text-ds-text-muted mt-0.5">M3 layered elevation model built on mathematical contrast steps rather than blurry dropshadows.</p>
+                  <h2 className="text-xl font-bold text-md-on-surface font-display">Tonal Surfaces & Elevation Tiers</h2>
+                  <p className="text-xs text-md-on-surface-variant mt-0.5">Material 3 elevation system using calibrated container backgrounds and micro-shadows.</p>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                {/* Surface Tiers Grid */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   {[
-                    { level: 'Surface 0', color: '#0D0C11', name: 'Canvas Base', desc: 'Viewport root canvas with pure dark neutrality', border: 'border-transparent' },
-                    { level: 'Surface 1', color: '#14121A', name: 'Sidebars & Panels', desc: 'Toolbar, editors, and top-level cards', border: 'border-ds-border' },
-                    { level: 'Surface 2', color: '#1B1922', name: 'Containers & Inputs', desc: 'Form field wrapping groups and nested accordions', border: 'border-ds-border' },
-                    { level: 'Surface 3', color: '#25222D', name: 'Active & Selected', desc: 'Selected list items, active pill states', border: 'border-ds-border-focus/40' },
-                  ].map((s, i) => (
-                    <div 
-                      key={i} 
-                      className={`p-5 rounded-2xl border ${s.border} space-y-3 transition-transform hover:-translate-y-1`}
-                      style={{ backgroundColor: s.color }}
-                    >
-                      <div className="flex items-center justify-between">
-                        <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-white/10 text-ds-text-high font-bold">
-                          {s.level}
-                        </span>
-                        <code className="text-[10px] font-mono text-ds-text-muted">{s.color}</code>
-                      </div>
-                      <div>
-                        <h4 className="font-bold text-sm text-ds-text-high">{s.name}</h4>
-                        <p className="text-xs text-ds-text-muted mt-1 leading-relaxed">{s.desc}</p>
-                      </div>
+                    { name: 'Surface Canvas (Base)', bg: 'bg-md-surface', var: '--md-sys-color-surface', desc: 'Root background layer' },
+                    { name: 'Container Lowest', bg: 'bg-md-surface-container-lowest', var: '--md-sys-color-surface-container-lowest', desc: 'Deep code areas, JSON editor' },
+                    { name: 'Container Low', bg: 'bg-md-surface-container-low', var: '--md-sys-color-surface-container-low', desc: 'Sidebar rail, top app bar' },
+                    { name: 'Container (Standard)', bg: 'bg-md-surface-container', var: '--md-sys-color-surface-container', desc: 'Accordion bodies, main drawer' },
+                    { name: 'Container High', bg: 'bg-md-surface-container-high', var: '--md-sys-color-surface-container-high', desc: 'Dropdown menus, modal surfaces' },
+                    { name: 'Container Highest', bg: 'bg-md-surface-container-highest', var: '--md-sys-color-surface-container-highest', desc: 'Floating tooltips, quick actions' },
+                  ].map((s, idx) => (
+                    <div key={idx} className={`p-5 rounded-md-lg border border-white/[0.08] ${s.bg} space-y-2`}>
+                      <div className="text-xs font-semibold text-md-on-surface">{s.name}</div>
+                      <code className="text-[10px] font-mono text-md-on-surface-variant block">{s.var}</code>
+                      <p className="text-[11px] text-md-on-surface-variant">{s.desc}</p>
                     </div>
                   ))}
                 </div>
 
-                {/* Border Radii Spec */}
-                <div className="p-6 rounded-xl border border-ds-border bg-ds-panel space-y-4">
-                  <h3 className="text-xs font-bold uppercase tracking-wider text-ds-text-muted font-mono">
-                    Border Radius Scale Tokens
+                {/* Elevation Shadows */}
+                <div className="space-y-3">
+                  <h3 className="text-xs font-bold uppercase tracking-wider text-md-on-surface-variant font-mono">
+                    Elevation Shadow Tokens
                   </h3>
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                    {[
-                      { name: 'Small (6px)', token: 'rounded-md', usage: 'Tags, inner buttons' },
-                      { name: 'Regular (12px)', token: 'rounded-xl', usage: 'Inputs, toolbar buttons' },
-                      { name: 'Large (16px)', token: 'rounded-2xl', usage: 'Cards, modal dialogs' },
-                      { name: 'Full (9999px)', token: 'rounded-full', usage: 'Pills, avatar circles' },
-                    ].map((r, i) => (
-                      <div key={i} className="p-4 rounded-xl border border-ds-border bg-ds-container space-y-2 text-center">
-                        <div className="text-xs font-bold text-ds-text-high">{r.name}</div>
-                        <code className="text-[10.5px] font-mono text-ds-border-focus block">{r.token}</code>
-                        <div className="text-[10px] text-ds-text-muted">{r.usage}</div>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                    {DEFAULT_SHADOW_TOKENS.map((sh) => (
+                      <div
+                        key={sh.id}
+                        className={`p-4 rounded-md-lg bg-md-surface-container-low border border-white/[0.06] ${sh.tailwind} space-y-2 text-center`}
+                      >
+                        <div className="text-xs font-semibold text-md-on-surface">{sh.name}</div>
+                        <code className="text-[10px] font-mono text-md-primary block">{sh.tailwind}</code>
+                        <div className="text-[10px] text-md-on-surface-variant">{sh.usage}</div>
                       </div>
                     ))}
                   </div>
@@ -849,119 +901,39 @@ export const DesignSystemPage: React.FC<DesignSystemPageProps> = ({ onClose }) =
               </div>
             )}
 
-            {/* TAB: ATS & PRINT STANDARDS */}
-            {activeTab === 'ats' && (
+            {/* TAB: CODE & VARIABLES */}
+            {activeTab === 'code' && (
               <div className="space-y-6 animate-fade-in">
-                <div>
-                  <h2 className="text-xl font-bold text-ds-text-high font-display">ATS Parser & Print Geometry Standards</h2>
-                  <p className="text-xs text-ds-text-muted mt-0.5">Rules enforcing seamless automated parsing and 1:1 physical print rendering.</p>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                  <div className="p-6 rounded-xl border border-ds-border bg-ds-panel space-y-4">
-                    <div className="flex items-center gap-2 text-emerald-400 font-bold text-sm">
-                      <ShieldCheck className="w-5 h-5" />
-                      <span>Applicant Tracking System (ATS) Compliance</span>
-                    </div>
-                    <ul className="space-y-2.5 text-xs text-ds-text-medium">
-                      <li className="flex items-start gap-2">
-                        <Check className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
-                        <span><strong>Standard Document Flow:</strong> Avoid multi-column text collision that breaks OCR parsing.</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <Check className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
-                        <span><strong>True Selectable Text:</strong> Never render experience descriptions inside canvas images or canvas SVG paths.</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <Check className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
-                        <span><strong>Standardized Headers:</strong> Work Experience, Education, Projects, Skills ensure algorithmic section detection.</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <Check className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
-                        <span><strong>Font Embeddings:</strong> Exported PDFs preserve glyph tables to prevent garbled character output.</span>
-                      </li>
-                    </ul>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h2 className="text-xl font-bold text-md-on-surface font-display">Exportable Tokens (SSOT)</h2>
+                    <p className="text-xs text-md-on-surface-variant mt-0.5">
+                      Production-ready CSS variables and JSON schema dynamically generated from current active state.
+                    </p>
                   </div>
 
-                  <div className="p-6 rounded-xl border border-ds-border bg-ds-panel space-y-4">
-                    <div className="flex items-center gap-2 text-cyan-400 font-bold text-sm">
-                      <FileText className="w-5 h-5" />
-                      <span>A4 Print Calibration (210mm × 297mm)</span>
-                    </div>
-                    <ul className="space-y-2.5 text-xs text-ds-text-medium">
-                      <li className="flex items-start gap-2">
-                        <Check className="w-4 h-4 text-cyan-400 shrink-0 mt-0.5" />
-                        <span><strong>Exact 296mm Container Height:</strong> Locks paper container 1mm below standard A4 height to prevent blank trailing page exports.</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <Check className="w-4 h-4 text-cyan-400 shrink-0 mt-0.5" />
-                        <span><strong>Print Color Adjust:</strong> Forces <code className="font-mono text-ds-border-focus">-webkit-print-color-adjust: exact</code> so background accents render faithfully.</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <Check className="w-4 h-4 text-cyan-400 shrink-0 mt-0.5" />
-                        <span><strong>Vector Scalability:</strong> Text, dividers, and bullet points remain crisp at 600+ DPI physical laser printing.</span>
-                      </li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* TAB: CODE & TOKENS */}
-            {activeTab === 'tokens' && (
-              <div className="space-y-6 animate-fade-in">
-                <div>
-                  <h2 className="text-xl font-bold text-ds-text-high font-display">Code Snippets & CSS Variables</h2>
-                  <p className="text-xs text-ds-text-muted mt-0.5">Copy paste the official M3 token specifications into your frontend stack.</p>
-                </div>
-
-                <div className="p-5 rounded-xl border border-ds-border bg-ds-panel space-y-3">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <Code2 className="w-4 h-4 text-ds-primary" />
-                      <span className="text-xs font-bold text-ds-text-high">CSS Root Variables (:root)</span>
-                    </div>
-                    <button
-                      onClick={() => copyToClipboard(`:root {
-  --color-surface-bg: #0d0c11;
-  --color-surface-panel: #14121a;
-  --color-surface-container: #1b1922;
-  --color-surface-active: #25222d;
-  --color-surface-hover: #1f1d26;
-  --color-brand-primary: #a855f7;
-  --color-brand-primary-hover: #9333ea;
-  --color-brand-secondary: #22d3ee;
-  --color-text-high: #f5f2fa;
-  --color-text-medium: #d6cfde;
-  --color-text-muted: #a69bb0;
-  --color-border-main: #2b2734;
-  --color-border-focus: #c084fc;
-}`, 'CSS Variables')}
-                      className="flex items-center gap-1 text-xs text-ds-border-focus hover:underline cursor-pointer"
+                  <div className="flex items-center gap-2">
+                    <Button 
+                      variant="primary" 
+                      leftIcon={<Copy className="w-3.5 h-3.5" />}
+                      onClick={() => copyToClipboard(exportRootCss(), 'CSS Variables')}
                     >
-                      <Copy className="w-3.5 h-3.5" />
-                      <span>Copy Block</span>
-                    </button>
+                      Copy :root CSS
+                    </Button>
+                    <Button 
+                      variant="secondary" 
+                      leftIcon={<Copy className="w-3.5 h-3.5" />}
+                      onClick={() => copyToClipboard(exportJsonTokens(), 'JSON Schema')}
+                    >
+                      Copy JSON
+                    </Button>
                   </div>
+                </div>
 
-                  <pre className="p-4 rounded-lg bg-ds-bg border border-ds-border overflow-x-auto text-[11px] font-mono text-ds-text-medium leading-relaxed">
-{`:root {
-  --color-surface-bg: #0d0c11;                /* Deep premium charcoal-black */
-  --color-surface-panel: #14121a;             /* Main sidebar panel */
-  --color-surface-container: #1b1922;         /* Nested input groups */
-  --color-surface-active: #25222d;            /* Focus states */
-  --color-surface-hover: #1f1d26;             /* Transition trigger */
-  
-  --color-brand-primary: #a855f7;             /* Purple-Indigo accent */
-  --color-brand-primary-hover: #9333ea;       /* Focused action key */
-  --color-brand-secondary: #22d3ee;           /* Tech Cyan focus */
-
-  --color-text-high: #f5f2fa;                 /* Maximum readability */
-  --color-text-medium: #d6cfde;               /* Secondary descriptions */
-  --color-text-muted: #a69bb0;                /* WCAG AA compliant */
-  --color-border-main: #2b2734;               /* Ultra-thin separator */
-  --color-border-focus: #c084fc;              /* Active focus ring */
-}`}
+                {/* CSS Block Display */}
+                <div className="p-4 rounded-md-lg bg-md-surface-container-lowest border border-white/[0.08] overflow-x-auto">
+                  <pre className="text-xs font-mono text-md-on-surface leading-relaxed whitespace-pre">
+                    {exportRootCss()}
                   </pre>
                 </div>
               </div>

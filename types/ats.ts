@@ -1,15 +1,7 @@
-export interface AtsCategoryBreakdown {
-  label: string;
-  found: number;
-  total: number;
-  percentage: number;
-}
-
-export interface AtsAnalysisResult {
-  matchScore: number;
-  grade: string;
-  matchedKeywords: string[];
-  missingKeywords: string[];
-  recommendations: string[];
-  categoryBreakdown?: AtsCategoryBreakdown[];
+export interface AtsResult {
+  score: number;
+  found: string[];
+  missing: string[];
+  improvements: string[];
+  warning?: string;
 }

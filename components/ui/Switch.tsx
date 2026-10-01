@@ -19,13 +19,13 @@ const Switch = React.forwardRef<HTMLButtonElement, SwitchProps>(
         disabled={disabled}
         onClick={() => onCheckedChange(!checked)}
         className={cn(
-          "relative inline-flex shrink-0 items-center rounded-full transition-colors duration-200",
-          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ds-primary/50 focus-visible:ring-offset-2 focus-visible:ring-offset-ds-panel cursor-pointer select-none",
-          isSm ? "h-4.5 w-8" : "h-5.5 w-10",
+          "relative inline-flex shrink-0 items-center rounded-full transition-all duration-200 cursor-pointer select-none",
+          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-md-primary/50 focus-visible:ring-offset-2 focus-visible:ring-offset-md-surface",
+          isSm ? "h-6 w-11 p-0.5" : "h-8 w-[52px] p-1",
           checked 
-            ? "bg-ds-primary shadow-[0_0_10px_rgba(168,85,247,0.35)]" 
-            : "bg-ds-container border border-ds-border hover:border-ds-border-focus/40",
-          disabled && "opacity-50 cursor-not-allowed",
+            ? "bg-md-primary border-transparent" 
+            : "bg-md-surface-container-highest border-2 border-md-outline hover:border-md-on-surface-variant",
+          disabled && "opacity-38 cursor-not-allowed",
           className
         )}
         ref={ref}
@@ -33,10 +33,14 @@ const Switch = React.forwardRef<HTMLButtonElement, SwitchProps>(
       >
         <span
           className={cn(
-            "inline-block rounded-full bg-white shadow-ds-sm transition-transform duration-200 ease-out",
-            isSm 
-              ? (checked ? "h-3.5 w-3.5 translate-x-4" : "h-3.5 w-3.5 translate-x-0.5") 
-              : (checked ? "h-4.5 w-4.5 translate-x-5" : "h-4.5 w-4.5 translate-x-0.5")
+            "inline-block rounded-full transition-all duration-200 ease-out shadow-sm",
+            checked
+              ? (isSm 
+                  ? "h-4.5 w-4.5 translate-x-5 bg-md-on-primary" 
+                  : "h-6 w-6 translate-x-5 bg-md-on-primary")
+              : (isSm 
+                  ? "h-3.5 w-3.5 translate-x-0.5 bg-md-outline" 
+                  : "h-4 w-4 translate-x-1 bg-md-outline")
           )}
         />
       </button>

@@ -2,19 +2,23 @@ import React from 'react';
 import { cn } from '../../utils/cn';
 
 export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
-  variant?: 'panel' | 'container' | 'outline' | 'interactive';
+  variant?: 'panel' | 'container' | 'outline' | 'interactive' | 'elevated' | 'filled' | 'outlined';
 }
 
 const Card = React.forwardRef<HTMLDivElement, CardProps>(
-  ({ className, variant = 'panel', ...props }, ref) => (
+  ({ className, variant = 'elevated', ...props }, ref) => (
     <div
       ref={ref}
       className={cn(
-        "rounded-ds-lg border text-ds-text-high transition-all duration-200",
-        variant === 'panel' && "bg-ds-panel border-ds-border shadow-ds-sm",
-        variant === 'container' && "bg-ds-container border-ds-border shadow-none",
-        variant === 'outline' && "bg-transparent border-ds-border shadow-none",
-        variant === 'interactive' && "bg-ds-panel border-ds-border shadow-ds-sm hover:border-ds-border-focus/50 hover:bg-ds-hover cursor-pointer",
+        "rounded-md-lg text-md-on-surface transition-all duration-200",
+        // M3 Elevated
+        (variant === 'elevated' || variant === 'panel') && "bg-md-surface-container-low border border-md-outline-variant/40 shadow-md-elevation-1",
+        // M3 Filled
+        (variant === 'filled' || variant === 'container') && "bg-md-surface-container border border-transparent shadow-none",
+        // M3 Outlined
+        (variant === 'outlined' || variant === 'outline') && "bg-transparent border border-md-outline-variant shadow-none",
+        // M3 Interactive
+        variant === 'interactive' && "bg-md-surface-container-low border border-md-outline-variant/60 shadow-md-elevation-1 hover:shadow-md-elevation-2 hover:border-md-primary/40 hover:bg-md-surface-container cursor-pointer",
         className
       )}
       {...props}
@@ -38,7 +42,7 @@ const CardTitle = React.forwardRef<HTMLHeadingElement, React.HTMLAttributes<HTML
   ({ className, ...props }, ref) => (
     <h3
       ref={ref}
-      className={cn("text-sm font-semibold tracking-tight text-ds-text-high font-sans", className)}
+      className={cn("text-[15px] font-semibold tracking-tight text-md-on-surface font-sans", className)}
       {...props}
     />
   )
@@ -49,7 +53,7 @@ const CardDescription = React.forwardRef<HTMLParagraphElement, React.HTMLAttribu
   ({ className, ...props }, ref) => (
     <p
       ref={ref}
-      className={cn("text-xs text-ds-text-muted leading-relaxed font-sans", className)}
+      className={cn("text-xs text-md-on-surface-variant leading-relaxed font-sans", className)}
       {...props}
     />
   )

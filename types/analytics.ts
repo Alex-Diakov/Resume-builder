@@ -1,9 +1,7 @@
-export interface DocumentProfile {
-  targetRole: string;
-  seniorityLevel: string;
-  primaryDomain: string;
-  keyStrengths: string[];
-  suggestedFocus: string;
+export interface AnalyticsData {
+  detectedRole: string;
+  detectedIndustry: string;
+  warning?: string;
 }
 
 export interface AnalyticsMetrics {
@@ -12,5 +10,5 @@ export interface AnalyticsMetrics {
   bulletCount: number;
   quantifiedBulletRatio: number;
   exportCount: number;
-  profile?: DocumentProfile;
+  profile?: AnalyticsData;
 }

@@ -1,6 +1,10 @@
 import { Router, Request, Response, NextFunction } from "express";
 import { geminiService } from "../services/geminiService";
-import { generateHeuristicBackupAnalysis } from "../../services/heuristic/heuristicEngine";
+import { 
+  generateHeuristicBackupAnalysis, 
+  generateHeuristicAtsAnalysis, 
+  generateHeuristicAnalytics 
+} from "../../services/heuristic/heuristicEngine";
 
 const router = Router();
 
@@ -15,16 +19,14 @@ router.post("/analyze", async (req: Request, res: Response, next: NextFunction) 
     return res.json(result);
 
   } catch (apiError: any) {
-    console.error("Gemini API Error in /analyze:", apiError);
-    // Zero-Downtime Design: fallback to scientific heuristic scoring dynamically
+    console.info("Info: Engaging backup heuristics for /analyze:", apiError?.message || apiError);
     const fallbackAnalysis = generateHeuristicBackupAnalysis(req.body.resumeData);
     return res.json({
       ...fallbackAnalysis,
-      warning: "The neural diagnostic network is currently experiencing latency spikes. We've instantly activated our fallback HCI heuristics to maintain zero-delay service!"
+      warning: "Diagnostic network currently busy. Local heuristic engine activated."
     });
   }
 });
-
 
 router.post("/ats", async (req: Request, res: Response) => {
   try {
@@ -35,13 +37,11 @@ router.post("/ats", async (req: Request, res: Response) => {
     const result = await geminiService.analyzeAts(resumeData, jobDescription);
     return res.json(result);
   } catch (apiError: any) {
-    console.error("Gemini API Error in /ats:", apiError);
+    console.warn("Notice: Heuristic fallback engaged for /ats:", apiError?.message || apiError);
+    const fallbackAts = generateHeuristicAtsAnalysis(req.body.resumeData, req.body.jobDescription || "");
     return res.json({
-      score: 50,
-      found: [],
-      missing: ["Failed to connect to API"],
-      improvements: ["Check your API key"],
-      warning: "Error connecting to AI service. Ensure you have GEMINI_API_KEY set."
+      ...fallbackAts,
+      warning: "AI service connection unavailable. Using offline keyword-frequency analyzer to ensure uninterrupted workflow."
     });
   }
 });
@@ -55,13 +55,14 @@ router.post("/analytics", async (req: Request, res: Response) => {
     const result = await geminiService.analyzeAnalytics(resumeData);
     return res.json(result);
   } catch (apiError: any) {
-    console.error("Gemini API Error in /analytics:", apiError);
+    console.warn("Notice: Heuristic fallback engaged for /analytics:", apiError?.message || apiError);
+    const fallbackAnalytics = generateHeuristicAnalytics(req.body.resumeData);
     return res.json({
-      detectedRole: "General",
-      detectedIndustry: "General",
-      warning: "Error connecting to AI service."
+      ...fallbackAnalytics,
+      warning: "AI service connection unavailable. Displaying deterministic heuristic profile."
     });
   }
 });
 
 export default router;
+

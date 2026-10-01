@@ -40,7 +40,7 @@ export function Tabs({
 
 export function TabsList({ children, className }: { children: React.ReactNode; className?: string }) {
   return (
-    <div className={cn("flex bg-ds-panel/95 backdrop-blur-md p-1 rounded-ds-lg border border-ds-border shadow-ds-sm gap-1", className)}>
+    <div className={cn("flex bg-md-surface-container-low p-1 rounded-full border border-md-outline-variant/40 shadow-none gap-1", className)}>
       {children}
     </div>
   );
@@ -69,10 +69,10 @@ export function TabsTrigger({
       type="button"
       onClick={() => context.onValueChange(value)}
       className={cn(
-        "flex-1 relative py-2 px-3 rounded-ds-md text-xs uppercase font-semibold tracking-wider transition-all duration-200 cursor-pointer select-none text-center focus-visible:outline-none flex items-center justify-center gap-1.5",
+        "flex-1 relative py-1.5 px-3 rounded-full text-xs font-sans font-medium transition-all duration-200 cursor-pointer select-none text-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-md-primary/50 flex items-center justify-center gap-1.5",
         isActive 
-          ? "bg-ds-primary text-white shadow-ds-sm z-10" 
-          : "bg-transparent text-ds-text-medium hover:text-ds-text-high hover:bg-ds-hover",
+          ? "bg-md-secondary-container text-md-on-secondary-container font-semibold z-10 shadow-none" 
+          : "bg-transparent text-md-on-surface-variant hover:text-md-on-surface hover:bg-md-surface-container-high/60",
         className
       )}
     >

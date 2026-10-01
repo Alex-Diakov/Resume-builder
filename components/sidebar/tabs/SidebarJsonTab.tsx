@@ -54,55 +54,66 @@ export const SidebarJsonTab: React.FC<SidebarJsonTabProps> = ({
   };
 
   return (
-    <div className="flex-1 flex flex-col min-h-0 animate-fade-in font-sans relative">
-      <div className="flex items-center justify-between px-4.5 py-2.5 bg-ds-panel/45 border-b border-ds-border shrink-0">
-        <div className="flex items-center gap-2">
-          <span className="relative flex h-2 w-2">
-            <span className={jsonError ? "animate-ping absolute inline-flex h-full w-full rounded-full bg-ds-danger opacity-75" : "absolute inline-flex rounded-full h-2 w-2 bg-ds-success hidden"}></span>
-            <span className={`relative inline-flex rounded-full h-2 w-2 ${jsonError ? 'bg-ds-danger' : 'bg-ds-success'}`}></span>
+    <div className="flex-1 flex flex-col min-h-0 animate-fade-in font-sans relative bg-md-surface-container">
+      <div className="flex items-center justify-between px-5 py-2.5 bg-md-surface-container-low border-b border-white/[0.08] shrink-0">
+        <div className="flex items-center gap-2.5">
+          <span className="relative flex h-2.5 w-2.5">
+            <span className={jsonError ? "animate-ping absolute inline-flex h-full w-full rounded-full bg-md-error opacity-75" : "absolute inline-flex rounded-full h-2.5 w-2.5 bg-md-success hidden"}></span>
+            <span className={`relative inline-flex rounded-full h-2.5 w-2.5 ${jsonError ? 'bg-md-error' : 'bg-md-success'}`}></span>
           </span>
-          <span className="text-[11px] text-ds-text-muted font-bold uppercase tracking-wider font-display">
+          <span className="text-xs text-md-on-surface font-semibold">
             {jsonError ? 'Syntax Invalid' : 'A4 Realtime Synced'}
           </span>
         </div>
         
-        <div className="flex items-center gap-2">
-          {/* PASTE FROM CLIPBOARD ACTION BUTTON */}
-          <Button variant="ghost" size="sm" onClick={handlePaste} title="Paste JSON from clipboard" className="gap-1.5 text-ds-text-muted">
-            {pasted ? <Check className="w-3.5 h-3.5 text-ds-success" /> : <Clipboard className="w-3.5 h-3.5 text-ds-primary" />}
+        {/* Sleek Segmented Actions */}
+        <div className="flex items-center bg-white/[0.04] p-0.5 rounded-full border border-white/[0.08]">
+          <button 
+            type="button" 
+            onClick={handlePaste} 
+            title="Paste JSON from clipboard" 
+            className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium text-md-on-surface-variant hover:text-md-on-surface hover:bg-white/[0.06] transition-all cursor-pointer"
+          >
+            {pasted ? <Check className="w-3.5 h-3.5 text-md-success" /> : <Clipboard className="w-3.5 h-3.5 text-md-primary" />}
             <span>{pasted ? 'Pasted!' : 'Paste'}</span>
-          </Button>
+          </button>
 
-          {/* COPY TO CLIPBOARD ACTION BUTTON */}
-          <Button variant="ghost" size="sm" onClick={handleCopy} title="Copy JSON" className="gap-1.5 text-ds-text-muted border-l border-ds-border rounded-none pl-3 hover:bg-transparent">
-            {copied ? <Check className="w-3.5 h-3.5 text-ds-success" /> : <Copy className="w-3.5 h-3.5 text-ds-primary" />}
+          <div className="w-[1px] h-3 bg-white/[0.10]" />
+
+          <button 
+            type="button" 
+            onClick={handleCopy} 
+            title="Copy JSON" 
+            className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium text-md-on-surface-variant hover:text-md-on-surface hover:bg-white/[0.06] transition-all cursor-pointer"
+          >
+            {copied ? <Check className="w-3.5 h-3.5 text-md-success" /> : <Copy className="w-3.5 h-3.5 text-md-primary" />}
             <span>{copied ? 'Copied' : 'Copy'}</span>
-          </Button>
+          </button>
         </div>
       </div>
       
-      <div className="flex-1 relative flex flex-col min-h-0">
+      <div className="flex-1 relative flex flex-col min-h-0 bg-md-surface-container">
         <textarea
           ref={textareaRef}
           value={jsonInput}
           onChange={(e) => setJsonInput(e.target.value)}
-          className="flex-1 w-full p-4 bg-transparent text-ds-text-high font-mono text-[11px] leading-relaxed resize-none focus:outline-none focus-visible:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:ring-1 focus-visible:ring-ds-primary/20 focus-visible:bg-ds-container"
+          className="flex-1 w-full p-4.5 bg-md-surface-container text-md-on-surface font-mono text-xs leading-relaxed resize-none outline-none focus:outline-none focus:ring-0 caret-md-primary"
           spellCheck={false}
           placeholder="Paste your JSON here..."
         />
 
         {/* CLIPPED HELPER EXPLANATION GIVEN SANDBOX PERMISSION ISSUES */}
         {pasteError && (
-          <div className="absolute top-3 left-3 right-3 p-3 bg-ds-container border border-ds-primary/40 text-ds-text-high text-[11px] leading-relaxed flex items-start gap-2.5 shadow-ds-md rounded-ds-md animate-fade-in z-20">
-            <AlertTriangle className="w-4 h-4 shrink-0 text-ds-primary mt-0.5" />
+          <div className="absolute top-3.5 left-3.5 right-3.5 p-3.5 bg-md-surface-container-high border border-md-primary/40 text-md-on-surface text-xs leading-relaxed flex items-start gap-3 shadow-md-elevation-2 rounded-md-md animate-fade-in z-20">
+            <AlertTriangle className="w-4.5 h-4.5 shrink-0 text-md-primary mt-0.5" />
             <span>{pasteError}</span>
           </div>
         )}
       </div>
 
       {jsonError && (
-        <div className="absolute bottom-0 left-0 right-0 p-4 bg-ds-danger/15 border-t border-ds-danger/40 text-ds-danger backdrop-blur-md text-xs flex items-start gap-3 shadow-ds-lg rounded-t-ds-md z-10">
-          <AlertTriangle className="w-4 h-4 shrink-0 text-ds-danger mt-0.5" />
+        <div className="absolute bottom-0 left-0 right-0 p-4 bg-md-error-container/30 border-t border-md-error/40 text-md-on-error-container backdrop-blur-md text-xs flex items-start gap-3 shadow-md-elevation-3 rounded-t-md-md z-10">
+          <AlertTriangle className="w-4.5 h-4.5 shrink-0 text-md-error mt-0.5" />
           <span className="font-mono text-xs break-all leading-normal">{jsonError}</span>
         </div>
       )}

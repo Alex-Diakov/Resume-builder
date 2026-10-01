@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import { ResumeData } from '../types';
+import { ResumeData, CognitiveAnalysisResult } from '../types';
 
 export const useCognitiveAnalysis = (resumeData: ResumeData, onChangeData: (data: ResumeData) => void, setJsonInput: (input: string) => void) => {
-  const [analysisResult, setAnalysisResult] = useState<any>(null);
+  const [analysisResult, setAnalysisResult] = useState<CognitiveAnalysisResult | null>(null);
   const [analyzing, setAnalyzing] = useState(false);
   const [analyzerWarning, setAnalyzerWarning] = useState<string | null>(null);
   const [analyzedDataString, setAnalyzedDataString] = useState<string>('');

@@ -3,9 +3,17 @@ import path from "path";
 import { createServer as createViteServer } from "vite";
 import apiRouter from "./server/routes/api";
 
+process.on("uncaughtException", (err) => {
+  console.error("[CRITICAL] Uncaught exception:", err);
+});
+
+process.on("unhandledRejection", (reason) => {
+  console.error("[CRITICAL] Unhandled promise rejection:", reason);
+});
+
 async function startServer() {
   const app = express();
-  const PORT = 3000;
+  const PORT = Number(process.env.PORT) || 3000;
 
   // Architectural optimization: Increased JSON parser capability safeguards backend from large nested state payloads.
   app.use(express.json({ limit: "15mb" }));
@@ -38,7 +46,7 @@ async function startServer() {
   } else {
     const distPath = path.join(process.cwd(), "dist");
     app.use(express.static(distPath));
-    app.get("/*all", (req, res) => {
+    app.get("*all", (req, res) => {
       res.sendFile(path.join(distPath, "index.html"));
     });
   }
@@ -52,27 +60,9 @@ async function startServer() {
     });
   });
 
-  const serverInstance = app.listen(PORT, "0.0.0.0", () => {
-    console.log(`Express microservices running robustly on http://0.0.0.0:${PORT}`);
+  app.listen(PORT, "0.0.0.0", () => {
+    console.log(`Server running on http://localhost:${PORT}`);
   });
-
-  // Clean Termination Signal Listeners to handle cloud auto-scaling shutdowns gracefully
-  const initiateGracefulShutdown = (signal: string) => {
-    console.log(`[SHUTDOWN] Received ${signal}. Draining connections for seamless handover...`);
-    serverInstance.close(() => {
-      console.log("[SHUTDOWN] HTTP service successfully drained. Downscaling finalized safely.");
-      process.exit(0);
-    });
-    
-    // Safety timeout to force immediate shutdown if draining hangs
-    setTimeout(() => {
-      console.warn("[SHUTDOWN] Draining timed out. Terminating immediately.");
-      process.exit(1);
-    }, 5000);
-  };
-
-  process.on("SIGTERM", () => initiateGracefulShutdown("SIGTERM"));
-  process.on("SIGINT", () => initiateGracefulShutdown("SIGINT"));
 }
 
 startServer();

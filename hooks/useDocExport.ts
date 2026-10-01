@@ -1,6 +1,5 @@
 import { useState, useCallback } from 'react';
 import { ResumeData } from '../types';
-import { exportToDocx } from '../services/export/docExporter';
 
 export const useDocExport = (resumeData: ResumeData) => {
   const [isGeneratingDoc, setIsGeneratingDoc] = useState(false);
@@ -15,6 +14,7 @@ export const useDocExport = (resumeData: ResumeData) => {
       } catch (e) {
         console.error(e);
       }
+      const { exportToDocx } = await import('../services/export/docExporter');
       await exportToDocx(resumeData);
     } catch (err) {
       console.error('Error generating DOCX document:', err);
@@ -26,3 +26,4 @@ export const useDocExport = (resumeData: ResumeData) => {
 
   return { isGeneratingDoc, handleDownloadDocx };
 };
+

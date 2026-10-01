@@ -25,15 +25,15 @@ export const SidebarAnalyticsTab: React.FC<SidebarAnalyticsTabProps> = ({ resume
   }, []);
 
   return (
-    <div className="flex flex-col pb-16 font-sans text-left">
-      <div className="px-4 py-3 space-y-4">
+    <div className="flex flex-col pb-20 font-sans text-left">
+      <div className="px-5 py-4 space-y-4">
         
         {/* STATS HEADER */}
-        <div className="space-y-3">
+        <div className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="text-xs font-bold uppercase tracking-wider text-ds-text-high font-display">Resume Overview</h3>
-              <p className="text-[10px] text-ds-text-muted mt-0.5">Automatic Document Intelligence</p>
+              <h3 className="text-sm font-semibold text-md-on-surface font-display">Resume Overview</h3>
+              <p className="text-xs text-md-on-surface-variant mt-0.5">Automatic Document Intelligence</p>
             </div>
             <Button
               variant="ghost"
@@ -42,31 +42,32 @@ export const SidebarAnalyticsTab: React.FC<SidebarAnalyticsTabProps> = ({ resume
               disabled={isAnalyzing}
               title="Refresh Analytics"
               aria-label="Refresh Analytics"
+              className="p-2 rounded-md-sm hover:bg-md-surface-container-high cursor-pointer"
             >
-              <RefreshCw className={`w-3.5 h-3.5 ${isAnalyzing ? 'animate-spin text-ds-primary' : 'text-ds-text-muted hover:text-ds-text-high'}`} />
+              <RefreshCw className={`w-4 h-4 ${isAnalyzing ? 'animate-spin text-md-primary' : 'text-md-on-surface-variant hover:text-md-on-surface'}`} />
             </Button>
           </div>
 
-          <div className="bg-ds-panel border border-ds-border rounded-ds-lg p-4 flex items-center justify-between shadow-ds-sm">
+          <div className="bg-md-surface-container-low border border-md-outline-variant/30 rounded-md-lg p-4.5 flex items-center justify-between shadow-md-elevation-1">
             <div>
-              <span className="text-[10px] uppercase font-bold tracking-wider text-ds-text-muted block">Total Exports</span>
-              <span className="text-[10px] text-ds-text-muted mt-0.5 block">Documents generated</span>
+              <span className="text-xs font-semibold text-md-on-surface block">Total Exports</span>
+              <span className="text-xs text-md-on-surface-variant mt-0.5 block">Documents generated</span>
             </div>
-            <div className="text-2xl font-mono font-bold text-ds-text-high">
+            <div className="text-3xl font-mono font-bold text-md-on-surface">
               {currentCount}
             </div>
           </div>
 
-          <div className="bg-ds-panel border border-ds-border rounded-ds-lg p-4 space-y-3.5 shadow-ds-sm relative overflow-hidden">
+          <div className="bg-md-surface-container-low border border-md-outline-variant/30 rounded-md-lg p-4.5 space-y-4 shadow-md-elevation-1 relative overflow-hidden">
             {isAnalyzing && (
-              <div className="absolute inset-0 bg-ds-panel/80 backdrop-blur-sm z-10 flex items-center justify-center">
-                <Activity className="w-5 h-5 text-ds-primary animate-bounce" />
+              <div className="absolute inset-0 bg-md-surface-container-low/80 backdrop-blur-sm z-10 flex items-center justify-center">
+                <Activity className="w-6 h-6 text-md-primary animate-bounce" />
               </div>
             )}
             
             <div>
-              <h4 className="text-[10px] uppercase font-bold tracking-wider text-ds-text-muted mb-2">Target Role</h4>
-              <div className="flex flex-wrap gap-1.5">
+              <h4 className="text-xs font-semibold text-md-on-surface mb-2.5">Target Role</h4>
+              <div className="flex flex-wrap gap-2">
                 {analyticsData?.detectedRole ? (
                   analyticsData.detectedRole.split(/,|\/| and /i).map((role, idx) => (
                     <Badge key={idx} variant="primary" size="sm">
@@ -74,16 +75,16 @@ export const SidebarAnalyticsTab: React.FC<SidebarAnalyticsTabProps> = ({ resume
                     </Badge>
                   ))
                 ) : (
-                  <span className="text-xs text-ds-text-muted font-medium">Not Analyzed</span>
+                  <span className="text-xs text-md-on-surface-variant font-medium">Not Analyzed</span>
                 )}
               </div>
             </div>
 
-            <div className="w-full h-px bg-ds-border" />
+            <div className="w-full h-px bg-md-outline-variant/30" />
 
             <div>
-              <h4 className="text-[10px] uppercase font-bold tracking-wider text-ds-text-muted mb-2">Target Industry</h4>
-              <div className="flex flex-wrap gap-1.5">
+              <h4 className="text-xs font-semibold text-md-on-surface mb-2.5">Target Industry</h4>
+              <div className="flex flex-wrap gap-2">
                 {analyticsData?.detectedIndustry ? (
                   analyticsData.detectedIndustry.split(/,|\/| and /i).map((ind, idx) => (
                     <Badge key={idx} variant="secondary" size="sm">
@@ -91,7 +92,7 @@ export const SidebarAnalyticsTab: React.FC<SidebarAnalyticsTabProps> = ({ resume
                     </Badge>
                   ))
                 ) : (
-                  <span className="text-xs text-ds-text-muted font-medium">Not Analyzed</span>
+                  <span className="text-xs text-md-on-surface-variant font-medium">Not Analyzed</span>
                 )}
               </div>
             </div>

@@ -1,5 +1,17 @@
 import { GoogleGenAI, Type } from "@google/genai";
-import { serializeResume, generateHeuristicBackupAnalysis } from "../../services/heuristic/heuristicEngine";
+import { 
+  serializeResume, 
+  generateHeuristicBackupAnalysis, 
+  generateHeuristicAtsAnalysis, 
+  generateHeuristicAnalytics 
+} from "../../services/heuristic/heuristicEngine";
+
+const PRIMARY_MODEL = "gemini-3.8-flash";
+const FALLBACK_MODELS = [
+  "gemini-2.5-flash",
+  "gemini-3.1-flash-lite",
+  "gemini-flash-latest"
+];
 
 const SYSTEM_INSTRUCTION = `You are a World-Class Executive Career Architect, Neuro-Cognitive Usability specialist, and C-Level Negotiator. You evaluate professional resume presentations based on scientific laws of attention, cognitive load, and visual processing, and you rewrite elements using elite strategic framing:
 
@@ -44,13 +56,48 @@ export class GeminiService {
     return !!this.ai;
   }
 
+  private async executeGenerateContent(callOptions: (modelName: string) => any) {
+    const modelsToTry = [PRIMARY_MODEL, ...FALLBACK_MODELS];
+    let lastError: any = null;
+
+    for (const model of modelsToTry) {
+      try {
+        const req = callOptions(model);
+        const response = await this.ai.models.generateContent(req);
+        if (response?.text) {
+          return response;
+        }
+      } catch (err: any) {
+        lastError = err;
+        const errMsg = err?.message || "";
+        const isTransientOrQuota = 
+          err?.status === "UNAVAILABLE" || 
+          err?.status === "RESOURCE_EXHAUSTED" ||
+          errMsg.includes("503") ||
+          errMsg.includes("429") ||
+          errMsg.toLowerCase().includes("unavailable") ||
+          errMsg.toLowerCase().includes("high demand") ||
+          errMsg.toLowerCase().includes("quota") ||
+          errMsg.toLowerCase().includes("spikes in demand");
+
+        if (isTransientOrQuota) {
+          // Immediately try next model in cascade to ensure zero-delay response
+          continue;
+        } else {
+          continue;
+        }
+      }
+    }
+
+    throw lastError || new Error("Failed to generate content from AI models.");
+  }
+
   public async analyzeResume(resumeData: any) {
     if (!this.isConfigured()) {
-      console.warn("[HEURISTIC FALLBACK] GEMINI_API_KEY not configured. Instantly firing backup assessment model.");
       const fallbackAnalysis = generateHeuristicBackupAnalysis(resumeData);
       return {
         ...fallbackAnalysis,
-        warning: "GEMINI_API_KEY is not configured in Secrets. Showing local heuristic analysis. Connect a key in Settings > Secrets for customized dynamic neural analysis!"
+        warning: "GEMINI_API_KEY is not configured. Showing local heuristic analysis."
       };
     }
 
@@ -63,124 +110,72 @@ ${textRepresentation}
 
 Provide specific diagnostics (Laws tab), scoring & hotspots (Overview tab), and highly professional value-driven sentence rewrites (Frames tab) formatted strictly according to the 3 Core Strategic Rewriting Frameworks and the strict Formula. Follow the schema strictly.`;
 
-    let response;
-    let lastError: any = null;
-    let retryDelay = 2000;
-    const maxRetries = 4;
-
-    for (let attempt = 1; attempt <= maxRetries; attempt++) {
-      try {
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 12000);
-
-        response = await this.ai.models.generateContent({
-          model: "gemini-2.5-flash",
-          contents: prompt,
-          config: {
-            systemInstruction: SYSTEM_INSTRUCTION,
-            responseMimeType: "application/json",
-            responseSchema: {
-              type: Type.OBJECT,
-              properties: {
-                overallScore: { type: Type.INTEGER, description: "A comprehensive recruiter read score out of 100." },
-                cognitiveScore: { type: Type.INTEGER, description: "Cognitive load and processing ease score (1-100)." },
-                scanningScore: { type: Type.INTEGER, description: "Visual eye-tracking scanning readiness score (1-100)." },
-                kpiScore: { type: Type.INTEGER, description: "How effectively metrics and impact are structured (1-100)." },
-                summaryFeedback: { type: Type.STRING, description: "A high-level scannable narrative assessing reading friction and cognitive weight." },
-                diagnostics: {
-                  type: Type.ARRAY,
-                  description: "Deep diagnostic findings based on information laws.",
-                  items: {
-                    type: Type.OBJECT,
-                    properties: {
-                      section: { type: Type.STRING, description: "E.g., Work Experience, Professional Summary, Skills, or Contact Coordinates" },
-                      severity: { type: Type.STRING, description: "low, medium, or high" },
-                      finding: { type: Type.STRING, description: "Explain the visual/cognitive hurdle found in this section." },
-                      psychologicalBasis: { type: Type.STRING, description: "References Miller's Law, F-Pattern Scanning, Hick's Law, or Fitts' law." },
-                      suggestion: { type: Type.STRING, description: "Concrete structural recommendation to solve the hurdle." }
-                    },
-                    required: ["section", "severity", "finding", "psychologicalBasis", "suggestion"]
-                  }
-                },
-                scanningHotspots: {
-                  type: Type.ARRAY,
-                  description: "Key elements that will successfully capture a recruiter's eye during a 6-second scan.",
-                  items: { type: Type.STRING }
-                },
-                rewrites: {
-                  type: Type.ARRAY,
-                  description: "High-impact sentence revisions to maximize quantifiable facts while shrinking word counts to minimize cognitive load.",
-                  items: {
-                    type: Type.OBJECT,
-                    properties: {
-                      where: { type: Type.STRING, description: "Identify which company/role or heading this pertains to." },
-                      original: { type: Type.STRING, description: "The original line or statement." },
-                      replacement: { type: Type.STRING, description: "Active-verb revision stressing a metric/outcome clearly." },
-                      benefit: { type: Type.STRING, description: "How this rewrite decreases information density or increases visual bite." }
-                    },
-                    required: ["where", "original", "replacement", "benefit"]
-                  }
+    try {
+      const response = await this.executeGenerateContent((model) => ({
+        model,
+        contents: prompt,
+        config: {
+          systemInstruction: SYSTEM_INSTRUCTION,
+          responseMimeType: "application/json",
+          responseSchema: {
+            type: Type.OBJECT,
+            properties: {
+              overallScore: { type: Type.INTEGER, description: "A comprehensive recruiter read score out of 100." },
+              cognitiveScore: { type: Type.INTEGER, description: "Cognitive load and processing ease score (1-100)." },
+              scanningScore: { type: Type.INTEGER, description: "Visual eye-tracking scanning readiness score (1-100)." },
+              kpiScore: { type: Type.INTEGER, description: "How effectively metrics and impact are structured (1-100)." },
+              summaryFeedback: { type: Type.STRING, description: "A high-level scannable narrative assessing reading friction and cognitive weight." },
+              diagnostics: {
+                type: Type.ARRAY,
+                description: "Deep diagnostic findings based on information laws.",
+                items: {
+                  type: Type.OBJECT,
+                  properties: {
+                    section: { type: Type.STRING, description: "E.g., Work Experience, Professional Summary, Skills, or Contact Coordinates" },
+                    severity: { type: Type.STRING, description: "low, medium, or high" },
+                    finding: { type: Type.STRING, description: "Explain the visual/cognitive hurdle found in this section." },
+                    psychologicalBasis: { type: Type.STRING, description: "References Miller's Law, F-Pattern Scanning, Hick's Law, or Fitts' law." },
+                    suggestion: { type: Type.STRING, description: "Concrete structural recommendation to solve the hurdle." }
+                  },
+                  required: ["section", "severity", "finding", "psychologicalBasis", "suggestion"]
                 }
               },
-              required: ["overallScore", "cognitiveScore", "scanningScore", "kpiScore", "summaryFeedback", "diagnostics", "scanningHotspots", "rewrites"]
-            }
+              scanningHotspots: {
+                type: Type.ARRAY,
+                items: { type: Type.STRING }
+              },
+              rewrites: {
+                type: Type.ARRAY,
+                items: {
+                  type: Type.OBJECT,
+                  properties: {
+                    where: { type: Type.STRING, description: "Identify which company/role or heading this pertains to." },
+                    original: { type: Type.STRING, description: "The original line or statement." },
+                    replacement: { type: Type.STRING, description: "Active-verb revision stressing a metric/outcome clearly." },
+                    benefit: { type: Type.STRING, description: "How this rewrite decreases information density or increases visual bite." }
+                  },
+                  required: ["where", "original", "replacement", "benefit"]
+                }
+              }
+            },
+            required: ["overallScore", "cognitiveScore", "scanningScore", "kpiScore", "summaryFeedback", "diagnostics", "scanningHotspots", "rewrites"]
           }
-        });
-        
-        clearTimeout(timeoutId);
-        lastError = null;
-        break; 
-      } catch (err: any) {
-        lastError = err;
-        const status = err.status || "";
-        const code = err.code || 0;
-        const errMsg = err.message || "";
-        
-        const isTransient = 
-          code === 503 || 
-          code === 429 || 
-          status === "UNAVAILABLE" || 
-          status === "RESOURCE_EXHAUSTED" ||
-          errMsg.includes("503") ||
-          errMsg.includes("429") ||
-          errMsg.toLowerCase().includes("unavailable") ||
-          errMsg.toLowerCase().includes("high demand") ||
-          errMsg.toLowerCase().includes("spikes in demand");
-
-        if (isTransient && attempt < maxRetries) {
-          await new Promise((resolve) => setTimeout(resolve, retryDelay));
-          retryDelay *= 2;
-        } else {
-          throw err;
         }
-      }
-    }
+      }));
 
-    if (lastError) {
-      throw lastError;
+      return JSON.parse(response.text.trim());
+    } catch (err: any) {
+      const fallbackAnalysis = generateHeuristicBackupAnalysis(resumeData);
+      return {
+        ...fallbackAnalysis,
+        warning: "AI service connection temporarily experiencing high demand. Seamlessly engaging offline heuristic analyzer."
+      };
     }
-
-    const responseText = response?.text;
-    if (!responseText) {
-      throw new Error("Empty response received from Gemini AI after retries.");
-    }
-
-    return JSON.parse(responseText.trim());
   }
 
   public async analyzeAts(resumeData: any, jobDescription: string) {
     if (!this.isConfigured()) {
-      return {
-        score: 65,
-        found: ["Skill 1 (Example)", "Skill 2"],
-        missing: ["Missing Skill 1", "Missing Skill 2"],
-        improvements: [
-          "Include GEMINI_API_KEY in secrets to get real ATS analysis.",
-          "Add more relevant skills.",
-          "Quantify your experience."
-        ],
-        warning: "GEMINI_API_KEY is not configured in Secrets. Showing dummy data."
-      };
+      return generateHeuristicAtsAnalysis(resumeData, jobDescription);
     }
 
     const textRepresentation = serializeResume(resumeData);
@@ -194,46 +189,50 @@ ${textRepresentation}
 
 Identify which keywords/skills are found in the resume, which ones from the job description are missing, and provide 3 concrete suggestions for improving the resume to better match the job description. Give an overall match score from 0 to 100.`;
 
-    const response = await this.ai.models.generateContent({
-      model: "gemini-2.5-flash",
-      contents: prompt,
-      config: {
-        responseMimeType: "application/json",
-        responseSchema: {
-          type: Type.OBJECT,
-          properties: {
-            score: { type: Type.INTEGER, description: "Match score from 0 to 100." },
-            found: {
-              type: Type.ARRAY,
-              items: { type: Type.STRING },
-              description: "Keywords or skills found in the resume."
+    try {
+      const response = await this.executeGenerateContent((model) => ({
+        model,
+        contents: prompt,
+        config: {
+          responseMimeType: "application/json",
+          responseSchema: {
+            type: Type.OBJECT,
+            properties: {
+              score: { type: Type.INTEGER, description: "Match score from 0 to 100." },
+              found: {
+                type: Type.ARRAY,
+                items: { type: Type.STRING },
+                description: "Keywords or skills found in the resume."
+              },
+              missing: {
+                type: Type.ARRAY,
+                items: { type: Type.STRING },
+                description: "Keywords or skills required by the job description but missing from the resume."
+              },
+              improvements: {
+                type: Type.ARRAY,
+                items: { type: Type.STRING },
+                description: "3 concrete, actionable suggestions to improve the match score."
+              }
             },
-            missing: {
-              type: Type.ARRAY,
-              items: { type: Type.STRING },
-              description: "Keywords or skills required by the job description but missing from the resume."
-            },
-            improvements: {
-              type: Type.ARRAY,
-              items: { type: Type.STRING },
-              description: "3 concrete, actionable suggestions to improve the match score."
-            }
-          },
-          required: ["score", "found", "missing", "improvements"]
+            required: ["score", "found", "missing", "improvements"]
+          }
         }
-      }
-    });
+      }));
 
-    return JSON.parse(response.text.trim());
+      return JSON.parse(response.text.trim());
+    } catch (err: any) {
+      const fallbackAts = generateHeuristicAtsAnalysis(resumeData, jobDescription);
+      return {
+        ...fallbackAts,
+        warning: "AI service connection temporarily experiencing high demand. Engaging offline keyword analyzer."
+      };
+    }
   }
 
   async analyzeAnalytics(resumeData: any) {
     if (!this.isConfigured()) {
-      return {
-        detectedRole: "Lead Architect",
-        detectedIndustry: "Enterprise Cloud & Systems",
-        warning: "GEMINI_API_KEY is not configured in Secrets. Showing baseline heuristics."
-      };
+      return generateHeuristicAnalytics(resumeData);
     }
 
     const prompt = `
@@ -244,24 +243,27 @@ You are an AI resume analytics engine. Analyze the provided resume JSON and retu
 Resume Data:
 ${JSON.stringify(resumeData, null, 2)}`;
 
-    const response = await this.ai.models.generateContent({
-      model: "gemini-2.5-flash",
-      contents: prompt,
-      config: {
-        responseMimeType: "application/json",
-        responseSchema: {
-          type: Type.OBJECT,
-          properties: {
-            detectedRole: { type: Type.STRING },
-            detectedIndustry: { type: Type.STRING }
-          },
-          required: ["detectedRole", "detectedIndustry"]
+    try {
+      const response = await this.executeGenerateContent((model) => ({
+        model,
+        contents: prompt,
+        config: {
+          responseMimeType: "application/json",
+          responseSchema: {
+            type: Type.OBJECT,
+            properties: {
+              detectedRole: { type: Type.STRING },
+              detectedIndustry: { type: Type.STRING }
+            },
+            required: ["detectedRole", "detectedIndustry"]
+          }
         }
-      }
-    });
+      }));
 
-    return JSON.parse(response.text.trim());
+      return JSON.parse(response.text.trim());
+    } catch (err: any) {
+      return generateHeuristicAnalytics(resumeData);
+    }
   }
-
 }
 export const geminiService = new GeminiService();

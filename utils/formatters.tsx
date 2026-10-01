@@ -10,11 +10,30 @@ export const highlightText = (text?: string) => {
   );
 };
 
-// Helper to ensure URL has proper protocol
-export const formatUrl = (url: string) => {
-  if (!url) return '#';
-  if (url.startsWith('http://') || url.startsWith('https://')) {
-    return url;
+// Helper to ensure URL has proper protocol and clean format
+export const formatUrl = (url?: string): string => {
+  if (!url) return '';
+  let trimmed = url.trim();
+  if (!trimmed || trimmed === '#') return '';
+
+  // If already starts with a protocol or special scheme
+  if (/^(https?|mailto|tel):/i.test(trimmed)) {
+    // Canonicalize linkedin.com without www to avoid redirect/CORS issues
+    trimmed = trimmed.replace(/^https?:\/\/linkedin\.com/i, 'https://www.linkedin.com');
+    return trimmed;
   }
-  return `https://${url}`;
+
+  // Handle protocol-relative URL
+  if (trimmed.startsWith('//')) {
+    trimmed = `https:${trimmed}`;
+  } else {
+    // If domain starts with linkedin.com
+    if (/^linkedin\.com/i.test(trimmed)) {
+      trimmed = `https://www.${trimmed}`;
+    } else {
+      trimmed = `https://${trimmed}`;
+    }
+  }
+
+  return trimmed;
 };

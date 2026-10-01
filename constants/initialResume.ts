@@ -9,7 +9,7 @@ export const INITIAL_RESUME_DATA: ResumeData = {
     "With a focus on ownership and autonomy, I am a self-managed product unit seeking to build scalable product ecosystems turning operational chaos into something predictable."
   ],
   contact: {
-    website: "linkedin.com/in/alex-diakov",
+    website: "alexdiakov.design",
     linkedin: "linkedin.com/in/alex-diakov",
     email: "diakovoleksandr@gmail.com",
     location: "Kyiv, Ukraine"
@@ -228,7 +228,7 @@ export const RESUME_PRESETS: Record<string, { label: string; data: ResumeData }>
         "Adept at translating complex technological architectures and business metrics into straightforward product roadmaps that elevate team output and customer lifetime value."
       ],
       contact: {
-        website: "linkedin.com/in/alex-diakov",
+        website: "alexdiakov.com",
         linkedin: "linkedin.com/in/alex-diakov",
         email: "diakovoleksandr@gmail.com",
         location: "Kyiv, Ukraine"

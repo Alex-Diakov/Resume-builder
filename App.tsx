@@ -37,6 +37,7 @@ const App: React.FC = () => {
     showPageGuides,
     compressPdf,
     pdfImageQuality,
+    enableAdaptiveFit,
   } = useResumeContext();
 
   useEffect(() => {
@@ -84,7 +85,7 @@ const App: React.FC = () => {
   }
 
   return (
-    <div className="h-screen flex flex-col bg-ds-bg font-sans overflow-hidden print:h-auto print:block print:overflow-visible print:bg-white relative">
+    <div className="h-screen flex flex-col bg-md-surface text-md-on-surface font-sans overflow-hidden print:h-auto print:block print:overflow-visible print:bg-white relative">
       <Toolbar 
         onFileUpload={handleFileUpload}
         onDownloadPdf={handleDownloadPdf}
@@ -98,22 +99,27 @@ const App: React.FC = () => {
       />
 
       <div className="flex flex-1 overflow-hidden relative print:overflow-visible print:block">
-        {/* Sidebar Panel */}
-        <div 
-          className={`shrink-0 transition-all duration-300 ease-in-out z-20 print:hidden ${
-            sidebarOpen ? 'w-full md:w-96 lg:w-[450px] border-r border-ds-border' : 'w-0 border-r-0'
+        {/* Sidebar Panel: Desktop collapses to 72px vertical rail, mobile collapses to 0 */}
+        <aside 
+          className={`shrink-0 transition-[width] duration-300 ease-in-out z-20 print:hidden flex overflow-hidden ${
+            sidebarOpen 
+              ? 'w-full md:w-[490px] lg:w-[530px] border-r border-white/[0.08]' 
+              : 'w-0 md:w-[72px] border-r-0 md:border-r border-white/[0.08]'
           }`}
+          aria-label="Application tools"
         >
-          <div className="w-full md:w-96 lg:w-[450px] shrink-0 h-full overflow-hidden animate-fade-in">
+          <div className="w-full md:w-[490px] lg:w-[530px] shrink-0 h-full overflow-hidden">
             <SidebarEditor
               activeTab={activeTab}
               setActiveTab={setActiveTab}
+              isExpanded={sidebarOpen}
+              onToggleExpand={() => setSidebarOpen(!sidebarOpen)}
             />
           </div>
-        </div>
+        </aside>
 
         {/* Main Resume Canvas Area */}
-        <main className="flex-1 overflow-y-auto w-full bg-ds-bg p-4 md:p-8 flex justify-center print:p-0 print:block print:overflow-visible relative">
+        <main className="flex-1 overflow-y-auto w-full bg-md-surface p-4 md:p-8 flex justify-center print:p-0 print:block print:overflow-visible relative">
           <div className="w-full max-w-[210mm] transition-all duration-300 ease-in-out print:max-w-none print:w-full min-h-full">
             <ResumePaper 
               data={resumeData} 
@@ -122,8 +128,9 @@ const App: React.FC = () => {
               sectionSpacing={sectionSpacing}
               itemSpacing={itemSpacing}
               showPageGuides={showPageGuides}
+              enableAdaptiveFit={enableAdaptiveFit}
             />
-            <footer className="mt-8 mb-4 text-center text-ds-text-disabled text-xs print:hidden">
+            <footer className="mt-8 mb-4 text-center text-md-on-surface-variant text-xs print:hidden">
                <p>&copy; {new Date().getFullYear()} Cognitive Resume Analyzer &amp; Builder. Optimized for recruiter attention &amp; print consistency.</p>
             </footer>
           </div>
@@ -133,7 +140,7 @@ const App: React.FC = () => {
       {/* Mobile Overlay */}
       {sidebarOpen && (
         <div 
-           className="md:hidden fixed inset-0 z-10 bg-ds-scrim/80 backdrop-blur-sm print:hidden" 
+           className="md:hidden fixed inset-0 z-10 bg-black/60 backdrop-blur-sm print:hidden" 
            onClick={() => setSidebarOpen(false)}
         />
       )}

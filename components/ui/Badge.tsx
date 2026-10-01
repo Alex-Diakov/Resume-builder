@@ -3,33 +3,35 @@ import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '../../utils/cn';
 
 export const badgeVariants = cva(
-  "inline-flex items-center rounded-ds-xs font-semibold uppercase tracking-wider transition-colors select-none",
+  "inline-flex items-center rounded-md-sm font-sans font-medium text-xs transition-colors select-none",
   {
     variants: {
       variant: {
         default:
-          "border border-ds-primary/40 bg-ds-primary text-white shadow-ds-sm hover:bg-ds-primary-hover",
+          "border border-transparent bg-md-primary text-md-on-primary font-semibold shadow-none",
         primary:
-          "border border-ds-primary/40 bg-ds-primary text-white shadow-ds-sm hover:bg-ds-primary-hover",
+          "border border-transparent bg-md-primary text-md-on-primary font-semibold shadow-none",
         secondary:
-          "border border-ds-secondary/40 bg-ds-secondary text-ds-bg font-bold hover:bg-ds-secondary-hover",
+          "border border-transparent bg-md-secondary-container text-md-on-secondary-container font-medium",
+        tertiary:
+          "border border-transparent bg-md-tertiary-container text-md-on-tertiary-container font-medium",
         outline:
-          "border border-ds-border bg-transparent text-ds-text-medium hover:text-ds-text-high",
+          "border border-md-outline-variant/40 bg-transparent text-md-on-surface-variant hover:border-md-outline hover:text-md-on-surface",
         surface:
-          "border border-ds-border bg-ds-active text-ds-text-medium",
+          "border border-md-outline-variant/30 bg-md-surface-container text-md-on-surface",
         success:
-          "border border-ds-success/30 bg-ds-success-bg text-ds-success",
+          "border border-md-success/30 bg-md-success-container/40 text-md-on-success-container font-medium",
         warning:
-          "border border-ds-warning/30 bg-ds-warning-bg text-ds-warning",
+          "border border-md-warning/30 bg-md-warning-container/40 text-md-on-warning-container font-medium",
         danger:
-          "border border-ds-error/30 bg-ds-error-bg text-ds-error",
+          "border border-md-error/30 bg-md-error-container/40 text-md-on-error-container font-medium",
         info:
-          "border border-ds-info/30 bg-ds-info-bg text-ds-info",
+          "border border-md-info/30 bg-md-info-container/40 text-md-on-info-container font-medium",
       },
       size: {
-        sm: "px-1.5 py-0.5 text-[9px] leading-tight gap-1",
-        default: "px-2 py-0.5 text-[10px] leading-tight gap-1.5",
-        lg: "px-2.5 py-1 text-xs leading-tight gap-1.5",
+        sm: "px-2 py-0.5 text-[11px] gap-1.5",
+        default: "px-2.5 py-1 text-xs gap-1.5",
+        lg: "px-3 py-1.5 text-xs font-semibold gap-2",
       },
     },
     defaultVariants: {
@@ -51,14 +53,16 @@ function Badge({ className, variant, size, dot, children, ...props }: BadgeProps
       {dot && (
         <span
           className={cn(
-            "w-1.5 h-1.5 rounded-full shrink-0",
-            variant === 'success' && "bg-ds-success animate-pulse",
-            variant === 'warning' && "bg-ds-warning",
-            variant === 'danger' && "bg-ds-error",
-            variant === 'info' && "bg-ds-info",
-            (!variant || variant === 'default' || variant === 'primary') && "bg-white",
-            variant === 'secondary' && "bg-ds-bg",
-            (variant === 'outline' || variant === 'surface') && "bg-ds-text-muted"
+            "w-2 h-2 rounded-full shrink-0",
+            variant === 'success' && "bg-md-success animate-pulse",
+            variant === 'warning' && "bg-md-warning",
+            variant === 'danger' && "bg-md-error",
+            variant === 'info' && "bg-md-info",
+            (!variant || variant === 'default' || variant === 'primary') && "bg-md-on-primary",
+            variant === 'secondary' && "bg-md-on-secondary-container",
+            variant === 'tertiary' && "bg-md-tertiary",
+            variant === 'outline' && "bg-md-outline",
+            variant === 'surface' && "bg-md-on-surface-variant"
           )}
         />
       )}

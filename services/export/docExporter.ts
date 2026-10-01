@@ -464,7 +464,7 @@ export async function exportToDocx(resumeData: ResumeData) {
             size: 18,
             font: 'Arial',
             color: '6B7280',
-            italic: true,
+            italics: true,
           }),
         ],
       })

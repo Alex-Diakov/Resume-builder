@@ -12,17 +12,17 @@ const Label = React.forwardRef<HTMLLabelElement, LabelProps>(
       <label
         ref={ref}
         className={cn(
-          "flex items-center justify-between text-[11px] font-semibold text-ds-text-medium uppercase tracking-wider mb-1.5 select-none font-sans",
+          "flex items-center justify-between text-xs font-medium text-md-on-surface-variant mb-1.5 select-none font-sans tracking-normal",
           className
         )}
         {...props}
       >
-        <span className="inline-flex items-center gap-1">
+        <span className="inline-flex items-center gap-1.5">
           {children}
-          {required && <span className="text-ds-error text-xs leading-none">*</span>}
+          {required && <span className="text-md-error text-xs font-bold leading-none" aria-hidden="true">*</span>}
         </span>
         {optional && (
-          <span className="text-[10px] text-ds-text-disabled lowercase font-normal">
+          <span className="text-[11px] text-md-outline lowercase font-normal tracking-normal">
             optional
           </span>
         )}

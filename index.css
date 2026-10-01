@@ -6,64 +6,146 @@
 
 @layer base {
   :root {
-    /* Design Tokens for Dark Theme GUI - Material 3 / 2026 Edition */
-    /* 1. Surface Elevation Hierarchy */
-    --color-surface-bg: #0d0c11;                /* Deep premium obsidian canvas (Elevation 0) */
-    --color-surface-panel: #14121a;             /* Main toolbar and sidebar background (Elevation 1) */
-    --color-surface-container: #1b1922;         /* Nested groups and card inputs (Elevation 2) */
-    --color-surface-active: #25222d;            /* Focus states and selected list elements (Elevation 3) */
-    --color-surface-hover: #1f1d26;             /* Transition trigger hover states */
-    
-    /* 2. Brand & Primary Accents */
-    --color-brand-primary: #a855f7;             /* Vibrant Purple-Indigo Accent key */
-    --color-brand-primary-hover: #9333ea;       /* Focused action key */
-    --color-brand-primary-light: rgba(168, 85, 247, 0.12); /* Selected overlays */
-    
-    --color-brand-secondary: #22d3ee;           /* Tech Cyan focus anchors */
-    --color-brand-secondary-hover: #0891b2;     /* Secondary hover */
-    --color-brand-secondary-light: rgba(34, 211, 238, 0.10); /* Secondary tint */
+    /* ==========================================================================
+       MATERIAL DESIGN 3 (M3) DESIGN TOKENS - DARK THEME PALETTE
+       ========================================================================== */
 
-    /* 3. Text & Typography Readability */
-    --color-text-high: #f5f2fa;                 /* Maximum readability text for dark panels (16.8:1 AAA) */
-    --color-text-medium: #d6cfde;               /* High accessibility body copy secondary descriptions (12.4:1 AAA) */
-    --color-text-muted: #a69bb0;                /* WCAG-compliant muted metadata (5.8:1 AA) */
-    --color-text-disabled: #6d6178;             /* Input labels placeholders and inactive tracks */
+    /* 1. M3 Surface Hierarchy (Tonal Elevation System) */
+    --md-sys-color-surface: #141218;
+    --md-sys-color-surface-dim: #141218;
+    --md-sys-color-surface-bright: #3b383e;
+    --md-sys-color-surface-container-lowest: #0f0d13;
+    --md-sys-color-surface-container-low: #1d1b20;
+    --md-sys-color-surface-container: #211f26;
+    --md-sys-color-surface-container-high: #2b2930;
+    --md-sys-color-surface-container-highest: #36343b;
 
-    /* 4. Borders & Outlines */
-    --color-border-main: #2b2734;               /* Ultra-thin separator lines */
-    --color-border-focus: #c084fc;              /* Active focus rings */
+    /* 2. M3 Primary Roles (Lilac / Dark Violet) */
+    --md-sys-color-primary: #d0bcff;
+    --md-sys-color-on-primary: #21005d;
+    --md-sys-color-primary-container: #4f378b;
+    --md-sys-color-on-primary-container: #eaddff;
+    --md-sys-color-inverse-primary: #6750a4;
 
-    /* 5. Semantic Status Indicators */
-    --color-status-success: #34d399;            /* Positive validation / high scores */
-    --color-status-success-bg: rgba(52, 211, 153, 0.12);
-    --color-status-warning: #fbc02d;            /* Moderate actions recommended */
-    --color-status-warning-bg: rgba(251, 192, 45, 0.12);
-    --color-status-error: #f87171;              /* Fault parameters needing remediation */
-    --color-status-error-bg: rgba(248, 113, 113, 0.12);
-    --color-status-info: #38bdf8;               /* Informational toasts and badges */
-    --color-status-info-bg: rgba(56, 189, 248, 0.12);
+    /* 3. M3 Secondary Roles (Muted Lavender) */
+    --md-sys-color-secondary: #ccc2dc;
+    --md-sys-color-on-secondary: #332d41;
+    --md-sys-color-secondary-container: #4a4458;
+    --md-sys-color-on-secondary-container: #e8def8;
 
-    /* 6. Geometric Radii Hierarchy */
-    --radius-xs: 4px;
-    --radius-sm: 6px;
-    --radius-md: 10px;
-    --radius-lg: 14px;
-    --radius-xl: 20px;
-    --radius-full: 9999px;
+    /* 4. M3 Tertiary Roles (Cyan / Tech Accent for ATS & Metrics) */
+    --md-sys-color-tertiary: #7dd0df;
+    --md-sys-color-on-tertiary: #00363f;
+    --md-sys-color-tertiary-container: #1f4d56;
+    --md-sys-color-on-tertiary-container: #a6eefb;
 
-    /* 7. Shadow & Elevation Tokens */
-    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.25);
-    --shadow-md: 0 4px 14px -2px rgba(0, 0, 0, 0.45);
-    --shadow-lg: 0 12px 28px -4px rgba(0, 0, 0, 0.65);
-    --shadow-glow: 0 0 15px rgba(168, 85, 247, 0.25);
+    /* 5. M3 Neutral & Content Roles */
+    --md-sys-color-on-surface: #e6e0e9;
+    --md-sys-color-on-surface-variant: #cac4d0;
+    --md-sys-color-outline: #938f99;
+    --md-sys-color-outline-variant: #49454f;
+    --md-sys-color-inverse-surface: #e6e0e9;
+    --md-sys-color-inverse-on-surface: #313033;
+
+    /* 6. M3 Status Roles (Error, Success, Warning, Info) */
+    --md-sys-color-error: #f2b8b5;
+    --md-sys-color-on-error: #601410;
+    --md-sys-color-error-container: #8c1d18;
+    --md-sys-color-on-error-container: #f9dedc;
+
+    --md-sys-color-success: #85d996;
+    --md-sys-color-on-success: #003915;
+    --md-sys-color-success-container: #0e5224;
+    --md-sys-color-on-success-container: #a1f6b0;
+
+    --md-sys-color-warning: #f5be48;
+    --md-sys-color-on-warning: #412d00;
+    --md-sys-color-warning-container: #5e4200;
+    --md-sys-color-on-warning-container: #ffdf9d;
+
+    --md-sys-color-info: #7dd0df;
+    --md-sys-color-on-info: #00363f;
+    --md-sys-color-info-container: #1f4d56;
+    --md-sys-color-on-info-container: #a6eefb;
+
+    /* 7. M3 Shape Tokens */
+    --md-sys-shape-none: 0px;
+    --md-sys-shape-xs: 4px;
+    --md-sys-shape-sm: 8px;
+    --md-sys-shape-md: 12px;
+    --md-sys-shape-lg: 16px;
+    --md-sys-shape-xl: 28px;
+    --md-sys-shape-full: 9999px;
+
+    /* 8. M3 Elevation Shadow Tokens */
+    --md-sys-elevation-0: none;
+    --md-sys-elevation-1: 0px 1px 3px 1px rgba(0, 0, 0, 0.25), 0px 1px 2px 0px rgba(0, 0, 0, 0.35);
+    --md-sys-elevation-2: 0px 2px 6px 2px rgba(0, 0, 0, 0.30), 0px 1px 2px 0px rgba(0, 0, 0, 0.40);
+    --md-sys-elevation-3: 0px 4px 8px 3px rgba(0, 0, 0, 0.35), 0px 1px 3px 0px rgba(0, 0, 0, 0.45);
+    --md-sys-elevation-4: 0px 6px 10px 4px rgba(0, 0, 0, 0.40), 0px 2px 3px 0px rgba(0, 0, 0, 0.50);
+    --md-sys-elevation-5: 0px 8px 12px 6px rgba(0, 0, 0, 0.45), 0px 4px 4px 0px rgba(0, 0, 0, 0.55);
+
+    /* 9. M3 State Layer Opacities */
+    --md-sys-state-hover-opacity: 0.08;
+    --md-sys-state-focus-opacity: 0.12;
+    --md-sys-state-pressed-opacity: 0.12;
+    --md-sys-state-dragged-opacity: 0.16;
+
+    /* ==========================================================================
+       BACKWARD COMPATIBILITY ALIASES (Map legacy tokens to M3 architecture)
+       ========================================================================== */
+    --color-surface-bg: var(--md-sys-color-surface);
+    --color-surface-panel: var(--md-sys-color-surface-container-low);
+    --color-surface-container: var(--md-sys-color-surface-container);
+    --color-surface-active: var(--md-sys-color-surface-container-high);
+    --color-surface-hover: var(--md-sys-color-surface-container-highest);
+
+    --color-brand-primary: var(--md-sys-color-primary);
+    --color-brand-primary-hover: #bda0fa;
+    --color-brand-primary-light: rgba(208, 188, 255, 0.12);
+
+    --color-brand-secondary: var(--md-sys-color-tertiary);
+    --color-brand-secondary-hover: #98e0ed;
+    --color-brand-secondary-light: rgba(125, 208, 223, 0.12);
+
+    --color-text-high: var(--md-sys-color-on-surface);
+    --color-text-medium: var(--md-sys-color-on-surface-variant);
+    --color-text-muted: var(--md-sys-color-outline);
+    --color-text-disabled: #6d6676;
+
+    --color-border-main: rgba(255, 255, 255, 0.08);
+    --color-border-focus: rgba(208, 188, 255, 0.45);
+    --color-border-accordion-open: rgba(208, 188, 255, 0.35);
+    --color-accordion-open-bg: var(--md-sys-color-surface-container);
+
+    --color-status-success: var(--md-sys-color-success);
+    --color-status-success-bg: rgba(133, 217, 150, 0.14);
+    --color-status-warning: var(--md-sys-color-warning);
+    --color-status-warning-bg: rgba(245, 190, 72, 0.14);
+    --color-status-error: var(--md-sys-color-error);
+    --color-status-error-bg: rgba(242, 184, 181, 0.14);
+    --color-status-info: var(--md-sys-color-info);
+    --color-status-info-bg: rgba(125, 208, 223, 0.14);
+
+    --radius-xs: var(--md-sys-shape-xs);
+    --radius-sm: var(--md-sys-shape-sm);
+    --radius-md: var(--md-sys-shape-md);
+    --radius-lg: var(--md-sys-shape-lg);
+    --radius-xl: var(--md-sys-shape-xl);
+    --radius-full: var(--md-sys-shape-full);
+
+    --shadow-sm: var(--md-sys-elevation-1);
+    --shadow-md: var(--md-sys-elevation-2);
+    --shadow-lg: var(--md-sys-elevation-3);
+    --shadow-glow: 0 0 16px rgba(208, 188, 255, 0.28);
     --shadow-paper: 0 10px 30px -5px rgba(0, 0, 0, 0.45), 0 4px 12px -2px rgba(0, 0, 0, 0.25);
 
-    /* 8. Document Print & Paper Tokens (Single Source of Truth for Resume Canvas) */
+    /* Document Print & Paper Tokens (Protected Canvas) */
     --doc-paper: #ffffff;
     --doc-text-primary: #1e293b;
     --doc-text-secondary: #475569;
     --doc-text-muted: #64748b;
-    --doc-accent: #7c52ff;
+    --doc-accent: #6750a4;
     --doc-border: #e2e8f0;
   }
 
@@ -81,6 +163,19 @@
     color: var(--color-text-medium);
   }
 
+  /* Global Material Design 3 Text Selection */
+  ::selection {
+    background-color: var(--md-sys-color-primary-container);
+    color: var(--md-sys-color-on-primary-container);
+  }
+  input::selection, textarea::selection {
+    background-color: var(--md-sys-color-primary-container);
+    color: var(--md-sys-color-on-primary-container);
+  }
+  input, textarea {
+    caret-color: var(--md-sys-color-primary);
+  }
+
   /* Custom scrollbar matching Material 3 theme */
   ::-webkit-scrollbar {
     width: 6px;
@@ -95,6 +190,23 @@
   }
   ::-webkit-scrollbar-thumb:hover {
     background: rgba(255, 255, 255, 0.3);
+  }
+
+  /* Clean modern focus & outline handling: eliminate crude browser default blue/white focus boxes */
+  button:focus,
+  [role="button"]:focus,
+  [role="tab"]:focus {
+    outline: none;
+  }
+
+  button:focus-visible,
+  [role="button"]:focus-visible,
+  [role="tab"]:focus-visible,
+  input:focus-visible,
+  textarea:focus-visible,
+  select:focus-visible {
+    outline: 2px solid rgba(208, 188, 255, 0.45);
+    outline-offset: 1px;
   }
 }
 
@@ -151,11 +263,51 @@
     page-break-inside: avoid !important;
     break-inside: avoid !important;
   }
+
+  /* Physical A4 Print & Rasterization Alignment Guard for Contact Header */
+  .resume-contact-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    line-height: 14px;
+  }
+  .resume-contact-item {
+    display: inline-flex !important;
+    align-items: center !important;
+    vertical-align: middle !important;
+    height: 14px !important;
+    line-height: 14px !important;
+  }
+  .resume-contact-icon {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 14px !important;
+    height: 14px !important;
+    margin-right: 6px !important;
+    flex-shrink: 0 !important;
+  }
+  .resume-contact-icon svg {
+    display: block !important;
+    width: 14px !important;
+    height: 14px !important;
+    transform: none !important;
+  }
+  .resume-contact-text {
+    display: inline-block !important;
+    height: 14px !important;
+    line-height: 14px !important;
+    vertical-align: middle !important;
+  }
 }
 
 
 @layer base {
-  *:focus-visible {
-    outline: none !important;
+  button:focus-visible, 
+  a:focus-visible,
+  [role="button"]:focus-visible,
+  [role="tab"]:focus-visible {
+    outline: 2px solid var(--md-sys-color-primary);
+    outline-offset: 2px;
   }
 }
