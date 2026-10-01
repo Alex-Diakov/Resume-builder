@@ -3,9 +3,11 @@ import { ResumeData } from '../types';
 
 export const useDocExport = (resumeData: ResumeData) => {
   const [isGeneratingDoc, setIsGeneratingDoc] = useState(false);
+  const [docError, setDocError] = useState<string | null>(null);
 
   const handleDownloadDocx = useCallback(async () => {
     setIsGeneratingDoc(true);
+    setDocError(null);
     try {
       try {
         const currentCount = parseInt(localStorage.getItem('resume_download_count') || '0', 10);
@@ -16,14 +18,14 @@ export const useDocExport = (resumeData: ResumeData) => {
       }
       const { exportToDocx } = await import('../services/export/docExporter');
       await exportToDocx(resumeData);
-    } catch (err) {
+    } catch (err: any) {
+      const errorMsg = err?.message || 'Failed to generate Word document';
       console.error('Error generating DOCX document:', err);
-      alert('Failed to generate Word document. Please try again.');
+      setDocError(errorMsg);
     } finally {
       setIsGeneratingDoc(false);
     }
   }, [resumeData]);
 
-  return { isGeneratingDoc, handleDownloadDocx };
+  return { isGeneratingDoc, handleDownloadDocx, docError };
 };
-

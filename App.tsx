@@ -57,7 +57,7 @@ const App: React.FC = () => {
         setJsonInput(JSON.stringify(mergedData, null, 2));
         setAtsInput(mergedData.atsKeywords || '');
       } catch (err) {
-        alert("Failed to parse JSON file.");
+        console.error("Failed to parse uploaded JSON resume file:", err);
       }
     };
     reader.readAsText(file);

@@ -588,7 +588,12 @@ export const DesignSystemPage: React.FC<DesignSystemPageProps> = ({ onClose }) =
                           <span>Adaptive Fit</span>
                           <Switch checked={sampleToggle} onCheckedChange={setSampleToggle} size="sm" />
                         </div>
-                        <Slider value={sampleSlider} min={0} max={100} onChange={setSampleSlider} />
+                        <Slider 
+                          value={sampleSlider} 
+                          min={0} 
+                          max={100} 
+                          onChange={(e) => setSampleSlider(Number(e.target.value))} 
+                        />
                       </div>
                     </div>
                   </div>
@@ -844,7 +849,7 @@ export const DesignSystemPage: React.FC<DesignSystemPageProps> = ({ onClose }) =
                             value={sampleSlider}
                             min={0}
                             max={100}
-                            onChange={setSampleSlider}
+                            onChange={(e) => setSampleSlider(Number(e.target.value))}
                           />
                         </div>
                       </div>

@@ -110,6 +110,102 @@ export function generatePdfFileName(resumeData: ResumeData): string {
   return `${nameStr || 'Resume'}.pdf`;
 }
 
+/**
+ * Converts any modern CSS color string (including CSS Color 4 color(srgb ...),
+ * color-mix(...), oklch(...), lab(...), etc.) into a legacy rgba(...) or rgb(...)
+ * string that html2canvas can safely tokenize and parse without throwing.
+ */
+function createColorSanitizer() {
+  let scratchCanvas: HTMLCanvasElement | null = null;
+  let scratchCtx: CanvasRenderingContext2D | null = null;
+
+  try {
+    scratchCanvas = document.createElement('canvas');
+    scratchCanvas.width = 1;
+    scratchCanvas.height = 1;
+    scratchCtx = scratchCanvas.getContext('2d', { willReadFrequently: true });
+  } catch (e) {
+    scratchCtx = null;
+  }
+
+  const colorToRgba = (colorStr: string): string => {
+    if (!scratchCtx) return colorStr;
+    try {
+      scratchCtx.clearRect(0, 0, 1, 1);
+      scratchCtx.fillStyle = 'rgba(0,0,0,0)';
+      scratchCtx.fillStyle = colorStr;
+      scratchCtx.fillRect(0, 0, 1, 1);
+      const [r, g, b, a] = scratchCtx.getImageData(0, 0, 1, 1).data;
+      return `rgba(${r}, ${g}, ${b}, ${+(a / 255).toFixed(3)})`;
+    } catch {
+      return colorStr;
+    }
+  };
+
+  const sanitizeValue = (val: any): any => {
+    if (!val || typeof val !== 'string') return val;
+    if (
+      !val.includes('color(') &&
+      !val.includes('color-mix(') &&
+      !val.includes('oklch(') &&
+      !val.includes('oklab(') &&
+      !val.includes('lab(') &&
+      !val.includes('lch(')
+    ) {
+      return val;
+    }
+
+    return val.replace(
+      /(?:color-mix|color|oklch|oklab|lab|lch)\((?:[^)(]+|\((?:[^)(]+|\([^)(]*\))*\))*\)/gi,
+      (match) => colorToRgba(match)
+    );
+  };
+
+  return { sanitizeValue, colorToRgba };
+}
+
+/**
+ * Executes a rendering action with a transparent getComputedStyle proxy installed
+ * on both the main window and any cloned document windows to guarantee html2canvas
+ * never encounters unsupported CSS Color Module 4 functions.
+ */
+async function runWithColorSanitization<T>(action: () => Promise<T>): Promise<T> {
+  const { sanitizeValue } = createColorSanitizer();
+  const originalGetComputedStyle = window.getComputedStyle;
+
+  const createProxiedStyle = (realStyle: CSSStyleDeclaration): CSSStyleDeclaration => {
+    return new Proxy(realStyle, {
+      get(target, prop) {
+        const origVal = (target as any)[prop];
+        if (typeof origVal === 'function') {
+          if (prop === 'getPropertyValue') {
+            return function (propertyName: string) {
+              const raw = target.getPropertyValue(propertyName);
+              return sanitizeValue(raw);
+            };
+          }
+          return origVal.bind(target);
+        }
+        if (typeof origVal === 'string') {
+          return sanitizeValue(origVal);
+        }
+        return origVal;
+      }
+    });
+  };
+
+  window.getComputedStyle = function (element: Element, pseudoElt?: string | null): CSSStyleDeclaration {
+    const style = originalGetComputedStyle.call(window, element, pseudoElt);
+    return createProxiedStyle(style);
+  };
+
+  try {
+    return await action();
+  } finally {
+    window.getComputedStyle = originalGetComputedStyle;
+  }
+}
+
 export async function exportToPdf(
   resumeData: ResumeData,
   options: PdfExportOptions
@@ -147,6 +243,8 @@ export async function exportToPdf(
     g.style.display = 'none';
   });
 
+  const { sanitizeValue } = createColorSanitizer();
+
   try {
     for (let pageIdx = 0; pageIdx < pageElements.length; pageIdx++) {
       const pageEl = pageElements[pageIdx];
@@ -162,31 +260,55 @@ export async function exportToPdf(
 
       let canvas: HTMLCanvasElement;
       try {
-        // Render the discrete page container to canvas with isolated subpixel boundaries
-        canvas = await html2canvas(pageEl, {
-          scale: profile.scale,
-          useCORS: true,
-          backgroundColor: '#ffffff', // Ensures JPEG does not produce dark alpha artifacts
-          logging: false,
-          scrollY: 0,
-          scrollX: 0,
-          windowWidth: 1200, // Guarantees desktop layout breakpoints regardless of current viewport size
-          onclone: (clonedDoc) => {
-            // ISOLATED PDF EXPORT ALIGNMENT GUARD:
-            // In browser DOM, flexbox items-center vertically centers the 14px SVG and 12.67px text.
-            // However, html2canvas renders text via ctx.fillText at (bounds.top + fontMetrics.baseline)
-            // using alphabetic baseline (~21px for Plus Jakarta Sans), while SVG replaced elements
-            // are rendered via ctx.drawImage directly at bounds.top.
-            // Without compensation in html2canvas, SVG icons render ~7.5px too high relative to text.
-            // By shifting .resume-contact-icon in clonedDoc only, we ensure the exported PDF has
-            // subpixel-perfect vertical alignment between icons, text, and bullet dots without
-            // affecting the live UI or browser print styles.
-            const contactIcons = clonedDoc.querySelectorAll<HTMLElement>('.resume-contact-icon');
-            contactIcons.forEach((icon) => {
-              icon.style.position = 'relative';
-              icon.style.top = '7.5px';
-            });
-          },
+        // Render with safe color sanitization active to catch any computed color(...) values
+        canvas = await runWithColorSanitization(async () => {
+          return await html2canvas(pageEl, {
+            scale: profile.scale,
+            useCORS: true,
+            backgroundColor: '#ffffff', // Ensures JPEG does not produce dark alpha artifacts
+            logging: false,
+            scrollY: 0,
+            scrollX: 0,
+            windowWidth: 1200, // Guarantees desktop layout breakpoints regardless of current viewport size
+            onclone: (clonedDoc) => {
+              // 1. Install getComputedStyle proxy in cloned iframe window if present
+              const clonedWin = clonedDoc.defaultView;
+              if (clonedWin && clonedWin.getComputedStyle) {
+                const origClonedGetComputedStyle = clonedWin.getComputedStyle;
+                clonedWin.getComputedStyle = function (el: Element, pseudo?: string | null) {
+                  const style = origClonedGetComputedStyle.call(clonedWin, el, pseudo);
+                  return new Proxy(style, {
+                    get(target, prop) {
+                      const origVal = (target as any)[prop];
+                      if (typeof origVal === 'function') {
+                        if (prop === 'getPropertyValue') {
+                          return (p: string) => sanitizeValue(target.getPropertyValue(p));
+                        }
+                        return origVal.bind(target);
+                      }
+                      if (typeof origVal === 'string') {
+                        return sanitizeValue(origVal);
+                      }
+                      return origVal;
+                    }
+                  });
+                };
+              }
+
+              // 2. Explicitly establish light background & dark print text on root/body of cloned doc
+              if (clonedDoc.body) {
+                clonedDoc.body.style.backgroundColor = '#ffffff';
+                clonedDoc.body.style.color = '#1e293b';
+              }
+
+              // 3. Subpixel vertical alignment for icons in contact bar
+              const contactIcons = clonedDoc.querySelectorAll<HTMLElement>('.resume-contact-icon');
+              contactIcons.forEach((icon) => {
+                icon.style.position = 'relative';
+                icon.style.top = '7.5px';
+              });
+            },
+          });
         });
       } finally {
         pageEl.className = originalClassName;

@@ -165,7 +165,7 @@ export const ResumeProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       // When user is typing inside an input/textarea, let native text undo work unless Cmd+Shift+Z
       if (isInput) return;
 
-      const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
+      const isMac = typeof navigator !== 'undefined' && (/Mac|iPhone|iPod|iPad/i.test(navigator.userAgent || navigator.platform || ''));
       const mod = isMac ? e.metaKey : e.ctrlKey;
 
       if (mod && !e.shiftKey && e.key.toLowerCase() === 'z') {
