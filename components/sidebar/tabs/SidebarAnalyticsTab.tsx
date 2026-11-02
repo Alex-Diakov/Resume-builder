@@ -1,103 +1,119 @@
-import React, { useEffect, useState } from 'react';
-import { useAnalytics } from '../../../hooks/useAnalytics';
+import React, { useState } from 'react';
 import { ResumeData } from '../../../types';
-import { Activity, RefreshCw } from 'lucide-react';
-import { Badge } from '../../ui/Badge';
-import { Button } from '../../ui/Button';
+import { FileText, FileType, Printer } from 'lucide-react';
+import { useAnalyticsStats } from '../../../hooks/useAnalyticsStats';
+import { ActivityKpiSlider } from '../../statistics/ActivityKpiSlider';
+import { ResumeActivityInfographic } from '../../statistics/ResumeActivityInfographic';
 
 interface SidebarAnalyticsTabProps {
   resumeData: ResumeData;
+  atsInput?: string;
 }
 
-export const SidebarAnalyticsTab: React.FC<SidebarAnalyticsTabProps> = ({ resumeData }) => {
-  const { downloadCount, isAnalyzing, analyticsData, runAnalytics } = useAnalytics(resumeData);
-  const [currentCount, setCurrentCount] = useState(downloadCount);
+export const SidebarAnalyticsTab: React.FC<SidebarAnalyticsTabProps> = ({ 
+  resumeData: _resumeData,
+  atsInput: _atsInput
+}) => {
+  const now = new Date();
+  const [selectedYear, setSelectedYear] = useState<number>(now.getFullYear());
+  const [selectedMonthIndex, setSelectedMonthIndex] = useState<number>(now.getMonth());
 
-  useEffect(() => {
-    // Listen for custom event when downloads happen in other components
-    const handleDownload = () => {
-      const count = parseInt(localStorage.getItem('resume_download_count') || '0', 10);
-      setCurrentCount(count);
-    };
-    handleDownload(); // init
-    window.addEventListener('resume_downloaded', handleDownload);
-    return () => window.removeEventListener('resume_downloaded', handleDownload);
-  }, []);
+  // Unified Export Telemetry Hook
+  const { allTimeStats } = useAnalyticsStats(selectedYear, selectedMonthIndex);
+
+  const handlePrevMonth = () => {
+    if (selectedMonthIndex === 0) {
+      setSelectedMonthIndex(11);
+      setSelectedYear(prev => prev - 1);
+    } else {
+      setSelectedMonthIndex(prev => prev - 1);
+    }
+  };
+
+  const handleNextMonth = () => {
+    if (selectedMonthIndex === 11) {
+      setSelectedMonthIndex(0);
+      setSelectedYear(prev => prev + 1);
+    } else {
+      setSelectedMonthIndex(prev => prev + 1);
+    }
+  };
 
   return (
     <div className="flex flex-col pb-20 font-sans text-left">
       <div className="px-5 py-4 space-y-4">
         
-        {/* STATS HEADER */}
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h3 className="text-sm font-semibold text-md-on-surface font-display">Resume Overview</h3>
-              <p className="text-xs text-md-on-surface-variant mt-0.5">Automatic Document Intelligence</p>
-            </div>
-            <Button
-              variant="ghost"
-              size="icon-sm"
-              onClick={() => runAnalytics(true)}
-              disabled={isAnalyzing}
-              title="Refresh Analytics"
-              aria-label="Refresh Analytics"
-              className="p-2 rounded-md-sm hover:bg-md-surface-container-high cursor-pointer"
-            >
-              <RefreshCw className={`w-4 h-4 ${isAnalyzing ? 'animate-spin text-md-primary' : 'text-md-on-surface-variant hover:text-md-on-surface'}`} />
-            </Button>
-          </div>
-
-          <div className="bg-md-surface-container-low border border-md-outline-variant/30 rounded-md-lg p-4.5 flex items-center justify-between shadow-md-elevation-1">
-            <div>
-              <span className="text-xs font-semibold text-md-on-surface block">Total Exports</span>
-              <span className="text-xs text-md-on-surface-variant mt-0.5 block">Documents generated</span>
-            </div>
-            <div className="text-3xl font-mono font-bold text-md-on-surface">
-              {currentCount}
-            </div>
-          </div>
-
-          <div className="bg-md-surface-container-low border border-md-outline-variant/30 rounded-md-lg p-4.5 space-y-4 shadow-md-elevation-1 relative overflow-hidden">
-            {isAnalyzing && (
-              <div className="absolute inset-0 bg-md-surface-container-low/80 backdrop-blur-sm z-10 flex items-center justify-center">
-                <Activity className="w-6 h-6 text-md-primary animate-bounce" />
+        {/* 1. TOTAL EXPORTS CARD: PROMINENT GRAND TOTAL */}
+        <div className="bg-md-surface-container-low border border-white/[0.08] rounded-md-lg p-4 shadow-md-elevation-1 space-y-3">
+            <div className="flex items-center justify-between gap-3">
+              <div className="min-w-0">
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-semibold text-md-on-surface block truncate">
+                    Total Exports
+                  </span>
+                </div>
+                <span className="text-xs text-md-on-surface-variant block truncate mt-0.5">
+                  Synchronized count of all exported and downloaded files
+                </span>
               </div>
-            )}
-            
-            <div>
-              <h4 className="text-xs font-semibold text-md-on-surface mb-2.5">Target Role</h4>
-              <div className="flex flex-wrap gap-2">
-                {analyticsData?.detectedRole ? (
-                  analyticsData.detectedRole.split(/,|\/| and /i).map((role, idx) => (
-                    <Badge key={idx} variant="primary" size="sm">
-                      {role.trim()}
-                    </Badge>
-                  ))
-                ) : (
-                  <span className="text-xs text-md-on-surface-variant font-medium">Not Analyzed</span>
-                )}
+              <div className="flex items-baseline gap-1.5 shrink-0">
+                <span className="text-3xl font-mono font-bold text-emerald-300 tabular-nums">
+                  {allTimeStats.totalExports}
+                </span>
+                <span className="text-xs text-md-on-surface-variant font-medium">total</span>
               </div>
             </div>
 
-            <div className="w-full h-px bg-md-outline-variant/30" />
+            {/* Granular Format Breakdown: PDF + DOCX + Print */}
+            <div className="pt-2.5 border-t border-white/[0.06] grid grid-cols-3 gap-2 text-xs">
+              {/* PDF */}
+              <div className="flex items-center justify-between p-2 rounded bg-white/[0.03] border border-white/[0.05] min-w-0">
+                <div className="flex items-center gap-1.5 truncate">
+                  <FileText className="w-3.5 h-3.5 text-md-primary shrink-0" />
+                  <span className="text-[11px] text-md-on-surface-variant truncate">PDF</span>
+                </div>
+                <span className="font-mono font-bold text-md-on-surface tabular-nums shrink-0 ml-1">
+                  {allTimeStats.pdfExports}
+                </span>
+              </div>
 
-            <div>
-              <h4 className="text-xs font-semibold text-md-on-surface mb-2.5">Target Industry</h4>
-              <div className="flex flex-wrap gap-2">
-                {analyticsData?.detectedIndustry ? (
-                  analyticsData.detectedIndustry.split(/,|\/| and /i).map((ind, idx) => (
-                    <Badge key={idx} variant="secondary" size="sm">
-                      {ind.trim()}
-                    </Badge>
-                  ))
-                ) : (
-                  <span className="text-xs text-md-on-surface-variant font-medium">Not Analyzed</span>
-                )}
+              {/* Word DOCX */}
+              <div className="flex items-center justify-between p-2 rounded bg-white/[0.03] border border-white/[0.05] min-w-0">
+                <div className="flex items-center gap-1.5 truncate">
+                  <FileType className="w-3.5 h-3.5 text-md-secondary shrink-0" />
+                  <span className="text-[11px] text-md-on-surface-variant truncate">DOCX</span>
+                </div>
+                <span className="font-mono font-bold text-md-on-surface tabular-nums shrink-0 ml-1">
+                  {allTimeStats.docxExports}
+                </span>
+              </div>
+
+              {/* Print */}
+              <div className="flex items-center justify-between p-2 rounded bg-white/[0.03] border border-white/[0.05] min-w-0">
+                <div className="flex items-center gap-1.5 truncate">
+                  <Printer className="w-3.5 h-3.5 text-sky-400 shrink-0" />
+                  <span className="text-[11px] text-md-on-surface-variant truncate">Print</span>
+                </div>
+                <span className="font-mono font-bold text-md-on-surface tabular-nums shrink-0 ml-1">
+                  {allTimeStats.printExports}
+                </span>
               </div>
             </div>
           </div>
-        </div>
+
+        {/* 2. NATIVE KPI SLIDER (4 CARDS IN ENGLISH: This Month, Export Streak, Monthly Peak, Active Days) */}
+        <ActivityKpiSlider
+          selectedYear={selectedYear}
+          selectedMonthIndex={selectedMonthIndex}
+        />
+
+        {/* 3. EXPORT CALENDAR INFOGRAPHIC (Monthly Heatmap & Daily Logs) */}
+        <ResumeActivityInfographic
+          selectedYear={selectedYear}
+          selectedMonthIndex={selectedMonthIndex}
+          onPrevMonth={handlePrevMonth}
+          onNextMonth={handleNextMonth}
+        />
       </div>
     </div>
   );

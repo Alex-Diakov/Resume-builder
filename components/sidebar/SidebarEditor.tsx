@@ -8,10 +8,12 @@ import {
   BarChart2,
   ChevronLeft,
   ChevronRight,
-  Sparkles
+  Sparkles,
+  Palette
 } from 'lucide-react';
 import { ResumeData } from '../../types';
 import { SidebarFormTab } from './tabs/SidebarFormTab';
+import { SidebarStyleTab } from './tabs/SidebarStyleTab';
 import { SidebarJsonTab } from './tabs/SidebarJsonTab';
 import { SidebarAtsTab } from './tabs/SidebarAtsTab';
 import { SidebarCognitiveTab } from './tabs/SidebarCognitiveTab';
@@ -19,7 +21,7 @@ import { SidebarAnalyticsTab } from './tabs/SidebarAnalyticsTab';
 import { useResumeContext } from '../../contexts/ResumeContext';
 import { useCognitiveAnalysis } from '../../hooks/useCognitiveAnalysis';
 
-export type SidebarTabType = 'form' | 'json' | 'cognitive' | 'ats' | 'analytics';
+export type SidebarTabType = 'form' | 'style' | 'json' | 'cognitive' | 'ats' | 'analytics';
 
 export interface SidebarEditorProps {
   activeTab: SidebarTabType;
@@ -48,6 +50,16 @@ const TAB_CONFIGS: TabItemConfig[] = [
     category: 'edit',
     icon: Sliders,
     description: 'Personal info, experience, skills & formatting',
+    accentColor: 'text-md-primary',
+    badgeBg: 'bg-md-primary-container/40 text-md-on-primary-container',
+  },
+  {
+    id: 'style',
+    label: 'Resume Styling',
+    shortLabel: 'Style',
+    category: 'edit',
+    icon: Palette,
+    description: 'Typography, color themes, spacing & header styles',
     accentColor: 'text-md-primary',
     badgeBg: 'bg-md-primary-container/40 text-md-on-primary-container',
   },
@@ -84,11 +96,11 @@ const TAB_CONFIGS: TabItemConfig[] = [
   },
   {
     id: 'analytics',
-    label: 'Analytics & Heat',
-    shortLabel: 'Stats',
+    label: 'Export Telemetry & Activity',
+    shortLabel: 'Exports',
     category: 'eval',
     icon: BarChart2,
-    description: 'Recruiter visual flow & section balance',
+    description: 'Real-time tracking of generated PDF, Word, and print files',
     accentColor: 'text-md-secondary',
     badgeBg: 'bg-md-secondary-container/40 text-md-on-secondary-container',
   },
@@ -181,9 +193,9 @@ export const SidebarEditor: React.FC<SidebarEditorProps> = ({
       <button
         key={tab.id}
         onClick={() => handleTabClick(tab.id)}
-        className={`group relative w-[54px] h-[54px] rounded-md-md flex flex-col items-center justify-center gap-1 transition-all duration-150 cursor-pointer outline-none focus:outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-md-primary/40 select-none ${
+        className={`group relative w-[54px] h-[54px] rounded-md-md flex flex-col items-center justify-center gap-1 transition-all duration-150 cursor-pointer outline-none focus:outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-md-primary select-none ${
           isActive 
-            ? 'bg-md-primary/15 text-white shadow-sm ring-1 ring-md-primary/30' 
+            ? 'bg-md-primary/15 text-md-on-surface shadow-sm ring-1 ring-md-primary/40' 
             : 'text-md-on-surface-variant hover:text-md-on-surface hover:bg-white/[0.04]'
         }`}
         aria-label={tab.label}
@@ -318,9 +330,11 @@ export const SidebarEditor: React.FC<SidebarEditorProps> = ({
                   <h2 className="text-sm font-semibold text-md-on-surface font-display truncate">
                     {currentTabConfig.label}
                   </h2>
-                  <span className="text-xs text-md-on-surface-variant font-normal">
-                    · {currentTabConfig.category === 'edit' ? 'Authoring' : 'Intelligence'}
-                  </span>
+                  {currentTabConfig.id !== 'analytics' && (
+                    <span className="text-xs text-md-on-surface-variant font-normal">
+                      · {currentTabConfig.category === 'edit' ? 'Authoring' : 'Intelligence'}
+                    </span>
+                  )}
                 </div>
                 <p className="text-xs text-md-on-surface-variant truncate mt-0.5">
                   {currentTabConfig.description}
@@ -365,6 +379,10 @@ export const SidebarEditor: React.FC<SidebarEditorProps> = ({
               />
             )}
 
+            {activeTab === 'style' && (
+              <SidebarStyleTab />
+            )}
+
             {activeTab === 'json' && (
               <SidebarJsonTab
                 jsonInput={jsonInput}
@@ -395,7 +413,10 @@ export const SidebarEditor: React.FC<SidebarEditorProps> = ({
             )}
 
             {activeTab === 'analytics' && (
-              <SidebarAnalyticsTab resumeData={resumeData} />
+              <SidebarAnalyticsTab 
+                resumeData={resumeData} 
+                atsInput={atsInput}
+              />
             )}
           </main>
         </div>

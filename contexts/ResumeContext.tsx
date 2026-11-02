@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { ResumeData } from '../types';
+import { ResumeData, ResumeStyleSettings, DEFAULT_STYLE_SETTINGS } from '../types';
 import { INITIAL_RESUME_DATA } from '../constants';
+import { UserResumeMeta } from '../types/auth';
 
 interface ResumeContextType {
   resumeData: ResumeData;
@@ -11,6 +12,18 @@ interface ResumeContextType {
   setAtsInput: (input: string) => void;
   jsonError: string | null;
   handleUpdateResumeData: (newData: ResumeData) => void;
+
+  // Active Multi-Resume Metadata
+  currentResumeId: string | null;
+  setCurrentResumeId: (id: string | null) => void;
+  currentResumeTitle: string;
+  setCurrentResumeTitle: (title: string) => void;
+  loadResumeFromCloud: (resume: UserResumeMeta) => void;
+
+  // Style & Appearance Settings
+  styleSettings: ResumeStyleSettings;
+  setStyleSettings: React.Dispatch<React.SetStateAction<ResumeStyleSettings>>;
+  handleUpdateStyleSettings: (newStyle: Partial<ResumeStyleSettings>) => void;
 
   // History / Undo / Redo
   canUndo: boolean;
@@ -47,6 +60,9 @@ interface ResumeContextType {
 const ResumeContext = createContext<ResumeContextType | undefined>(undefined);
 
 export const ResumeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [currentResumeId, setCurrentResumeId] = useState<string | null>(null);
+  const [currentResumeTitle, setCurrentResumeTitle] = useState<string>('Professional Resume');
+
   const [resumeData, setResumeData] = useState<ResumeData>(INITIAL_RESUME_DATA);
   const [jsonInput, setJsonInput] = useState(() => JSON.stringify(INITIAL_RESUME_DATA, null, 2));
   const [atsInput, setAtsInput] = useState('');
@@ -62,11 +78,46 @@ export const ResumeProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [pdfImageQuality, setPdfImageQuality] = useState(0.7);
   const [enableAdaptiveFit, setEnableAdaptiveFit] = useState(true);
   
+  // Style and Appearance State
+  const [styleSettings, setStyleSettings] = useState<ResumeStyleSettings>(DEFAULT_STYLE_SETTINGS);
+
   const [resumeHeight, setResumeHeight] = useState(0);
 
   // Undo / Redo History Stack
   const [history, setHistory] = useState<ResumeData[]>([INITIAL_RESUME_DATA]);
   const [historyIndex, setHistoryIndex] = useState(0);
+
+  const handleUpdateStyleSettings = useCallback((newStyle: Partial<ResumeStyleSettings>) => {
+    setStyleSettings(prev => {
+      const updated = { ...prev, ...newStyle };
+      try {
+        localStorage.setItem('resume_style_settings_v1', JSON.stringify(updated));
+      } catch (e) {}
+      return updated;
+    });
+  }, []);
+
+  const loadResumeFromCloud = useCallback((resume: UserResumeMeta) => {
+    setCurrentResumeId(resume.id);
+    setCurrentResumeTitle(resume.title);
+    setResumeData(resume.data);
+    setJsonInput(JSON.stringify(resume.data, null, 2));
+    setAtsInput(resume.data.atsKeywords || '');
+    if (resume.layoutSettings) {
+      setPaddingTopBottom(resume.layoutSettings.paddingTopBottom ?? 12.7);
+      setPaddingLeftRight(resume.layoutSettings.paddingLeftRight ?? 14);
+      setSectionSpacing(resume.layoutSettings.sectionSpacing ?? 1.0);
+      setItemSpacing(resume.layoutSettings.itemSpacing ?? 1.0);
+      setSpacingPreset(resume.layoutSettings.spacingPreset ?? 'standard');
+    }
+    if (resume.styleSettings) {
+      setStyleSettings({ ...DEFAULT_STYLE_SETTINGS, ...resume.styleSettings });
+    } else {
+      setStyleSettings(DEFAULT_STYLE_SETTINGS);
+    }
+    setHistory([resume.data]);
+    setHistoryIndex(0);
+  }, []);
 
   // Load from LocalStorage on mount
   useEffect(() => {
@@ -74,15 +125,25 @@ export const ResumeProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       const savedData = localStorage.getItem('resume_data_v1');
       if (savedData) {
         const parsed = JSON.parse(savedData);
-        const merged = { ...INITIAL_RESUME_DATA, ...parsed };
-        setResumeData(merged);
-        setJsonInput(JSON.stringify(merged, null, 2));
-        setAtsInput(merged.atsKeywords || '');
-        setHistory([merged]);
-        setHistoryIndex(0);
+        if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+          const merged = { ...INITIAL_RESUME_DATA, ...parsed };
+          setResumeData(merged);
+          setJsonInput(JSON.stringify(merged, null, 2));
+          setAtsInput(merged.atsKeywords || '');
+          setHistory([merged]);
+          setHistoryIndex(0);
+        }
+      }
+
+      const savedStyle = localStorage.getItem('resume_style_settings_v1');
+      if (savedStyle) {
+        const parsedStyle = JSON.parse(savedStyle);
+        if (parsedStyle && typeof parsedStyle === 'object') {
+          setStyleSettings(prev => ({ ...prev, ...parsedStyle }));
+        }
       }
     } catch (e) {
-      console.error("Failed to load saved data", e);
+      console.warn("Failed to load saved data, starting with fresh initial resume:", e);
     }
   }, []);
 
@@ -248,7 +309,11 @@ export const ResumeProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       jsonInput, setJsonInput,
       atsInput, setAtsInput,
       jsonError, handleUpdateResumeData,
+      currentResumeId, setCurrentResumeId,
+      currentResumeTitle, setCurrentResumeTitle,
+      loadResumeFromCloud,
       canUndo, canRedo, undo, redo,
+      styleSettings, setStyleSettings, handleUpdateStyleSettings,
       paddingTopBottom, setPaddingTopBottom,
       paddingLeftRight, setPaddingLeftRight,
       sectionSpacing, setSectionSpacing,

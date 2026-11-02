@@ -6,7 +6,11 @@ import {
   generateHeuristicAnalytics 
 } from "../../services/heuristic/heuristicEngine";
 
+import pdfExportRouter from "./pdfExport";
+
 const router = Router();
+
+router.use("/", pdfExportRouter);
 
 router.post("/analyze", async (req: Request, res: Response, next: NextFunction) => {
   try {

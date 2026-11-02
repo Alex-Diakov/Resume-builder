@@ -6,4 +6,5 @@ export * from './Badge';
 export * from './Card';
 export * from './Switch';
 export * from './Slider';
+export * from './ScrubberInput';
 export * from './Tabs';

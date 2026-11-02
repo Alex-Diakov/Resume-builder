@@ -11,7 +11,9 @@ import {
   Undo2, 
   Redo2, 
   Palette, 
-  SlidersHorizontal
+  SlidersHorizontal,
+  ArrowLeft,
+  Cloud
 } from 'lucide-react';
 import { useResumeContext } from '../../contexts/ResumeContext';
 import { getCompressionProfile } from '../../services/export/pdfExporter';
@@ -27,6 +29,8 @@ interface ToolbarProps {
   sidebarOpen: boolean;
   onToggleSidebar: () => void;
   onOpenDesignSystem?: () => void;
+  onOpenDashboard?: () => void;
+  saveStatus?: 'saved' | 'saving';
 }
 
 export const Toolbar: React.FC<ToolbarProps> = ({
@@ -38,7 +42,9 @@ export const Toolbar: React.FC<ToolbarProps> = ({
   isGeneratingDoc = false,
   sidebarOpen,
   onToggleSidebar,
-  onOpenDesignSystem
+  onOpenDesignSystem,
+  onOpenDashboard,
+  saveStatus = 'saved'
 }) => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -83,15 +89,32 @@ export const Toolbar: React.FC<ToolbarProps> = ({
 
   return (
     <nav className="shrink-0 z-50 h-14 bg-md-surface-container-low/95 backdrop-blur-xl border-b border-white/[0.08] px-3 sm:px-5 flex items-center justify-between print:hidden transition-colors select-none">
-      {/* ZONE 1: BRAND IDENTITY */}
+      {/* ZONE 1: BRAND IDENTITY & NAVIGATION */}
       <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
+        {onOpenDashboard && (
+          <button
+            type="button"
+            onClick={onOpenDashboard}
+            className="flex items-center gap-2 h-10 min-h-[40px] px-3.5 py-2 rounded-[8px] bg-white/[0.04] hover:bg-white/[0.08] text-xs text-md-on-surface-variant hover:text-md-on-surface border border-white/[0.08] transition-all cursor-pointer font-medium shrink-0 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-md-primary focus-visible:ring-offset-2 focus-visible:ring-offset-md-surface"
+            title="Return to Personal Cabinet"
+            aria-label="Return to Personal Cabinet"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            <span className="hidden sm:inline">Cabinet</span>
+          </button>
+        )}
+
         <div className="flex items-center gap-2.5 min-w-0">
-          <div className="w-7 h-7 rounded-md-sm bg-md-primary-container text-md-on-primary-container flex items-center justify-center font-display font-bold text-xs shadow-sm shrink-0 border border-white/[0.06]">
+          <div className="w-8 h-8 rounded-md-sm bg-md-primary-container text-md-on-primary-container flex items-center justify-center font-display font-bold text-xs shadow-sm shrink-0 border border-white/[0.06]">
             CR
           </div>
-          <div className="min-w-0">
-            <span className="font-display font-semibold text-sm tracking-tight text-md-on-surface truncate block">
-              Cognitive<span className="text-md-primary font-medium ml-1">Resume</span>
+          <div className="min-w-0 flex items-center gap-2">
+            <span className="font-display font-semibold text-xs sm:text-sm tracking-tight text-md-on-surface truncate block max-w-[140px] sm:max-w-[220px]">
+              {resumeData.name ? `${resumeData.name}'s Resume` : 'Cognitive Resume'}
+            </span>
+            <span className="hidden md:inline-flex items-center gap-1 text-[10px] font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20 shrink-0">
+              <Cloud className="w-3 h-3" />
+              <span>{saveStatus === 'saving' ? 'Saving...' : 'Cloud Synced'}</span>
             </span>
           </div>
         </div>
@@ -104,50 +127,52 @@ export const Toolbar: React.FC<ToolbarProps> = ({
           <button
             type="button"
             onClick={onOpenDesignSystem}
-            className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium text-md-on-surface-variant hover:text-md-on-surface bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] hover:border-white/[0.16] transition-all cursor-pointer active:scale-95"
+            className="hidden sm:inline-flex items-center gap-2 h-10 min-h-[40px] px-3.5 py-2 rounded-[8px] text-xs font-medium text-md-on-surface-variant hover:text-md-on-surface bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] hover:border-white/[0.16] transition-all cursor-pointer active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-md-primary focus-visible:ring-offset-2 focus-visible:ring-offset-md-surface"
             title="Inspect Material Design 3 Tokens"
+            aria-label="Inspect Material Design 3 Tokens"
           >
-            <Palette className="w-3.5 h-3.5 text-md-primary" />
-            <span className="text-[11px] font-sans">M3 Tokens</span>
+            <Palette className="w-4 h-4 text-md-primary" />
+            <span className="text-xs font-sans">M3 Tokens</span>
           </button>
         )}
 
         {/* Undo / Redo Segmented Island */}
-        <div className="flex items-center bg-white/[0.04] border border-white/[0.08] rounded-full p-0.5 shadow-sm">
+        <div className="flex items-center bg-white/[0.04] border border-white/[0.08] rounded-[8px] p-1 shadow-sm">
           <button
             onClick={undo}
             disabled={!canUndo}
-            className="w-7 h-7 rounded-full flex items-center justify-center text-md-on-surface-variant hover:text-md-on-surface hover:bg-white/[0.08] disabled:opacity-30 disabled:hover:bg-transparent disabled:cursor-not-allowed transition-colors cursor-pointer"
+            className="w-8.5 h-8.5 min-w-[34px] min-h-[34px] rounded-[6px] flex items-center justify-center text-md-on-surface-variant hover:text-md-on-surface hover:bg-white/[0.08] disabled:opacity-30 disabled:hover:bg-transparent disabled:cursor-not-allowed transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-md-primary"
             title="Undo change (Ctrl+Z / Cmd+Z)"
             aria-label="Undo change"
           >
-            <Undo2 className="w-3.5 h-3.5" />
+            <Undo2 className="w-4 h-4" />
           </button>
-          <div className="w-[1px] h-3 bg-white/[0.08] mx-0.5" />
+          <div className="w-[1px] h-4 bg-white/[0.08] mx-1" />
           <button
             onClick={redo}
             disabled={!canRedo}
-            className="w-7 h-7 rounded-full flex items-center justify-center text-md-on-surface-variant hover:text-md-on-surface hover:bg-white/[0.08] disabled:opacity-30 disabled:hover:bg-transparent disabled:cursor-not-allowed transition-colors cursor-pointer"
+            className="w-8.5 h-8.5 min-w-[34px] min-h-[34px] rounded-[6px] flex items-center justify-center text-md-on-surface-variant hover:text-md-on-surface hover:bg-white/[0.08] disabled:opacity-30 disabled:hover:bg-transparent disabled:cursor-not-allowed transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-md-primary"
             title="Redo change (Ctrl+Y / Cmd+Shift+Z)"
             aria-label="Redo change"
           >
-            <Redo2 className="w-3.5 h-3.5" />
+            <Redo2 className="w-4 h-4" />
           </button>
         </div>
 
         {/* Export Split Button & Dropdown Sheet */}
         <div className="relative" ref={dropdownRef}>
-          <div className="inline-flex rounded-full shadow-md-elevation-1">
+          <div className="inline-flex rounded-[8px] shadow-md-elevation-1">
             <button
               onClick={onDownloadPdf}
               disabled={isGenerating || isGeneratingDoc}
-              className="inline-flex items-center gap-1.5 bg-md-primary hover:bg-[#bda0fa] focus-visible:ring-2 focus-visible:ring-md-primary/40 text-md-on-primary pl-3.5 pr-3 py-1.5 rounded-l-full font-semibold text-xs transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+              className="inline-flex items-center gap-2 h-10 min-h-[40px] bg-md-primary hover:bg-md-primary-hover active:bg-md-primary-active focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-md-primary focus-visible:ring-offset-2 focus-visible:ring-offset-md-surface text-md-on-primary pl-4 pr-3.5 py-2 rounded-l-[8px] rounded-r-none font-semibold text-xs transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
               title="Export Vector-Grade PDF"
+              aria-label="Export Vector-Grade PDF"
             >
               {isGenerating ? (
-                <Loader2 className="w-3.5 h-3.5 animate-spin text-md-on-primary" />
+                <Loader2 className="w-4 h-4 animate-spin text-md-on-primary" />
               ) : (
-                <Download className="w-3.5 h-3.5 text-md-on-primary" />
+                <Download className="w-4 h-4 text-md-on-primary" />
               )}
               <span>Export PDF</span>
             </button>
@@ -155,12 +180,12 @@ export const Toolbar: React.FC<ToolbarProps> = ({
             <button 
               onClick={() => setDropdownOpen(!dropdownOpen)}
               disabled={isGenerating || isGeneratingDoc}
-              className="inline-flex items-center justify-center bg-md-primary hover:bg-[#bda0fa] focus-visible:ring-2 focus-visible:ring-md-primary/40 text-md-on-primary px-2 py-1.5 rounded-r-full border-l border-md-on-primary/20 transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+              className="inline-flex items-center justify-center h-10 min-h-[40px] bg-md-primary hover:bg-md-primary-hover active:bg-md-primary-active focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-md-primary focus-visible:ring-offset-2 focus-visible:ring-offset-md-surface text-md-on-primary px-3 py-2 rounded-r-[8px] rounded-l-none border-l border-md-on-primary/20 transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
               aria-label="Export Formats & Compression Settings"
               aria-expanded={dropdownOpen}
               aria-haspopup="true"
             >
-              <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${dropdownOpen ? 'rotate-180' : ''}`} />
+              <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${dropdownOpen ? 'rotate-180' : ''}`} />
             </button>
           </div>
 
@@ -274,8 +299,8 @@ export const Toolbar: React.FC<ToolbarProps> = ({
                       animate={{ opacity: 1, height: 'auto' }}
                       className="mt-2 space-y-2"
                     >
-                      {/* Presets Segmented Pill */}
-                      <div className="grid grid-cols-3 gap-1 p-0.5 bg-white/[0.03] rounded-full border border-white/[0.08]">
+                      {/* Presets Segmented Selector */}
+                      <div className="grid grid-cols-3 gap-1 p-0.5 bg-white/[0.03] rounded-[8px] border border-white/[0.08]">
                         {[
                           { id: 'small', label: 'Compact', value: 0.55 },
                           { id: 'balanced', label: 'Balanced', value: 0.72 },
@@ -292,7 +317,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({
                                 e.stopPropagation();
                                 setPdfImageQuality(preset.value);
                               }}
-                              className={`py-1 text-[11px] font-medium rounded-full transition-all text-center cursor-pointer select-none ${
+                              className={`h-8 py-1.5 px-2 text-xs font-medium rounded-[6px] transition-all text-center cursor-pointer select-none flex items-center justify-center ${
                                 isActive 
                                   ? 'bg-md-primary text-md-on-primary shadow-sm font-semibold' 
                                   : 'text-md-on-surface-variant hover:text-md-on-surface'

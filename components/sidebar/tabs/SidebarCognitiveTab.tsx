@@ -118,12 +118,12 @@ export const SidebarCognitiveTab: React.FC<SidebarCognitiveTabProps> = ({
       {/* COGNITIVE SUB-TABS (STICKY AT TOP) */}
       {!analyzing && analysisResult && (
         <div className="sticky top-0 z-30 bg-md-surface-container/95 backdrop-blur-md pt-3.5 pb-3 px-5 mb-2 mt-0 border-b border-md-outline-variant/30">
-          <div role="tablist" aria-label="Cognitive Analysis Views" className="flex bg-md-surface-container-low p-1 rounded-md-md border border-md-outline-variant/30 shadow-md-elevation-1 gap-1">
+          <div role="tablist" aria-label="Cognitive Analysis Views" className="flex bg-md-surface-container-low p-1 rounded-[10px] border border-md-outline-variant/30 shadow-md-elevation-1 gap-1">
             <button
               role="tab"
               aria-selected={activeSubTab === 'overview'}
               onClick={() => setActiveSubTab('overview')}
-              className={`flex-1 py-1.5 px-3 rounded-md-sm text-xs font-medium transition-all duration-200 cursor-pointer text-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-md-primary/40 ${
+              className={`flex-1 h-9 min-h-[36px] py-2 px-3.5 rounded-[6px] text-xs font-medium transition-all duration-200 cursor-pointer text-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-md-primary flex items-center justify-center ${
                 activeSubTab === 'overview' ? 'bg-md-primary text-md-on-primary font-semibold shadow-md-elevation-1' : 'bg-transparent text-md-on-surface-variant hover:text-md-on-surface hover:bg-md-surface-container-high'
               }`}
             >
@@ -133,7 +133,7 @@ export const SidebarCognitiveTab: React.FC<SidebarCognitiveTabProps> = ({
               role="tab"
               aria-selected={activeSubTab === 'laws'}
               onClick={() => setActiveSubTab('laws')}
-              className={`flex-1 py-1.5 px-3 rounded-md-sm text-xs font-medium transition-all duration-200 cursor-pointer text-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-md-primary/40 ${
+              className={`flex-1 h-9 min-h-[36px] py-2 px-3.5 rounded-[6px] text-xs font-medium transition-all duration-200 cursor-pointer text-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-md-primary flex items-center justify-center ${
                 activeSubTab === 'laws' ? 'bg-md-primary text-md-on-primary font-semibold shadow-md-elevation-1' : 'bg-transparent text-md-on-surface-variant hover:text-md-on-surface hover:bg-md-surface-container-high'
               }`}
             >
@@ -143,7 +143,7 @@ export const SidebarCognitiveTab: React.FC<SidebarCognitiveTabProps> = ({
               role="tab"
               aria-selected={activeSubTab === 'frames'}
               onClick={() => setActiveSubTab('frames')}
-              className={`flex-1 py-1.5 px-3 rounded-md-sm text-xs font-medium transition-all duration-200 cursor-pointer text-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-md-primary/40 ${
+              className={`flex-1 h-9 min-h-[36px] py-2 px-3.5 rounded-[6px] text-xs font-medium transition-all duration-200 cursor-pointer text-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-md-primary flex items-center justify-center ${
                 activeSubTab === 'frames' ? 'bg-md-primary text-md-on-primary font-semibold shadow-md-elevation-1' : 'bg-transparent text-md-on-surface-variant hover:text-md-on-surface hover:bg-md-surface-container-high'
               }`}
             >

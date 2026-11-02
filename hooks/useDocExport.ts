@@ -1,7 +1,11 @@
 import { useState, useCallback } from 'react';
 import { ResumeData } from '../types';
 
-export const useDocExport = (resumeData: ResumeData) => {
+export const useDocExport = (
+  resumeData: ResumeData,
+  paddingTopBottom: number = 12.7,
+  paddingLeftRight: number = 14.0
+) => {
   const [isGeneratingDoc, setIsGeneratingDoc] = useState(false);
   const [docError, setDocError] = useState<string | null>(null);
 
@@ -10,14 +14,18 @@ export const useDocExport = (resumeData: ResumeData) => {
     setDocError(null);
     try {
       try {
-        const currentCount = parseInt(localStorage.getItem('resume_download_count') || '0', 10);
-        localStorage.setItem('resume_download_count', (currentCount + 1).toString());
-        window.dispatchEvent(new Event('resume_downloaded'));
+        const { recordActivity } = await import('../utils/activityStorage');
+        recordActivity(
+          resumeData.name
+            ? `${resumeData.name} (Word DOCX)`
+            : 'Professional Resume (Word DOCX)',
+          'exported'
+        );
       } catch (e) {
         console.error(e);
       }
       const { exportToDocx } = await import('../services/export/docExporter');
-      await exportToDocx(resumeData);
+      await exportToDocx(resumeData, paddingTopBottom, paddingLeftRight);
     } catch (err: any) {
       const errorMsg = err?.message || 'Failed to generate Word document';
       console.error('Error generating DOCX document:', err);
@@ -25,7 +33,7 @@ export const useDocExport = (resumeData: ResumeData) => {
     } finally {
       setIsGeneratingDoc(false);
     }
-  }, [resumeData]);
+  }, [resumeData, paddingTopBottom, paddingLeftRight]);
 
   return { isGeneratingDoc, handleDownloadDocx, docError };
 };

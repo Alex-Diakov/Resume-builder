@@ -46,14 +46,20 @@ const renderBlockItem = (
               </div>
             )}
             <div className="flex-1 min-w-0">
-              <h1 className="font-display text-resume-name font-bold text-resume-primary mb-1 leading-tight">
+              <h1 
+                className="font-display text-resume-name font-bold text-resume-primary mb-1 leading-tight"
+                style={{ fontFamily: 'var(--doc-font-heading, Outfit, sans-serif)' }}
+              >
                 {data.name}
               </h1>
-              <h2 className="font-display text-resume-title font-medium text-resume-secondary mb-2.5">
+              <h2 
+                className="font-display text-resume-title font-medium text-resume-secondary mb-2.5"
+                style={{ fontFamily: 'var(--doc-font-heading, Outfit, sans-serif)' }}
+              >
                 {data.title}
               </h2>
               
-              <div className="resume-contact-bar flex flex-wrap items-center gap-x-2 text-resume-meta text-resume-muted">
+              <div className="resume-contact-bar flex flex-wrap items-center gap-y-1 text-resume-meta text-resume-muted">
                 {data.contact.website && (
                   <>
                     <a 
@@ -61,14 +67,23 @@ const renderBlockItem = (
                       target="_blank" 
                       rel="noopener noreferrer" 
                       onClick={(e) => handleOpenLink(e, data.contact.website)}
-                      className="resume-contact-item inline-flex items-center text-resume-accent font-medium hover:text-resume-primary transition-colors cursor-pointer group"
+                      className="resume-contact-item group cursor-pointer"
+                      style={{ display: 'inline-table', verticalAlign: 'middle', borderCollapse: 'collapse', textDecoration: 'none' }}
                     >
-                      <span className="resume-contact-icon inline-flex items-center justify-center w-3.5 h-3.5 mr-1.5 shrink-0">
-                        <Globe className="w-3.5 h-3.5 text-current shrink-0 block" />
+                      <span 
+                        className="resume-contact-icon text-resume-accent group-hover:text-resume-primary transition-colors" 
+                        style={{ display: 'table-cell', verticalAlign: 'middle', width: '13px', paddingRight: '4px', lineHeight: 0 }}
+                      >
+                        <Globe style={{ display: 'block', width: '12px', height: '12px' }} />
                       </span>
-                      <span className="resume-contact-text inline-block leading-[14px]">Portfolio</span>
+                      <span 
+                        className="resume-contact-text text-resume-accent group-hover:text-resume-primary transition-colors font-medium" 
+                        style={{ display: 'table-cell', verticalAlign: 'middle', lineHeight: 1 }}
+                      >
+                        Portfolio
+                      </span>
                     </a>
-                    <span className="text-resume-border select-none inline-flex items-center">•</span>
+                    <span className="resume-contact-dot" style={{ display: 'inline-table', verticalAlign: 'middle', padding: '0 6px', color: 'var(--doc-border, #cbd5e1)', lineHeight: 1, selectNone: 'none' }}>•</span>
                   </>
                 )}
 
@@ -79,14 +94,23 @@ const renderBlockItem = (
                       target="_blank" 
                       rel="noopener noreferrer" 
                       onClick={(e) => handleOpenLink(e, data.contact.linkedin)}
-                      className="resume-contact-item inline-flex items-center text-resume-accent font-medium hover:text-resume-primary transition-colors cursor-pointer group"
+                      className="resume-contact-item group cursor-pointer"
+                      style={{ display: 'inline-table', verticalAlign: 'middle', borderCollapse: 'collapse', textDecoration: 'none' }}
                     >
-                      <span className="resume-contact-icon inline-flex items-center justify-center w-3.5 h-3.5 mr-1.5 shrink-0">
-                        <Linkedin className="w-3.5 h-3.5 text-current shrink-0 block" />
+                      <span 
+                        className="resume-contact-icon text-resume-accent group-hover:text-resume-primary transition-colors" 
+                        style={{ display: 'table-cell', verticalAlign: 'middle', width: '13px', paddingRight: '4px', lineHeight: 0 }}
+                      >
+                        <Linkedin style={{ display: 'block', width: '12px', height: '12px' }} />
                       </span>
-                      <span className="resume-contact-text inline-block leading-[14px]">LinkedIn</span>
+                      <span 
+                        className="resume-contact-text text-resume-accent group-hover:text-resume-primary transition-colors font-medium" 
+                        style={{ display: 'table-cell', verticalAlign: 'middle', lineHeight: 1 }}
+                      >
+                        LinkedIn
+                      </span>
                     </a>
-                    <span className="text-resume-border select-none inline-flex items-center">•</span>
+                    <span className="resume-contact-dot" style={{ display: 'inline-table', verticalAlign: 'middle', padding: '0 6px', color: 'var(--doc-border, #cbd5e1)', lineHeight: 1, selectNone: 'none' }}>•</span>
                   </>
                 )}
 
@@ -97,35 +121,64 @@ const renderBlockItem = (
                       target="_blank" 
                       rel="noopener noreferrer" 
                       onClick={(e) => handleOpenLink(e, data.contact.videoPitch)}
-                      className="resume-contact-item inline-flex items-center text-resume-accent font-medium hover:text-resume-primary transition-colors cursor-pointer group"
+                      className="resume-contact-item group cursor-pointer"
+                      style={{ display: 'inline-table', verticalAlign: 'middle', borderCollapse: 'collapse', textDecoration: 'none' }}
                     >
-                      <span className="resume-contact-icon inline-flex items-center justify-center w-3.5 h-3.5 mr-1.5 shrink-0">
-                        <PlayCircle className="w-3.5 h-3.5 text-current shrink-0 block" />
+                      <span 
+                        className="resume-contact-icon text-resume-accent group-hover:text-resume-primary transition-colors" 
+                        style={{ display: 'table-cell', verticalAlign: 'middle', width: '13px', paddingRight: '4px', lineHeight: 0 }}
+                      >
+                        <PlayCircle style={{ display: 'block', width: '12px', height: '12px' }} />
                       </span>
-                      <span className="resume-contact-text inline-block leading-[14px]">Video Pitch</span>
+                      <span 
+                        className="resume-contact-text text-resume-accent group-hover:text-resume-primary transition-colors font-medium" 
+                        style={{ display: 'table-cell', verticalAlign: 'middle', lineHeight: 1 }}
+                      >
+                        Video Pitch
+                      </span>
                     </a>
-                    <span className="text-resume-border select-none inline-flex items-center">•</span>
+                    <span className="resume-contact-dot" style={{ display: 'inline-table', verticalAlign: 'middle', padding: '0 6px', color: 'var(--doc-border, #cbd5e1)', lineHeight: 1, selectNone: 'none' }}>•</span>
                   </>
                 )}
 
                 <a 
                   href={`mailto:${data.contact.email}`} 
-                  className="resume-contact-item inline-flex items-center text-resume-accent font-medium hover:text-resume-primary transition-colors cursor-pointer group"
+                  className="resume-contact-item group cursor-pointer"
+                  style={{ display: 'inline-table', verticalAlign: 'middle', borderCollapse: 'collapse', textDecoration: 'none' }}
                 >
-                  <span className="resume-contact-icon inline-flex items-center justify-center w-3.5 h-3.5 mr-1.5 shrink-0">
-                    <Mail className="w-3.5 h-3.5 text-current shrink-0 block" />
+                  <span 
+                    className="resume-contact-icon text-resume-accent group-hover:text-resume-primary transition-colors" 
+                    style={{ display: 'table-cell', verticalAlign: 'middle', width: '13px', paddingRight: '4px', lineHeight: 0 }}
+                  >
+                    <Mail style={{ display: 'block', width: '12px', height: '12px' }} />
                   </span>
-                  <span className="resume-contact-text inline-block leading-[14px]">{data.contact.email}</span>
+                  <span 
+                    className="resume-contact-text text-resume-accent group-hover:text-resume-primary transition-colors font-medium" 
+                    style={{ display: 'table-cell', verticalAlign: 'middle', lineHeight: 1 }}
+                  >
+                    {data.contact.email}
+                  </span>
                 </a>
                 
                 {data.contact.location && (
                   <>
-                    <span className="text-resume-border select-none inline-flex items-center">•</span>
-                    <span className="resume-contact-item inline-flex items-center text-resume-muted cursor-default">
-                      <span className="resume-contact-icon inline-flex items-center justify-center w-3.5 h-3.5 mr-1.5 shrink-0">
-                        <MapPin className="w-3.5 h-3.5 text-current shrink-0 block" />
+                    <span className="resume-contact-dot" style={{ display: 'inline-table', verticalAlign: 'middle', padding: '0 6px', color: 'var(--doc-border, #cbd5e1)', lineHeight: 1, selectNone: 'none' }}>•</span>
+                    <span 
+                      className="resume-contact-item text-resume-muted cursor-default"
+                      style={{ display: 'inline-table', verticalAlign: 'middle', borderCollapse: 'collapse' }}
+                    >
+                      <span 
+                        className="resume-contact-icon" 
+                        style={{ display: 'table-cell', verticalAlign: 'middle', width: '13px', paddingRight: '4px', lineHeight: 0 }}
+                      >
+                        <MapPin style={{ display: 'block', width: '12px', height: '12px' }} />
                       </span>
-                      <span className="resume-contact-text inline-block leading-[14px]">{data.contact.location}</span>
+                      <span 
+                        className="resume-contact-text" 
+                        style={{ display: 'table-cell', verticalAlign: 'middle', lineHeight: 1 }}
+                      >
+                        {data.contact.location}
+                      </span>
                     </span>
                   </>
                 )}
@@ -213,9 +266,24 @@ export const ResumePaper: React.FC<ResumePaperProps> = ({
   showPageGuides = true,
   enableAdaptiveFit = true
 }) => {
-  const { setResumeHeight } = useResumeContext();
+  const { setResumeHeight, styleSettings } = useResumeContext();
   const measureContainerRef = useRef<HTMLDivElement>(null);
   const [measuredHeights, setMeasuredHeights] = useState<Record<string, number> | null>(null);
+
+  const docCssVars: React.CSSProperties = {
+    ['--doc-text-primary' as any]: styleSettings?.primaryColor || '#1e293b',
+    ['--doc-text-secondary' as any]: styleSettings?.secondaryColor || '#475569',
+    ['--doc-accent' as any]: styleSettings?.accentColor || '#6750a4',
+    ['--doc-border' as any]: styleSettings?.borderColor || '#e2e8f0',
+    ['--doc-paper' as any]: styleSettings?.paperBackground || '#ffffff',
+    ['--doc-font-heading' as any]: styleSettings?.headingFont || 'Outfit, sans-serif',
+    ['--doc-font-body' as any]: styleSettings?.bodyFont || 'Inter, sans-serif',
+    fontFamily: styleSettings?.bodyFont || 'Inter, sans-serif',
+  };
+
+  const fontScaleStyle: React.CSSProperties = {
+    fontSize: styleSettings?.fontScale === 'compact' ? '9.5pt' : styleSettings?.fontScale === 'spacious' ? '10.5pt' : '10pt',
+  };
 
   if (!data) return <div className="p-8 text-center bg-md-surface-container-low rounded-md-lg text-md-on-surface-variant border border-white/[0.08]">No Data Loaded</div>;
 
@@ -309,7 +377,9 @@ export const ResumePaper: React.FC<ResumePaperProps> = ({
         className="fixed -left-[99999px] top-0 pointer-events-none opacity-0 select-none overflow-hidden z-[-9999] print:hidden"
         style={{
           width: `${210 - (paddingLeftRight * 2)}mm`,
-          boxSizing: 'border-box'
+          boxSizing: 'border-box',
+          ...docCssVars,
+          ...fontScaleStyle
         }}
       >
         {candidateBlocks.map((block) => (
@@ -322,6 +392,7 @@ export const ResumePaper: React.FC<ResumePaperProps> = ({
       <div 
         id="resume-content" 
         className="flex flex-col gap-8 print:gap-0 bg-transparent print:bg-white pb-16 print:pb-0 relative z-0"
+        style={docCssVars}
       >
         {/* Dynamic ATS Text (Placed in the main content so it is indexing ready, but completely invisible once printed) */}
         {data.atsKeywords && (
@@ -341,7 +412,7 @@ export const ResumePaper: React.FC<ResumePaperProps> = ({
           return (
             <div
               key={pageIdx}
-              className="resume-page bg-white shadow-xl mx-auto rounded-md relative flex flex-col justify-between"
+              className="resume-page shadow-xl mx-auto rounded-md relative flex flex-col justify-between"
               style={{
                 width: '210mm',
                 height: '297mm', // Strict physical A4 page size
@@ -349,8 +420,11 @@ export const ResumePaper: React.FC<ResumePaperProps> = ({
                 paddingBottom: `${paddingTopBottom}mm`,
                 paddingLeft: `${paddingLeftRight}mm`,
                 paddingRight: `${paddingLeftRight}mm`,
+                backgroundColor: styleSettings?.paperBackground || '#ffffff',
                 boxSizing: 'border-box' as const,
-                overflow: 'hidden' as const
+                overflow: 'hidden' as const,
+                ...docCssVars,
+                ...fontScaleStyle
               }}
             >
               {/* Main Content Area */}

@@ -1,0 +1,68 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Default Deny All Catch-all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Hardened Security Primitives
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() > 0 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    // User Profile Document
+    match /users/{userId} {
+      allow get: if isOwner(userId);
+      allow list: if false; // Users cannot enumerate all accounts
+      allow create: if isOwner(userId)
+                    && incoming().uid == request.auth.uid
+                    && incoming().email is string
+                    && incoming().email.size() <= 256;
+      allow update: if isOwner(userId)
+                    && incoming().uid == request.auth.uid;
+      allow delete: if isOwner(userId);
+
+      // Resumes Subcollection
+      match /resumes/{resumeId} {
+        allow get, list: if isOwner(userId);
+        allow create: if isOwner(userId)
+                      && isValidId(resumeId)
+                      && incoming().userId == request.auth.uid
+                      && incoming().title is string
+                      && incoming().title.size() <= 128;
+        allow update: if isOwner(userId)
+                      && isValidId(resumeId)
+                      && incoming().userId == request.auth.uid;
+        allow delete: if isOwner(userId) && isValidId(resumeId);
+      }
+
+      // Exports Telemetry Subcollection
+      match /exports/{exportId} {
+        allow get, list: if isOwner(userId);
+        allow create: if isOwner(userId)
+                      && isValidId(exportId)
+                      && incoming().userId == request.auth.uid
+                      && incoming().format in ['pdf', 'docx', 'print'];
+        allow update: if isOwner(userId)
+                      && isValidId(exportId)
+                      && incoming().userId == request.auth.uid;
+        allow delete: if isOwner(userId) && isValidId(exportId);
+      }
+    }
+  }
+}

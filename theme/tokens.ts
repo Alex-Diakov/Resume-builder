@@ -415,12 +415,17 @@ export const ALIAS_MAP: Record<string, string> = {
 // ---------------------------------------------------------------------------
 export const DEFAULT_RADIUS_TOKENS: RadiusToken[] = [
   { id: 'none', name: 'Shape None', variable: '--md-sys-shape-none', tailwind: 'rounded-md-none', value: '0px', usage: 'Square corners, full bleed panels' },
+  { id: 'btn-xs', name: 'Button Extra Small (XS)', variable: '--btn-radius-xs', tailwind: 'rounded-btn-xs', value: '4px', usage: 'Compact micro buttons (h-8 / 32px), icon-xs controls' },
+  { id: 'btn-sm', name: 'Button Small (SM)', variable: '--btn-radius-sm', tailwind: 'rounded-btn-sm', value: '6px', usage: 'Secondary tool buttons (h-9.5 / 38px), icon-sm triggers, tabs' },
+  { id: 'btn-md', name: 'Button Base (MD / Default)', variable: '--btn-radius-md', tailwind: 'rounded-btn-md', value: '8px', usage: 'Canonical 8px base button radius, 44px height (WCAG 2.2 AAA standard)' },
+  { id: 'btn-lg', name: 'Button Large (LG)', variable: '--btn-radius-lg', tailwind: 'rounded-btn-lg', value: '10px', usage: 'Hero CTAs, high-emphasis dialog actions (h-12 / 48px)' },
+  { id: 'btn-xl', name: 'Button Extra Large (XL)', variable: '--btn-radius-xl', tailwind: 'rounded-btn-xl', value: '12px', usage: 'Prominent marketing CTAs, large touch actions (h-14 / 56px)' },
   { id: 'xs', name: 'Shape Extra Small (XS)', variable: '--md-sys-shape-xs', tailwind: 'rounded-md-xs', value: '4px', usage: 'Micro badges, status indicators, tiny tags' },
   { id: 'sm', name: 'Shape Small (SM)', variable: '--md-sys-shape-sm', tailwind: 'rounded-md-sm', value: '8px', usage: 'Chips, small cards, tooltips, slider thumbs' },
   { id: 'md', name: 'Shape Medium (MD)', variable: '--md-sys-shape-md', tailwind: 'rounded-md-md', value: '12px', usage: 'Standard text fields, dropdown menus, cards' },
   { id: 'lg', name: 'Shape Large (LG)', variable: '--md-sys-shape-lg', tailwind: 'rounded-md-lg', value: '16px', usage: 'Accordion expansion panels, dialogs, sheet containers' },
-  { id: 'xl', name: 'Shape Extra Large (XL)', variable: '--md-sys-shape-xl', tailwind: 'rounded-md-xl', value: '28px', usage: 'Large dialogs, floating action sheets, search pill wraps' },
-  { id: 'full', name: 'Shape Full', variable: '--md-sys-shape-full', tailwind: 'rounded-full', value: '9999px', usage: 'M3 filled/tonal buttons, switch tracks, circular avatars' },
+  { id: 'xl', name: 'Shape Extra Large (XL)', variable: '--md-sys-shape-xl', tailwind: 'rounded-md-xl', value: '28px', usage: 'Large dialogs, floating action sheets' },
+  { id: 'full', name: 'Shape Full', variable: '--md-sys-shape-full', tailwind: 'rounded-full', value: '9999px', usage: 'Circular avatars, radio knobs, progress tracks (strictly not for buttons)' },
 ];
 
 // ---------------------------------------------------------------------------
@@ -478,6 +483,7 @@ export const THEME_PRESETS: ThemePreset[] = [
       '--md-sys-color-on-surface-variant': '#CAC4D0',
       '--md-sys-color-outline': '#938F99',
       '--md-sys-color-outline-variant': '#49454F',
+      '--doc-accent': '#6750A4',
     }
   },
   {
@@ -504,6 +510,7 @@ export const THEME_PRESETS: ThemePreset[] = [
       '--md-sys-color-on-surface-variant': '#C0D5C7',
       '--md-sys-color-outline': '#718277',
       '--md-sys-color-outline-variant': '#334539',
+      '--doc-accent': '#16A34A',
     }
   },
   {
@@ -530,6 +537,7 @@ export const THEME_PRESETS: ThemePreset[] = [
       '--md-sys-color-on-surface-variant': '#C2D0DC',
       '--md-sys-color-outline': '#7B8B99',
       '--md-sys-color-outline-variant': '#384552',
+      '--doc-accent': '#0891B2',
     }
   },
   {
@@ -556,6 +564,7 @@ export const THEME_PRESETS: ThemePreset[] = [
       '--md-sys-color-on-surface-variant': '#D8C3C7',
       '--md-sys-color-outline': '#947B82',
       '--md-sys-color-outline-variant': '#4A353B',
+      '--doc-accent': '#E11D48',
     }
   },
   {
@@ -582,6 +591,7 @@ export const THEME_PRESETS: ThemePreset[] = [
       '--md-sys-color-on-surface-variant': '#D6C8B8',
       '--md-sys-color-outline': '#918576',
       '--md-sys-color-outline-variant': '#483E31',
+      '--doc-accent': '#D97706',
     }
   },
   {
@@ -608,6 +618,7 @@ export const THEME_PRESETS: ThemePreset[] = [
       '--md-sys-color-on-surface-variant': '#CBD5E1',
       '--md-sys-color-outline': '#7E8794',
       '--md-sys-color-outline-variant': '#3D434E',
+      '--doc-accent': '#475569',
     }
   }
 ];

@@ -77,6 +77,13 @@
     --md-sys-shape-xl: 28px;
     --md-sys-shape-full: 9999px;
 
+    /* 7b. Button Atomic Radius Scale (Canonical Base 8px Rule) */
+    --btn-radius-xs: 4px;
+    --btn-radius-sm: 6px;
+    --btn-radius-md: 8px; /* Unified Base Rule */
+    --btn-radius-lg: 10px;
+    --btn-radius-xl: 12px;
+
     /* 8. M3 Elevation Shadow Tokens */
     --md-sys-elevation-0: none;
     --md-sys-elevation-1: 0px 1px 3px 1px rgba(0, 0, 0, 0.25), 0px 1px 2px 0px rgba(0, 0, 0, 0.35);
@@ -91,8 +98,24 @@
     --md-sys-state-pressed-opacity: 0.12;
     --md-sys-state-dragged-opacity: 0.16;
 
+    /* 10. M3 Dynamic Theme-Adaptive Hover & State Layer Tokens (SSOT) */
+    --md-sys-color-primary-hover: color-mix(in srgb, var(--md-sys-color-primary) 86%, var(--md-sys-color-on-primary));
+    --md-sys-color-primary-active: color-mix(in srgb, var(--md-sys-color-primary) 76%, var(--md-sys-color-on-primary));
+    --md-sys-color-primary-container-hover: color-mix(in srgb, var(--md-sys-color-primary-container) 86%, var(--md-sys-color-on-primary-container));
+
+    --md-sys-color-secondary-hover: color-mix(in srgb, var(--md-sys-color-secondary) 86%, var(--md-sys-color-on-secondary));
+    --md-sys-color-secondary-container-hover: color-mix(in srgb, var(--md-sys-color-secondary-container) 86%, var(--md-sys-color-on-secondary-container));
+
+    --md-sys-color-tertiary-hover: color-mix(in srgb, var(--md-sys-color-tertiary) 86%, var(--md-sys-color-on-tertiary));
+    --md-sys-color-tertiary-container-hover: color-mix(in srgb, var(--md-sys-color-tertiary-container) 86%, var(--md-sys-color-on-tertiary-container));
+
+    --md-sys-color-error-container-hover: color-mix(in srgb, var(--md-sys-color-error-container) 86%, var(--md-sys-color-on-error-container));
+    --md-sys-color-success-container-hover: color-mix(in srgb, var(--md-sys-color-success-container) 86%, var(--md-sys-color-on-success-container));
+    --md-sys-color-warning-container-hover: color-mix(in srgb, var(--md-sys-color-warning-container) 86%, var(--md-sys-color-on-warning-container));
+    --md-sys-color-info-container-hover: color-mix(in srgb, var(--md-sys-color-info-container) 86%, var(--md-sys-color-on-info-container));
+
     /* ==========================================================================
-       BACKWARD COMPATIBILITY ALIASES (Map legacy tokens to M3 architecture)
+       BACKWARD COMPATIBILITY ALIASES (Map legacy tokens to dynamic M3 architecture)
        ========================================================================== */
     --color-surface-bg: var(--md-sys-color-surface);
     --color-surface-panel: var(--md-sys-color-surface-container-low);
@@ -101,31 +124,31 @@
     --color-surface-hover: var(--md-sys-color-surface-container-highest);
 
     --color-brand-primary: var(--md-sys-color-primary);
-    --color-brand-primary-hover: #bda0fa;
-    --color-brand-primary-light: rgba(208, 188, 255, 0.12);
+    --color-brand-primary-hover: var(--md-sys-color-primary-hover);
+    --color-brand-primary-light: color-mix(in srgb, var(--md-sys-color-primary) 12%, transparent);
 
     --color-brand-secondary: var(--md-sys-color-tertiary);
-    --color-brand-secondary-hover: #98e0ed;
-    --color-brand-secondary-light: rgba(125, 208, 223, 0.12);
+    --color-brand-secondary-hover: var(--md-sys-color-tertiary-hover);
+    --color-brand-secondary-light: color-mix(in srgb, var(--md-sys-color-tertiary) 12%, transparent);
 
     --color-text-high: var(--md-sys-color-on-surface);
     --color-text-medium: var(--md-sys-color-on-surface-variant);
     --color-text-muted: var(--md-sys-color-outline);
-    --color-text-disabled: #6d6676;
+    --color-text-disabled: color-mix(in srgb, var(--md-sys-color-on-surface-variant) 40%, transparent);
 
     --color-border-main: rgba(255, 255, 255, 0.08);
-    --color-border-focus: rgba(208, 188, 255, 0.45);
-    --color-border-accordion-open: rgba(208, 188, 255, 0.35);
+    --color-border-focus: color-mix(in srgb, var(--md-sys-color-primary) 45%, transparent);
+    --color-border-accordion-open: color-mix(in srgb, var(--md-sys-color-primary) 35%, transparent);
     --color-accordion-open-bg: var(--md-sys-color-surface-container);
 
     --color-status-success: var(--md-sys-color-success);
-    --color-status-success-bg: rgba(133, 217, 150, 0.14);
+    --color-status-success-bg: color-mix(in srgb, var(--md-sys-color-success) 14%, transparent);
     --color-status-warning: var(--md-sys-color-warning);
-    --color-status-warning-bg: rgba(245, 190, 72, 0.14);
+    --color-status-warning-bg: color-mix(in srgb, var(--md-sys-color-warning) 14%, transparent);
     --color-status-error: var(--md-sys-color-error);
-    --color-status-error-bg: rgba(242, 184, 181, 0.14);
+    --color-status-error-bg: color-mix(in srgb, var(--md-sys-color-error) 14%, transparent);
     --color-status-info: var(--md-sys-color-info);
-    --color-status-info-bg: rgba(125, 208, 223, 0.14);
+    --color-status-info-bg: color-mix(in srgb, var(--md-sys-color-info) 14%, transparent);
 
     --radius-xs: var(--md-sys-shape-xs);
     --radius-sm: var(--md-sys-shape-sm);
@@ -137,7 +160,7 @@
     --shadow-sm: var(--md-sys-elevation-1);
     --shadow-md: var(--md-sys-elevation-2);
     --shadow-lg: var(--md-sys-elevation-3);
-    --shadow-glow: 0 0 16px rgba(208, 188, 255, 0.28);
+    --shadow-glow: 0 0 16px color-mix(in srgb, var(--md-sys-color-primary) 28%, transparent);
     --shadow-paper: 0 10px 30px -5px rgba(0, 0, 0, 0.45), 0 4px 12px -2px rgba(0, 0, 0, 0.25);
 
     /* Document Print & Paper Tokens (Protected Canvas) */
@@ -205,8 +228,8 @@
   input:focus-visible,
   textarea:focus-visible,
   select:focus-visible {
-    outline: 2px solid rgba(208, 188, 255, 0.45);
-    outline-offset: 1px;
+    outline: 2px solid var(--md-sys-color-primary);
+    outline-offset: 2px;
   }
 }
 
@@ -269,35 +292,56 @@
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    line-height: 14px;
+    line-height: 1;
   }
   .resume-contact-item {
-    display: inline-flex !important;
-    align-items: center !important;
+    display: inline-table !important;
     vertical-align: middle !important;
-    height: 14px !important;
-    line-height: 14px !important;
+    border-collapse: collapse !important;
+    text-decoration: none !important;
+    line-height: 1 !important;
   }
   .resume-contact-icon {
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    width: 14px !important;
-    height: 14px !important;
-    margin-right: 6px !important;
-    flex-shrink: 0 !important;
+    display: table-cell !important;
+    vertical-align: middle !important;
+    width: 13px !important;
+    padding-right: 4px !important;
+    line-height: 0 !important;
   }
   .resume-contact-icon svg {
     display: block !important;
-    width: 14px !important;
-    height: 14px !important;
-    transform: none !important;
+    width: 12px !important;
+    height: 12px !important;
+    margin: 0 !important;
   }
   .resume-contact-text {
-    display: inline-block !important;
-    height: 14px !important;
-    line-height: 14px !important;
+    display: table-cell !important;
     vertical-align: middle !important;
+    line-height: 1 !important;
+    white-space: nowrap !important;
+  }
+  .resume-contact-dot {
+    display: inline-table !important;
+    vertical-align: middle !important;
+    padding: 0 6px !important;
+    opacity: 0.6 !important;
+    line-height: 1 !important;
+  }
+
+  /* Section Header Divider Line Math Centering */
+  .section-header-divider-table {
+    display: table !important;
+    width: 100% !important;
+    border-collapse: collapse !important;
+  }
+  .section-header-line {
+    display: block !important;
+    height: 1px !important;
+    line-height: 0 !important;
+    font-size: 0 !important;
+    margin: 0 !important;
+    position: relative !important;
+    top: 0.5px !important;
   }
 }
 

@@ -124,7 +124,7 @@ export const LayoutSection: React.FC<LayoutSectionProps> = ({
                 <button
                   key={preset}
                   onClick={() => onApplySpacingPreset(preset)}
-                  className={`py-2 px-3 rounded-md-sm text-xs font-medium transition-all text-center cursor-pointer select-none border capitalize focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-md-primary/40 ${
+                  className={`h-9.5 min-h-[38px] py-2 px-3 rounded-[6px] text-xs font-medium transition-all text-center cursor-pointer select-none border capitalize flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-md-primary ${
                     spacingPreset === preset
                       ? 'bg-md-primary text-md-on-primary font-semibold shadow-md-elevation-1 border-transparent'
                       : 'bg-white/[0.03] text-md-on-surface-variant border-white/[0.08] hover:bg-white/[0.07] hover:border-white/[0.15] hover:text-md-on-surface'

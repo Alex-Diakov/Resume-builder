@@ -67,26 +67,28 @@ export const SidebarJsonTab: React.FC<SidebarJsonTabProps> = ({
         </div>
         
         {/* Sleek Segmented Actions */}
-        <div className="flex items-center bg-white/[0.04] p-0.5 rounded-full border border-white/[0.08]">
+        <div className="flex items-center bg-white/[0.04] p-1 rounded-[8px] border border-white/[0.08]">
           <button 
             type="button" 
             onClick={handlePaste} 
             title="Paste JSON from clipboard" 
-            className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium text-md-on-surface-variant hover:text-md-on-surface hover:bg-white/[0.06] transition-all cursor-pointer"
+            aria-label="Paste JSON from clipboard"
+            className="flex items-center gap-1.5 h-8.5 min-h-[34px] px-3.5 py-1.5 rounded-[6px] text-xs font-medium text-md-on-surface-variant hover:text-md-on-surface hover:bg-white/[0.06] transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-md-primary"
           >
-            {pasted ? <Check className="w-3.5 h-3.5 text-md-success" /> : <Clipboard className="w-3.5 h-3.5 text-md-primary" />}
+            {pasted ? <Check className="w-4 h-4 text-md-success" /> : <Clipboard className="w-4 h-4 text-md-primary" />}
             <span>{pasted ? 'Pasted!' : 'Paste'}</span>
           </button>
 
-          <div className="w-[1px] h-3 bg-white/[0.10]" />
+          <div className="w-[1px] h-4 bg-white/[0.10] mx-0.5" />
 
           <button 
             type="button" 
             onClick={handleCopy} 
-            title="Copy JSON" 
-            className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium text-md-on-surface-variant hover:text-md-on-surface hover:bg-white/[0.06] transition-all cursor-pointer"
+            title="Copy JSON to clipboard" 
+            aria-label="Copy JSON to clipboard"
+            className="flex items-center gap-1.5 h-8.5 min-h-[34px] px-3.5 py-1.5 rounded-[6px] text-xs font-medium text-md-on-surface-variant hover:text-md-on-surface hover:bg-white/[0.06] transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-md-primary"
           >
-            {copied ? <Check className="w-3.5 h-3.5 text-md-success" /> : <Copy className="w-3.5 h-3.5 text-md-primary" />}
+            {copied ? <Check className="w-4 h-4 text-md-success" /> : <Copy className="w-4 h-4 text-md-primary" />}
             <span>{copied ? 'Copied' : 'Copy'}</span>
           </button>
         </div>

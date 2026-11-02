@@ -11,8 +11,6 @@ import {
   CheckCircle2, 
   Info, 
   ChevronRight, 
-  Sparkles, 
-  X, 
   Copy, 
   Check,
   Target,
@@ -94,32 +92,9 @@ export const SidebarAtsTab: React.FC<SidebarAtsTabProps> = ({
     <div className="flex flex-col h-full font-sans animate-fade-in p-5 overflow-y-auto text-left space-y-5">
       {/* SECTION 1: Input & Presets */}
       <section className="space-y-3.5">
-        <div className="flex items-center justify-between">
-          <div>
-            <h3 className="text-md-on-surface font-display font-semibold text-sm">
-              Target Job &amp; Keywords
-            </h3>
-            <p className="text-xs text-md-on-surface-variant mt-0.5">
-              Paste role requirements or pick a 1-click preset
-            </p>
-          </div>
-          {atsInput.trim() && (
-            <button
-              onClick={() => setAtsInput('')}
-              className="text-xs text-md-on-surface-variant hover:text-md-error flex items-center gap-1.5 transition-colors cursor-pointer py-1 px-2 rounded-md-sm hover:bg-md-surface-container-high"
-              title="Clear input"
-              aria-label="Clear input"
-            >
-              <X className="w-3.5 h-3.5" />
-              <span>Clear</span>
-            </button>
-          )}
-        </div>
-
         {/* Quick Role Presets */}
         <div className="space-y-2">
-          <span className="text-xs text-md-on-surface font-medium flex items-center gap-1.5">
-            <Sparkles className="w-3.5 h-3.5 text-md-tertiary" />
+          <span className="text-xs text-md-on-surface font-medium">
             Quick Presets
           </span>
           <div className="flex flex-wrap gap-2">
@@ -128,7 +103,7 @@ export const SidebarAtsTab: React.FC<SidebarAtsTabProps> = ({
                 key={preset.title}
                 type="button"
                 onClick={() => setAtsInput(preset.keywords)}
-                className="text-xs px-2.5 py-1 rounded-md-sm bg-md-surface-container border border-md-outline-variant/30 hover:border-md-outline text-md-on-surface hover:bg-md-surface-container-high transition-all cursor-pointer font-medium"
+                className="text-xs h-8.5 min-h-[34px] px-3.5 py-1.5 rounded-[6px] bg-md-surface-container border border-md-outline-variant/30 hover:border-md-outline text-md-on-surface hover:bg-md-surface-container-high transition-all cursor-pointer font-medium inline-flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-md-primary"
               >
                 {preset.title}
               </button>

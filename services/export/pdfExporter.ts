@@ -1,5 +1,6 @@
 import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas';
+import { saveAs } from 'file-saver';
 import { ResumeData } from '../../types';
 
 export interface PdfExportOptions {
@@ -206,9 +207,144 @@ async function runWithColorSanitization<T>(action: () => Promise<T>): Promise<T>
   }
 }
 
+async function attemptServerPdfExport(resumeData: ResumeData, fileName: string): Promise<boolean> {
+  const contentEl = document.getElementById('resume-content');
+  if (!contentEl) return false;
+
+  // Clone content safely to avoid mutating the live interactive DOM
+  const clone = contentEl.cloneNode(true) as HTMLElement;
+  clone.querySelectorAll('.page-guide-indicator').forEach((el) => el.remove());
+  clone.querySelectorAll('.resume-page').forEach((page) => {
+    page.classList.remove('shadow-xl', 'rounded-md');
+  });
+
+  // Extract computed document variables for exact color fidelity
+  const rootStyle = window.getComputedStyle(contentEl);
+  const docVarsList = [
+    '--doc-text-primary',
+    '--doc-text-secondary',
+    '--doc-text-muted',
+    '--doc-accent',
+    '--doc-border',
+    '--doc-paper',
+    '--doc-font-heading',
+    '--doc-font-body'
+  ];
+  const docVars: Record<string, string> = {};
+  docVarsList.forEach((v) => {
+    const val = rootStyle.getPropertyValue(v);
+    if (val) docVars[v] = val.trim();
+  });
+
+  // Extract compiled CSS rules from live document stylesheets for exact 1:1 parity with canvas
+  let inlinedStyles = '';
+  try {
+    for (const sheet of Array.from(document.styleSheets)) {
+      try {
+        if (sheet.cssRules) {
+          for (const rule of Array.from(sheet.cssRules)) {
+            inlinedStyles += rule.cssText + '\n';
+          }
+        }
+      } catch (crossOriginErr) {
+        // Cross-origin sheets (like Google Fonts) cannot be read via cssRules and are preserved via link tags
+      }
+    }
+  } catch (e) {
+    console.warn('[PDF Export] Notice: Could not read all stylesheet rules:', e);
+  }
+
+  // Collect active style tags and stylesheet links from head (exclude relative links that headless Puppeteer cannot resolve)
+  const linkTags = Array.from(document.querySelectorAll('link[rel="stylesheet"]'))
+    .filter((tag) => !tag.getAttribute('href')?.startsWith('/'))
+    .map((tag) => tag.outerHTML)
+    .join('\n');
+
+  const combinedStyles = `${linkTags}\n<style id="active-dom-styles">\n${inlinedStyles}\n</style>`;
+
+  const payload = {
+    html: clone.innerHTML,
+    styles: combinedStyles,
+    docVars,
+    title: fileName.replace(/\.pdf$/i, '')
+  };
+
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 8000);
+
+  let response: globalThis.Response;
+  try {
+    response = await fetch('/api/export-pdf', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(payload),
+      signal: controller.signal
+    });
+  } catch (fetchErr: any) {
+    clearTimeout(timeoutId);
+    console.warn('[PDF Export] Server export fetch aborted or network error:', fetchErr?.message || fetchErr);
+    return false;
+  } finally {
+    clearTimeout(timeoutId);
+  }
+
+  if (!response.ok) {
+    const errorDetails = await response.text().catch(() => '');
+    console.warn('[PDF Export] Server renderer returned non-OK status:', response.status, errorDetails);
+    return false;
+  }
+
+  const contentType = response.headers.get('content-type');
+  if (!contentType || !contentType.includes('application/pdf')) {
+    console.warn('[PDF Export] Unexpected Content-Type from server:', contentType);
+    return false;
+  }
+
+  const blob = await response.blob();
+  if (!blob || blob.size === 0) {
+    return false;
+  }
+
+  saveAs(blob, fileName);
+  return true;
+}
+
 export async function exportToPdf(
   resumeData: ResumeData,
   options: PdfExportOptions
+): Promise<void> {
+  const fileName = generatePdfFileName(resumeData);
+
+  // 1. Primary Strategy: Server-side Headless Chromium (Puppeteer)
+  // Generates 100% native vector PDF with pixel-perfect alignment matching the canvas
+  try {
+    const success = await attemptServerPdfExport(resumeData, fileName);
+    if (success) {
+      try {
+        const { recordActivity } = await import('../../utils/activityStorage');
+        recordActivity(
+          resumeData.name ? `${resumeData.name} (PDF)` : 'Professional Resume (PDF)',
+          'exported'
+        );
+      } catch (e) {
+        // Non-blocking telemetry
+      }
+      return;
+    }
+  } catch (serverErr) {
+    console.warn('[PDF Export] Server vector renderer unavailable, engaging client fallback:', serverErr);
+  }
+
+  // 2. Resilient Fallback: High-resolution client-side jsPDF + html2canvas pipeline
+  await runClientSidePdfExport(resumeData, options, fileName);
+}
+
+async function runClientSidePdfExport(
+  resumeData: ResumeData,
+  options: PdfExportOptions,
+  fileName: string
 ): Promise<void> {
   // Ensure web fonts are completely loaded and rendered prior to pixel rasterization
   await document.fonts.ready;
@@ -225,7 +361,6 @@ export async function exportToPdf(
 
   // Profile configuration based on mathematical compression parameters
   const profile = getCompressionProfile(options.compress, options.quality, pageElements.length);
-  const fileName = generatePdfFileName(resumeData);
 
   // Initialize jsPDF with standard physical A4 (210mm x 297mm)
   const pdf = new jsPDF({
@@ -263,13 +398,14 @@ export async function exportToPdf(
         // Render with safe color sanitization active to catch any computed color(...) values
         canvas = await runWithColorSanitization(async () => {
           return await html2canvas(pageEl, {
-            scale: profile.scale,
+            scale: Math.max(profile.scale, 2.5),
             useCORS: true,
-            backgroundColor: '#ffffff', // Ensures JPEG does not produce dark alpha artifacts
+            backgroundColor: pageEl.style.backgroundColor || '#ffffff', // Honors customized paper background tone
             logging: false,
             scrollY: 0,
             scrollX: 0,
-            windowWidth: 1200, // Guarantees desktop layout breakpoints regardless of current viewport size
+            width: pageEl.offsetWidth,
+            height: pageEl.offsetHeight,
             onclone: (clonedDoc) => {
               // 1. Install getComputedStyle proxy in cloned iframe window if present
               const clonedWin = clonedDoc.defaultView;
@@ -295,45 +431,135 @@ export async function exportToPdf(
                 };
               }
 
-              // 2. Explicitly establish light background & dark print text on root/body of cloned doc
-              if (clonedDoc.body) {
-                clonedDoc.body.style.backgroundColor = '#ffffff';
-                clonedDoc.body.style.color = '#1e293b';
+              // 2. Synchronize stylesheet links and font definitions into cloned head
+              Array.from(document.head.querySelectorAll('link[rel="stylesheet"], style')).forEach((tag) => {
+                const href = tag.getAttribute('href');
+                if (!href || !clonedDoc.head.querySelector(`link[href="${href}"]`)) {
+                  clonedDoc.head.appendChild(tag.cloneNode(true));
+                }
+              });
+
+              // 3. Propagate all document CSS variables onto cloned root and body
+              const liveRoot = document.getElementById('resume-content');
+              if (liveRoot) {
+                const rootStyle = window.getComputedStyle(liveRoot);
+                const docVars = [
+                  '--doc-text-primary',
+                  '--doc-text-secondary',
+                  '--doc-accent',
+                  '--doc-border',
+                  '--doc-paper',
+                  '--doc-font-heading',
+                  '--doc-font-body'
+                ];
+                docVars.forEach((v) => {
+                  const val = rootStyle.getPropertyValue(v);
+                  if (val) {
+                    clonedDoc.documentElement.style.setProperty(v, val);
+                    if (clonedDoc.body) clonedDoc.body.style.setProperty(v, val);
+                  }
+                });
               }
 
-              // 3. Subpixel vertical alignment for icons in contact bar
-              const contactIcons = clonedDoc.querySelectorAll<HTMLElement>('.resume-contact-icon');
-              contactIcons.forEach((icon) => {
-                icon.style.position = 'relative';
-                icon.style.top = '7.5px';
+              // 4. Normalize and lock computed font metrics on all heading elements to prevent baseline upward shift
+              const liveHeadings = pageEl.querySelectorAll<HTMLElement>('h1, h2, h3');
+              const clonedHeadings = clonedDoc.querySelectorAll<HTMLElement>('h1, h2, h3');
+              liveHeadings.forEach((liveNode, idx) => {
+                const cloneNode = clonedHeadings[idx];
+                if (cloneNode) {
+                  const comp = window.getComputedStyle(liveNode);
+                  cloneNode.style.fontFamily = comp.fontFamily;
+                  cloneNode.style.fontSize = comp.fontSize;
+                  cloneNode.style.lineHeight = comp.lineHeight;
+                  cloneNode.style.letterSpacing = comp.letterSpacing;
+                  cloneNode.style.fontWeight = comp.fontWeight;
+                  cloneNode.style.boxSizing = 'border-box';
+                }
               });
+
+              // 5. Contact icons & text optical table-cell alignment calibration for html2canvas
+              const clonedContactItems = clonedDoc.querySelectorAll<HTMLElement>('.resume-contact-item');
+              clonedContactItems.forEach((item) => {
+                item.style.display = 'inline-table';
+                item.style.verticalAlign = 'middle';
+                item.style.borderCollapse = 'collapse';
+              });
+
+              const clonedContactIcons = clonedDoc.querySelectorAll<HTMLElement>('.resume-contact-icon');
+              clonedContactIcons.forEach((icon) => {
+                icon.style.display = 'table-cell';
+                icon.style.verticalAlign = 'middle';
+                icon.style.lineHeight = '0';
+                icon.style.width = '13px';
+                icon.style.paddingRight = '4px';
+                const svg = icon.querySelector<SVGElement>('svg');
+                if (svg) {
+                  svg.style.display = 'block';
+                  svg.style.width = '12px';
+                  svg.style.height = '12px';
+                  svg.style.margin = '0';
+                }
+              });
+
+              const clonedContactTexts = clonedDoc.querySelectorAll<HTMLElement>('.resume-contact-text');
+              clonedContactTexts.forEach((txt) => {
+                txt.style.display = 'table-cell';
+                txt.style.verticalAlign = 'middle';
+                txt.style.lineHeight = '1';
+              });
+
+              // 6. Section divider table optical vertical centering calibration for html2canvas
+              const clonedDividerTables = clonedDoc.querySelectorAll<HTMLElement>('.section-header-divider-table, .section-header-leftbar-table');
+              clonedDividerTables.forEach((table) => {
+                table.style.display = 'table';
+                table.style.width = '100%';
+                table.style.borderCollapse = 'collapse';
+              });
+
+              const clonedDividerLines = clonedDoc.querySelectorAll<HTMLElement>('.section-header-line');
+              clonedDividerLines.forEach((line) => {
+                line.style.height = '1px';
+                line.style.display = 'block';
+                line.style.width = '100%';
+                line.style.margin = '0';
+                line.style.lineHeight = '0';
+                line.style.fontSize = '0';
+                line.style.position = 'relative';
+                line.style.top = '0.5px';
+              });
+
+              // 7. Explicitly establish light background & print text
+              if (clonedDoc.body) {
+                clonedDoc.body.style.backgroundColor = pageEl.style.backgroundColor || '#ffffff';
+                clonedDoc.body.style.color = '#1e293b';
+              }
             },
           });
         });
+
+        // Compress or format image according to profile
+        const imageData = canvas.toDataURL(profile.imageType, profile.quality);
+
+        // Add image mapping exactly to 210mm x 297mm physical A4 dimensions
+        pdf.addImage(
+          imageData,
+          profile.pdfFormat,
+          0,
+          0,
+          210,
+          297,
+          undefined,
+          'FAST'
+        );
+
+        // 1. Inject clickable native PDF links while pageEl is in clean, unshadowed geometry
+        injectClickableLinks(pdf, pageEl);
+
+        // 2. Inject invisible, selectable & searchable text layer matching clean geometry
+        injectSelectableTextLayer(pdf, pageEl);
       } finally {
         pageEl.className = originalClassName;
       }
-
-      // Compress or format image according to profile
-      const imageData = canvas.toDataURL(profile.imageType, profile.quality);
-
-      // Add image mapping exactly to 210mm x 297mm physical A4 dimensions
-      pdf.addImage(
-        imageData,
-        profile.pdfFormat,
-        0,
-        0,
-        210,
-        297,
-        undefined,
-        'FAST'
-      );
-
-      // 1. Inject clickable native PDF links (Portfolio, LinkedIn, Email, Projects, etc.)
-      injectClickableLinks(pdf, pageEl);
-
-      // 2. Inject invisible, selectable & searchable text layer for cursor highlight, copy-paste, and ATS
-      injectSelectableTextLayer(pdf, pageEl);
     }
 
     // Save output PDF file
@@ -341,9 +567,13 @@ export async function exportToPdf(
 
     // Track export metric
     try {
-      const currentCount = parseInt(localStorage.getItem('resume_download_count') || '0', 10);
-      localStorage.setItem('resume_download_count', (currentCount + 1).toString());
-      window.dispatchEvent(new Event('resume_downloaded'));
+      const { recordActivity } = await import('../../utils/activityStorage');
+      recordActivity(
+        resumeData.name
+          ? `${resumeData.name} (PDF)`
+          : 'Professional Resume (PDF)',
+        'exported'
+      );
     } catch (e) {
       console.warn('Unable to record download telemetry', e);
     }
@@ -441,12 +671,14 @@ function injectSelectableTextLayer(pdf: jsPDF, pageEl: HTMLElement): void {
 
     try {
       pdf.setFontSize(fontSizePt);
+      // Precise typographic font ascent offset: 1pt = 0.352778mm; ascent is ~0.75 of font size
+      const fontAscentMm = fontSizePt * 0.352778 * 0.75;
 
       if (rects.length === 1) {
         const r = rects[0];
         const x = (r.left - pageRect.left) * scaleX;
-        // Text baseline in PDF is positioned at bottom of font line, ~82% down the client rect
-        const y = (r.top - pageRect.top) * scaleY + (r.height * scaleY * 0.82);
+        const topMm = (r.top - pageRect.top) * scaleY;
+        const y = topMm + fontAscentMm;
         pdf.text(text.trim(), x, y, { renderingMode: 'invisible' });
       } else {
         // Multi-line wrapped text: group words into physical lines by vertical coordinate
@@ -471,7 +703,8 @@ function injectSelectableTextLayer(pdf: jsPDF, pageEl: HTMLElement): void {
                 const lineStr = lineTokens.join('').trim();
                 if (lineStr) {
                   const x = (lineRect.left - pageRect.left) * scaleX;
-                  const y = (lineRect.top - pageRect.top) * scaleY + (lineRect.height * scaleY * 0.82);
+                  const topMm = (lineRect.top - pageRect.top) * scaleY;
+                  const y = topMm + fontAscentMm;
                   pdf.text(lineStr, x, y, { renderingMode: 'invisible' });
                 }
               }
@@ -500,7 +733,8 @@ function injectSelectableTextLayer(pdf: jsPDF, pageEl: HTMLElement): void {
           const lineStr = lineTokens.join('').trim();
           if (lineStr) {
             const x = (lineRect.left - pageRect.left) * scaleX;
-            const y = (lineRect.top - pageRect.top) * scaleY + (lineRect.height * scaleY * 0.82);
+            const topMm = (lineRect.top - pageRect.top) * scaleY;
+            const y = topMm + fontAscentMm;
             pdf.text(lineStr, x, y, { renderingMode: 'invisible' });
           }
         }

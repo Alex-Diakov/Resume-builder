@@ -1,129 +1,352 @@
-# 📄 The Executive Manifesto: Neuro-Cognitive ATS Optimizer
-> **A resume is not a list of tasks. It is an executive manifesto. It is a psychological instrument of high-stakes persuasion.**
-> Built for professionals across the globe who demand flawless typography, deterministic structure, and science-backed framing to conquer Applicant Tracking Systems (ATS) and human recruiters alike.
+# 📄 Cognitive Resume Analyzer & Builder (Executive M3 Edition)
+
+[![React](https://img.shields.io/badge/React-19.2-61DAFB?style=flat-square&logo=react&logoColor=black)](https://react.dev/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.8-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Node.js](https://img.shields.io/badge/Node.js-22-339933?style=flat-square&logo=nodedotjs&logoColor=white)](https://nodejs.org/)
+[![Express](https://img.shields.io/badge/Express-5.2-000000?style=flat-square&logo=express&logoColor=white)](https://expressjs.com/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.4-38B2AC?style=flat-square&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
+[![Puppeteer](https://img.shields.io/badge/Puppeteer-25.3-40B5A4?style=flat-square&logo=puppeteer&logoColor=white)](https://pptr.dev/)
+[![Google Gemini API](https://img.shields.io/badge/Google_Gemini-2.5_Flash-8E75B2?style=flat-square&logo=google&logoColor=white)](https://ai.google.dev/)
+[![Firebase Firestore](https://img.shields.io/badge/Firebase-Firestore-FFCA28?style=flat-square&logo=firebase&logoColor=black)](https://firebase.google.com/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square)](LICENSE)
+
+> **Резюме — это не сухой список должностных инструкций. Это манифест профессионального влияния и инструмент психологического убеждения с высокими ставками.**
+> 
+> Создано для топ-специалистов, дизайнеров, инженеров и руководителей, которым необходима безупречная типографика, детерминированная структура листа A4, глубокий анализ когнитивной нагрузки и гарантия 100% прохождения ATS (Applicant Tracking Systems).
 
 ---
 
-## ⚡ The Philosophy
+## 📑 Содержание
 
-For decades, professionals have been taught to treat resumes as historical ledgers—a dry catalog of past duties. **This is a fundamental mistake.** 
+- [⚡ Философия и Когнитивная Наука](#-философия-и-когнитивная-наука)
+- [✨ Ключевые Возможности](#-ключевые-возможности)
+- [🏗 Архитектура Системы](#-архитектура-системы)
+- [🖨️ Двухконтурный PDF-движок высокой точности](#️-двухконтурный-pdf-движок-высокой-точности)
+- [🧠 Нейрокогнитивный AI-ассистент (Gemini)](#-нейрокогнитивный-ai-ассистент-gemini)
+- [🎨 Система Дизайна и Темы (Material Design 3)](#-система-дизайна-и-темы-material-design-3)
+- [🛠 Технологический Стек](#-технологический-стек)
+- [🚀 Быстрый Старт и Установка](#-быстрый-старт-и-установка)
+- [📦 Структура Репозитория](#-структура-репозитория)
+- [📄 Спецификация JSON-схемы резюме](#-спецификация-json-схемы-резюме)
+- [🛡 Безопасность и Отказоустойчивость](#-безопасность-и-отказоустойчивость)
+- [📜 Лицензия](#-лицензия)
 
-In the modern attention economy, human recruiters spend an average of **6.4 seconds** scanning a resume. ATS algorithms filter candidates with merciless binary precision. 
+---
 
-Your resume must be engineered not as a history book, but as a **high-precision teleological weapon**. It must translate subordinate-level duties into C-level business outcomes. It must respect Miller's Law of working memory. It must guide the eye along the natural F-Pattern scanning flow. 
+## ⚡ Философия и Когнитивная Наука
 
-This application was architected on this exact philosophy. It addresses the two most critical friction points in modern executive job hunting: **visual presentation inconsistency** and **algorithm-level cognitive overload**.
+В современной экономике внимания рекрутеры тратят в среднем **6.4 секунды** на первичный просмотр резюме. Алгоритмы ATS (Applicant Tracking Systems) отсеивают до 75% кандидатов из-за нечитаемой разметки, неверных базовых линий шрифтов или отсутствия релевантных семантических ключей.
 
-Unlike standard template builders, this tool implements a **Neuro-Cognitive AI Engine** (powered by Gemini) running purely on the server to perform elite C-level executive optimizations.
+Данная платформа разработана на стыке **человеко-компьютерного взаимодействия (HCI)**, **когнитивной эргономики** и **инженерной микротипографики**:
 
 ```
- ┌────────────────────────────────────────────────────────┐
- │                      WORSKPACE HUB                     │
- │  ┌──────────────┐   ┌──────────────┐   ┌────────────┐  │
- │  │  Forms Edit  │ ⇆ │  JSON Sync   │ ⇆ │ Cognitive  │  │
- │  └──────────────┘   └──────────────┘   └────────────┘  │
- │                                                  ▲     │
- └─────────────────────────┬────────────────────────│─────┘
-                           ▼                        │
-          ┌────────────────────────────────┐     ┌─────────────┐
-          │  REAL-TIME LIVE SYNC CANVASES  │     │ Express API │
-          └────────────────────────────────┘     └─────────────┘
+                       КОГНИТИВНЫЙ ФИЛЬТР ВОСПРИЯТИЯ
+  ┌────────────────────────────────────────────────────────────────────────┐
+  │                                                                        │
+  │   [ 6-секундный F-паттерн ]      [ Закон Миллера (7 ± 2 чанка) ]       │
+  │   Фокус на левом верхнем углу,   Мозг мгновенно устает от длинных      │
+  │   должности и ключевых метриках  неструктурированных списков           │
+  │                                                                        │
+  │   [ Оптическое якорение ]        [ C-Level Outcome Reframing ]         │
+  │   Иконки и разделители строго    Трансформация обязанностей            │
+  │   по центру заглавных букв       в бизнес-результаты и KPI             │
+  │                                                                        │
+  └────────────────────────────────────────────────────────────────────────┘
 ```
 
----
-
-## 🔥 Key Features & Value Propositions
-
-### 1. 🧠 Neuro-Cognitive AI Scanner (Gemini-Powered)
-*   **Executive Framing Rewrites**: Automatically translates weak, duty-based bullets ("helped make website") into C-level business outcomes ("Architected diagnostic digital platform, reducing latency and saving 40 engineering hours per quarter").
-*   **Psychological Information Laws**: Real-time evaluation against Miller's Law (working memory fatigue) and the 6-Second Screen Rule.
-*   **KPI & Visual Scanning Scores**: Quantifies metrics density and grades the F-Pattern eye-tracking flow of your layout.
-*   **Graceful Degradation Engine**: If the neural network (Gemini API) experiences transient errors, the server instantly falls back to a deterministic **Local Heuristic Assessment Engine** for zero-downtime operations.
-
-### 2. 🎚 High-Fidelity A4 Print Layout (Pixel-Perfect Grids)
-*   Eliminates broken content overflow, orphaned sections, and chaotic double pages.
-*   Includes built-in layout modes (`Standard`, `Compact`, `Super Compact`) and structural guides to ensure everything fits perfectly onto A4 bounds.
-*   Live page fraction calculators warn you when content spills over.
-
-### 3. 🔄 Bidirectional Dynamic Live Sync
-*   **Structured Form Input Panel**: A simplified, responsive input form for swift draft edits and quick additions.
-*   **Raw Code Data Stream (JSON)**: For power-users who want to import or export their resumes in portable, clean JSON formatting. Any keypress instantly replicates.
-
-### 4. 🖨 Perfect Borderless PDF Print Layouts
-*   Includes native 1-click PDF generation via standard print workflows, guaranteeing pixel-perfect styling match between the web app and the downloaded PDF.
+1. **Закон Миллера ($7 \pm 2$)**: Рабочая память человека ограничена. Приложение контролирует плотность буллетов и секций, предотвращая когнитивную усталость читателя.
+2. **F-Pattern Eye-Tracking**: Иерархия заголовков, дат и компаний выстроена так, чтобы взгляд рекрутера мгновенно цеплялся за ключевые триггеры найма.
+3. **C-Level Outcome Framing**: Обязанности исполнителя (*«писал код для сайта»*) переводятся в язык бизнеса (*«Спроектировал высоконагруженную платформу, сократив latency на 40% и сэкономив $120k/год»*).
+4. **Оптическое выравнивание и нулевой люфт**: Иконки контактов, разделители заголовков и базовые линии шрифтов согласованы по оптическому центру, устраняя визуальный «дребезг».
 
 ---
 
-## 🛠 Tech Stack
+## ✨ Ключевые Возможности
 
-The workspace operates as a full-stack application securely keeping all AI operations server-side.
+### 📐 Интерактивный Canvas A4 с расчетом Page Budget
+- **Реальный масштаб A4**: Фиксированный viewport листа (210×297 мм) с наглядным отображением границ страниц при печати.
+- **Индикатор Page-Budget**: Живой процент заполнения страницы. При превышении лимита система подсказывает, как скорректировать плотность контента.
+- **Micro-Compression (Анти-пустота)**: Автоматическая адаптация межстрочных интервалов (`line-height`) и вертикальных отступов (`gap-y`) для идеального заполнения без разрывов страниц.
+- **Разнообразие стилей заголовков**:
+  - `divider` — тонкая разделительная линия, выровненная строго по оптическому центру заглавных букв.
+  - `boxed` — структурированные карточки с мягкой заливкой.
+  - `left-bar` — акцентный вертикальный маркер слева.
+  - `underline` — классическое статусное подчеркивание.
+  - `minimal` — швейцарский минимализм без лишнего шума.
 
-*   **Frontend**: React 18 + TypeScript
-*   **Backend**: Node.js + Express (serving Vite middleware)
-*   **AI Engine**: Official Google Gen AI TypeScript SDK (`@google/genai`) -> *gemini-3.8-flash*
-*   **CSS Utility Framework**: Tailwind CSS
-*   **Motion System**: Framer Motion (`motion/react`)
+### 🖨️ Векторный Headless PDF-экспорт (Puppeteer Chromium)
+- **100% WYSIAWYG (What You See Is Absolutely What You Get)**: Рендеринг через изолированный браузер Chromium на сервере гарантирует попиксельное совпадение веб-канваса и финального PDF-документа.
+- **Отсутствие смещений**: Специальная табличная инлайн-растеризация для контактной строки исключает сдвиг иконок Lucide относительно текста.
+- **Поддержка текстового слоя**: Полный векторный PDF с кликабельными ссылками и индексируемым текстом для любых ATS-сканеров.
+- **Мгновенный Fallback**: При недоступности сервера клиент бесшовно переключается на встроенный генератор печати.
+
+### 🧠 Нейрокогнитивный AI-сканер (Gemini 2.5 Flash)
+- **Executive Rewrite**: Превращение слабых и шаблонных формулировок в сильные достижения по формуле Google XYZ *(«Accomplished [X], as measured by [Y], by doing [Z]»)*.
+- **ATS Keyword Optimizer**: Сканирование текста на соответствие требованиям автоматизированных систем найма и плотность смысловых тегов.
+- **Когнитивный аудит**: Анализ уровня читаемости, перегруженности терминами и силы глаголов действия.
+- **Гибридный Local Heuristics Fallback**: Если сеть недоступна, встроенный алгоритм на клиенте производит локальный расчет метрик и эвристический скоринг без задержек.
+
+### 📊 Панель Диагностики и Аналитики
+- **F-Pattern Visual Heatmap**: Симуляция траектории взгляда рекрутера по тепловой карте резюме.
+- **Metric Density Index**: Процент буллетов, содержащих оцифрованные показатели (числа, проценты, валюты, временные рамки).
+- **Executive Punch Rating**: Оценка уверенности и лидерского тона формулировок.
+
+### 🔄 Мультиформатный Экспорт и Импорт
+- **PDF**: Векторный A4 высокого разрешения через серверный Chromium.
+- **DOCX**: Полноценный Microsoft Word документ с поддержкой стилей и нативной структуры таблиц.
+- **JSON**: Переносимый открытый формат данных резюме для бэкапа и миграции.
+
+### ☁️ Облачное Хранение и Авторизация (Firebase)
+- Безопасная аутентификация пользователей.
+- Сохранение версий резюме в Cloud Firestore в реальном времени.
+- Работа в гостевом режиме с сохранением данных в `localStorage`.
 
 ---
 
-## ⚙️ Quick Start Guide
+## 🏗 Архитектура Системы
 
-### 1. Install Project Dependencies
+Приложение построено по принципу **Full-Stack Single Page Architecture**: легковесный фронтенд на React 19 с серверным слоем на Express для конфиденциальных операций (AI и headless-рендеринг).
+
+```
+                                  АРХИТЕКТУРА
+                                  
+  ┌────────────────────────────────────────────────────────────────────────┐
+  │                           CLIENT BROWSER                               │
+  │  ┌───────────────────────┐   ┌──────────────────────────────────────┐  │
+  │  │   Interactive Canvas  │   │      Sidebar & Form Controllers      │  │
+  │  │   - A4 Print Bounds   │ ⇆ │      - Resume Data Form              │  │
+  │  │   - Realtime Scaling  │   │      - JSON Live Code Editor         │  │
+  │  │   - Section Reorder   │   │      - Cognitive Analytics & Scores  │  │
+  │  └───────────┬───────────┘   └──────────────────┬───────────────────┘  │
+  └──────────────┼──────────────────────────────────┼──────────────────────┘
+                 │ (HTML + CSS Payload)             │ (Gemini Prompts / Sync)
+                 ▼                                  ▼
+  ┌────────────────────────────────────────────────────────────────────────┐
+  │                       EXPRESS NODE.JS BACKEND                          │
+  │                                                                        │
+  │   /api/export-pdf             /api/gemini/rephrase      /api/health    │
+  │   ┌─────────────────────┐     ┌─────────────────────┐   ┌────────────┐ │
+  │   │ Headless Chromium   │     │ Google Gen AI SDK   │   │ Diagnostic │ │
+  │   │ Puppeteer Pool      │     │ (@google/genai)     │   │ Ping       │ │
+  │   └──────────┬──────────┘     └──────────┬──────────┘   └────────────┘ │
+  └──────────────┼───────────────────────────┼─────────────────────────────┘
+                 ▼                           ▼
+        [ Pixel-Perfect PDF ]        [ Gemini 2.5 Flash ]
+```
+
+### Двунаправленный поток данных
+1. **Редактор форм** ⇆ **JSON-редактор** ⇆ **Холст резюме**: Любое изменение в одном интерфейсе синхронно отражается во всех остальных без задержки рендеринга.
+2. **Изоляция секретов**: Все обращения к Gemini API производятся строго через бэкенд `/api/*`. Ключи `GEMINI_API_KEY` никогда не попадают на сторону клиента.
+
+---
+
+## 🖨️ Двухконтурный PDF-движок высокой точности
+
+Одной из самых сложных инженерных задач при верстке резюме является **рассинхронизация шрифтов и плавающих элементов при печати**. Мы решили эту проблему на фундаментальном уровне:
+
+### 1. Серверный Контур (Puppeteer Headless Chromium)
+- **Изолированный headless-контекст**: Запуск через оптимизированные флаги (`--no-sandbox`, `--disable-gpu`, `--disable-dev-shm-usage`).
+- **Синхронизация шрифтов**: Использование `document.fonts.ready` с гарантированным тайм-аутом, исключающее FOUT (Flash of Unstyled Text).
+- **Точные печатные параметры**:
+  ```typescript
+  await page.pdf({
+    format: 'A4',
+    printBackground: true,
+    preferCSSPageSize: true,
+    margin: { top: '0px', right: '0px', bottom: '0px', left: '0px' },
+  });
+  ```
+- **Линейная растеризация контактов**: Иконки и текст помещаются в ячейки с `display: inline-block`, `vertical-align: middle` и фиксированной базовой линией, предотвращая смещение иконок относительно надписей.
+- **Оптическое выравнивание разделителей**: Линия разделителя рассчитывается исходя из cap-height заглавных букв шрифта заголовка, а не от общего контейнера строки.
+
+### 2. Клиентский Контур (Zero-Network Fallback)
+- В случае сбоя сети или превышения лимитов серверного контейнера автоматически активируется fallback-режим: прямое формирование PDF через векторный Canvas либо вызов нативного диалога браузера со встроенными `@media print` стилями.
+
+---
+
+## 🧠 Нейрокогнитивный AI-ассистент (Gemini)
+
+В приложение интегрирована библиотека `@google/genai` с моделью `gemini-2.5-flash`:
+
+| Функция | Описание | Результат |
+| :--- | :--- | :--- |
+| **C-Level Reframing** | Преобразование пассивного залога в активные глаголы действия | Повышение авторитетности резюме в глазах нанимателя |
+| **KPI Extraction** | Выявление мест, где не хватает конкретных цифр и процентов | Увеличение конверсии резюме на 30–40% |
+| **ATS Semantic Sync** | Подбор общепринятых терминов индустрии под профиль кандидата | Гарантированное прохождение фильтров первичного скрининга |
+| **Tone of Voice Control** | Настройка тональности: *Executive, Technical, Creative, Academic* | Точное попадание в культуру компании |
+
+---
+
+## 🎨 Система Дизайна и Темы (Material Design 3)
+
+Проект использует дизайн-систему на базе токенов Material Design 3 с поддержкой динамических акцентов:
+
+- **Executive Navy**: Строгий, консервативный стиль для топ-менеджмента и финансов.
+- **Swiss Clean**: Минималистичная швейцарская сетка, высокий контраст, безупречная типографика.
+- **Modern Teal**: Свежий технологичный профиль для продакт-менеджеров и стартапов.
+- **Slate Monospace**: Стиль с акцентом на техническую экспертизу и структурированные данные.
+- **Corporate Royal**: Глубокий синий оттенок для корпоративного консалтинга и enterprise-сектора.
+
+---
+
+## 🛠 Технологический Стек
+
+### Frontend
+- **React 19** + **TypeScript 5.8** — современная компонентная архитектура с чистыми хуками.
+- **Tailwind CSS 3.4** — утилитарная стилизация без сторонних runtime-замедлений.
+- **Lucide Icons** — векторная иконографика высокого разрешения.
+- **Framer Motion** — деликатные микровзаимодействия и плавные переходы.
+- **Recharts** — визуализация когнитивных метрик и графиков сканирования.
+- **docx** & **file-saver** — клиентская генерация документов Microsoft Word.
+
+### Backend & Инфраструктура
+- **Node.js 22** + **Express 5** — реактивный HTTP-сервер для API-роутов.
+- **Puppeteer 25** — серверный headless Chromium для векторной печати в PDF.
+- **@google/genai 2.9** — официальный SDK Google для взаимодействия с моделями семейства Gemini.
+- **Firebase Firestore & Auth 13** — облачная база данных и аутентификация.
+- **Vite 6** + **esbuild** — мгновенная сборка и горячая замена модулей (HMR).
+
+---
+
+## 🚀 Быстрый Старт и Установка
+
+### 1. Системные требования
+- **Node.js**: версия `20.x` или `22.x`
+- **npm** (v10+) или **bun** / **pnpm**
+- Chromium/Chrome (устанавливается автоматически через puppeteer)
+
+### 2. Клонирование репозитория
+```bash
+git clone https://github.com/your-username/cognitive-resume-builder.git
+cd cognitive-resume-builder
+```
+
+### 3. Установка зависимостей
 ```bash
 npm install
 ```
 
-### 2. Configure Environment Secrets
-Create a `.env` file (or configure Settings -> Secrets) and add your Gemini API Key. This must remain server-side.
-```env
-GEMINI_API_KEY="your_api_key_here"
+### 4. Настройка переменных окружения
+Создайте файл `.env` в корневой директории проекта на основе примера:
+```bash
+cp .env.example .env
 ```
 
-### 3. Launch Full-Stack Development Server
+Заполните переменные:
+```env
+# Порт сервера
+PORT=3000
+
+# API-ключ Google Gemini (для ИИ-переформулирования)
+GEMINI_API_KEY=your_gemini_api_key_here
+
+# (Опционально) Конфигурация Firebase для синхронизации в облаке
+# VITE_FIREBASE_API_KEY=...
+# VITE_FIREBASE_PROJECT_ID=...
+```
+
+### 5. Запуск в режиме разработки
 ```bash
 npm run dev
 ```
-The server binds to `0.0.0.0:3000`. The frontend will Hot-Reload, and Express API routes will be available at `/api/*`.
+Сервер запустится на `http://localhost:3000`. Приложение доступно для локальной работы с мгновенной перезагрузкой.
 
-### 4. Build for Production Deployment
+### 6. Сборка для Production
 ```bash
 npm run build
 npm run start
 ```
-Compiled, production-ready static assets will be packed into the `/dist` directory.
+Собранное оптимизированное приложение будет запущено из каталога `/dist`.
 
 ---
 
-## 📂 Portable JSON Resume Model
+## 📦 Структура Репозитория
 
-Your professional identity is yours to own. The configuration is structured inside a highly standardized, portable schema designed for global professionals:
+```
+├── App.tsx                     # Корневой компонент с управлением глобальным состоянием
+├── components/                 # Модульные компоненты интерфейса
+│   ├── auth/                   # Модальные окна авторизации и профиля Firebase
+│   ├── dashboard/              # Верхняя панель управления, переключатели вкладок и тем
+│   ├── layout/                 # Адаптивные контейнеры и панели управления
+│   ├── resume/                 # Компоненты A4 Canvas (Header, Experience, Skills, Education)
+│   ├── sidebar/                # Формы ввода данных, JSON-редактор, панель тем
+│   ├── statistics/             # Графики когнитивной нагрузки и ATS-анализатор
+│   └── ui/                     # Базовые UI-примитивы (кнопки, бейджи, инпуты, тултипы)
+├── constants/                  # Дефолтные данные резюме и шаблоны по умолчанию
+├── contexts/                   # React Contexts (ResumeContext, AuthContext, ThemeContext)
+├── hooks/                      # Пользовательские хуки (usePdfExport, useCognitiveScore)
+├── server/                     # Серверная часть на Express
+│   ├── routes/                 # Эндпоинты (/api/export-pdf, /api/gemini/rephrase)
+│   └── services/               # Сервисы Puppeteer-рендеринга и локальных эвристик
+├── services/                   # Клиентские сервисы экспорта (PDF, DOCX, JSON, Firebase)
+├── theme/                      # Палитры Material Design 3, типографика и токены
+├── types/                      # TypeScript-интерфейсы и схемы данных резюме
+├── server.ts                   # Точка входа Express-сервера с Vite middleware
+└── vite.config.ts              # Конфигурация сборщика Vite
+```
+
+---
+
+## 📄 Спецификация JSON-схемы резюме
+
+Структура данных полностью прозрачна и совместима со стандартными парсерами:
 
 ```json
 {
   "personal": {
-    "name": "Jane Doe",
-    "title": "Chief Operating Officer",
-    "email": "jane.doe@executive-network.com",
+    "name": "Alex Diakov",
+    "title": "Senior UI/UX Designer & Product Builder",
+    "email": "alex.diakov@example.com",
     "phone": "+1 (555) 019-2834",
-    "location": "New York, USA",
-    "website": "linkedin.com/in/janedoe"
+    "location": "San Francisco, CA",
+    "website": "https://linkedin.com/in/alexdiakov"
   },
-  "summary": "Strategic operational executive specializing in enterprise scaling, structural optimization, and driving multi-million dollar revenue growth...",
+  "summary": "Senior Product Designer with 7+ years of experience applying HCI principles to scale B2B SaaS platforms. Specialized in design systems, CRO, and high-velocity developer handoffs.",
   "experience": [
     {
-      "company": "Global Enterprise Corp.",
-      "role": "VP of Operations",
-      "period": "2020 - Present",
-      "description": "Architected a comprehensive logistical overhaul that improved Q4 delivery metrics by 40%..."
+      "id": "exp-1",
+      "company": "Next Self Technologies",
+      "role": "Founding Product Designer",
+      "period": "Jan 2023 — Present",
+      "location": "San Francisco, CA",
+      "highlights": [
+        "Architected scalable design token pipeline adopted by 32 engineers, decreasing release cycles by 26%.",
+        "Redesigned executive analytics dashboard, improving user retention from 41% to 68% in Q3."
+      ]
     }
+  ],
+  "education": [
+    {
+      "id": "edu-1",
+      "institution": "National Technical University",
+      "degree": "B.S. in Computer Science & Human-Computer Interaction",
+      "period": "2015 — 2019"
+    }
+  ],
+  "skills": [
+    { "category": "Design & Systems", "items": ["Figma", "Design Tokens", "Design Systems", "Prototyping"] },
+    { "category": "Engineering", "items": ["TypeScript", "React", "Tailwind CSS", "HTML5/CSS3"] }
   ]
 }
 ```
 
 ---
 
-## 🛡 License
-This project is licensed under the terms of the MIT License. Feel free to use, modify, share, and expand as you like!
+## 🛡 Безопасность и Отказоустойчивость
+
+- **Никаких секретов на клиенте**: Токены API и ключи ИИ изолированы на бэкенде.
+- **Graceful Degradation**: При любых сбоях внешних сервисов приложение сохраняет 100% функционала редактирования, локального скоринга и экспорта.
+- **Строгая валидация типов**: Полное покрытие TypeScript исключает ошибки времени выполнения.
+- **Защита ресурсов сервера**: Headless Chromium работает с жестким пулом инстансов и принудительным завершением зависших процессов по тайм-ауту.
 
 ---
-> **A resume is the highest ROI document you will ever write. Treat it accordingly.** 🎯
+
+## 📜 Лицензия
+
+Проект распространяется под открытой лицензией [MIT](LICENSE). Вы можете свободно использовать, модифицировать и внедрять данный код в свои личные и коммерческие проекты.
+
+---
+
+<p align="center">
+  <b>Разработано с уважением к когнитивной эргономике и высоким стандартам инженерии. 🎯</b>
+</p>

@@ -11,7 +11,11 @@ import {
 import saveAs from 'file-saver';
 import { ResumeData } from '../../types';
 
-export async function exportToDocx(resumeData: ResumeData) {
+export async function exportToDocx(
+  resumeData: ResumeData,
+  paddingTopBottom: number = 12.7,
+  paddingLeftRight: number = 14.0
+) {
   // Construct clean filename matching PDF conventions
   const rawFullName = (resumeData.name || 'Resume').trim();
   const nameParts = rawFullName.split(/\s+/);
@@ -471,16 +475,20 @@ export async function exportToDocx(resumeData: ResumeData) {
     );
   }
 
+  // Convert physical millimeters to DOCX twips (1mm = 56.6929 twips)
+  const topBottomTwips = Math.round(Math.max(6, Math.min(30, paddingTopBottom)) * 56.6929);
+  const leftRightTwips = Math.round(Math.max(6, Math.min(30, paddingLeftRight)) * 56.6929);
+
   const doc = new Document({
     sections: [
       {
         properties: {
           page: {
             margin: {
-              top: 1440, // 1 inch
-              bottom: 1440,
-              left: 1440,
-              right: 1440,
+              top: topBottomTwips,
+              bottom: topBottomTwips,
+              left: leftRightTwips,
+              right: leftRightTwips,
             },
           },
         },
