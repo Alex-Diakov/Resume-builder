@@ -2,6 +2,7 @@ import React from 'react';
 import { Layers, ChevronDown, ChevronRight, Plus, Trash2 } from 'lucide-react';
 import { ProjectItem } from '../../../../types';
 import { Button, Input, Label, Textarea } from '../../../ui';
+import { useTranslation } from '../../../../contexts/LanguageContext';
 
 interface ProjectsSectionProps {
   isOpen: boolean;
@@ -26,6 +27,8 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
   handleAddDetailRow,
   handleRemoveDetailRow,
 }) => {
+  const { t } = useTranslation();
+
   return (
     <div
       className={`border transition-all duration-200 rounded-md-lg overflow-hidden ${
@@ -44,7 +47,7 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
         <div className="flex items-center gap-3">
           <Layers className={`w-5 h-5 transition-colors ${isOpen ? 'text-md-primary' : 'text-md-on-surface-variant'}`} />
           <span className="font-display tracking-wide">
-            Projects & Innovations ({projects?.length || 0})
+            {t.form.featuredProjects} ({projects?.length || 0})
           </span>
         </div>
         {isOpen ? <ChevronDown className="w-5 h-5 text-md-primary" /> : <ChevronRight className="w-5 h-5 text-md-on-surface-variant" />}
@@ -57,39 +60,39 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
               <button
                 onClick={() => handleRemoveProjectItem(pIdx)}
                 className="absolute top-3.5 right-3.5 p-1.5 text-md-error hover:text-md-error hover:bg-md-error-container/20 rounded-md-sm cursor-pointer transition-colors"
-                title="Remove project"
-                aria-label="Remove project"
+                title={t.common.delete}
+                aria-label={t.common.delete}
               >
                 <Trash2 className="w-4 h-4" />
               </button>
 
               <div className="space-y-4 pr-7">
                 <div>
-                  <Label>Project Name</Label>
+                  <Label>{t.form.projectTitle}</Label>
                   <Input
                     type="text"
                     value={proj.title}
                     onChange={(e) => handleUpdateProject(pIdx, 'title', e.target.value)}
-                    placeholder="e.g. AI Workflow Canvas"
+                    placeholder={t.form.projectTitlePlaceholder}
                   />
                 </div>
 
                 <div>
-                  <Label>Your Role / Contribution</Label>
+                  <Label>{t.form.projectRole}</Label>
                   <Input
                     type="text"
                     value={proj.role}
                     onChange={(e) => handleUpdateProject(pIdx, 'role', e.target.value)}
-                    placeholder="e.g. Lead Product Architect"
+                    placeholder={t.form.projectRolePlaceholder}
                   />
                 </div>
 
                 <div>
-                  <Label>Brief Description</Label>
+                  <Label>{t.form.projectDesc}</Label>
                   <Textarea
                     value={proj.description}
                     onChange={(e) => handleUpdateProject(pIdx, 'description', e.target.value)}
-                    placeholder="Describe problem solved, technology stack, and user growth impact..."
+                    placeholder={t.form.projectDescPlaceholder}
                     rows={2}
                   />
                 </div>
@@ -97,7 +100,7 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
                 {/* Detail Label/Values */}
                 <div className="space-y-3 pt-3 border-t border-white/[0.08]">
                   <span className="block text-xs text-md-on-surface-variant font-medium">
-                    Key Highlights & Metrics
+                    {t.form.projectMetrics}
                   </span>
                   {(proj.details || []).map((d, dIdx) => (
                     <div key={dIdx} className="flex gap-2.5 items-center animate-fade-in">
@@ -106,7 +109,7 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
                           type="text"
                           value={d.label}
                           onChange={(e) => handleUpdateDetailRow(pIdx, dIdx, 'label', e.target.value)}
-                          placeholder="Label (e.g. Impact)"
+                          placeholder={t.form.metricLabel}
                         />
                       </div>
                       <div className="flex-1">
@@ -114,28 +117,28 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({
                           type="text"
                           value={d.value}
                           onChange={(e) => handleUpdateDetailRow(pIdx, dIdx, 'value', e.target.value)}
-                          placeholder="Outcome value..."
+                          placeholder={t.form.metricValue}
                         />
                       </div>
                       <button
                         onClick={() => handleRemoveDetailRow(pIdx, dIdx)}
                         className="p-1.5 text-md-error hover:text-md-error hover:bg-md-error-container/20 rounded cursor-pointer shrink-0"
-                        title="Remove detail"
-                        aria-label="Remove detail"
+                        title={t.common.remove}
+                        aria-label={t.common.remove}
                       >
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
                     </div>
                   ))}
                   <Button onClick={() => handleAddDetailRow(pIdx)} variant="secondary" size="sm" fullWidth className="gap-2">
-                    <Plus className="w-3.5 h-3.5 text-md-primary" /> Add Metric Detail
+                    <Plus className="w-3.5 h-3.5 text-md-primary" /> {t.form.addMetric}
                   </Button>
                 </div>
               </div>
             </div>
           ))}
           <Button onClick={handleAddProjectItem} variant="secondary" fullWidth className="gap-2">
-            <Plus className="w-4 h-4 text-md-primary" /> Add Project
+            <Plus className="w-4 h-4 text-md-primary" /> {t.form.addProject}
           </Button>
         </div>
       )}

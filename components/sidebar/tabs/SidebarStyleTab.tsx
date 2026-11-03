@@ -15,6 +15,7 @@ import { ResumeHeaderStyle, ResumeStyleSettings, DEFAULT_STYLE_SETTINGS } from '
 import { Button } from '../../ui/Button';
 import { Switch } from '../../ui/Switch';
 import { ScrubberInput } from '../../ui/ScrubberInput';
+import { useTranslation } from '../../../contexts/LanguageContext';
 
 interface ThemePreset {
   id: string;
@@ -147,14 +148,6 @@ const BODY_FONT_OPTIONS = [
   { value: '"Fira Code", monospace', label: 'Fira Code (Code & Monospace)' },
 ];
 
-const HEADER_STYLES: { id: ResumeHeaderStyle; label: string }[] = [
-  { id: 'underline', label: 'Underline' },
-  { id: 'divider', label: 'Divider' },
-  { id: 'left-bar', label: 'Left Bar' },
-  { id: 'boxed', label: 'Boxed' },
-  { id: 'minimal', label: 'Minimal' },
-];
-
 const ACCENT_SWATCHES = [
   '#6750a4', // M3 Violet
   '#1e40af', // Royal Blue
@@ -174,6 +167,7 @@ const PAPER_SWATCHES = [
 ];
 
 export const SidebarStyleTab: React.FC = () => {
+  const { t } = useTranslation();
   const {
     styleSettings,
     handleUpdateStyleSettings,
@@ -196,6 +190,14 @@ export const SidebarStyleTab: React.FC = () => {
 
   const [activeSection, setActiveSection] = useState<'themes' | 'typography' | 'headers' | 'layout'>('themes');
   const [resetConfirm, setResetConfirm] = useState(false);
+
+  const HEADER_STYLES: { id: ResumeHeaderStyle; label: string }[] = [
+    { id: 'underline', label: t.style.headerStyleUnderline },
+    { id: 'divider', label: t.style.headerStyleDivider },
+    { id: 'left-bar', label: t.style.headerStyleLeftBar },
+    { id: 'boxed', label: t.style.headerStyleBoxed },
+    { id: 'minimal', label: t.style.headerStyleMinimal },
+  ];
 
   const applyPreset = (preset: ThemePreset) => {
     handleUpdateStyleSettings({
@@ -220,64 +222,64 @@ export const SidebarStyleTab: React.FC = () => {
   };
 
   return (
-    <div className="p-4 flex flex-col gap-3.5 text-xs text-md-on-surface">
+    <div className="p-4 flex flex-col gap-3.5 text-xs text-md-on-surface font-sans">
       {/* Inspector Segmented Switcher & Quick Actions */}
       <div className="flex items-center gap-1.5">
         <div className="flex-1 grid grid-cols-4 gap-0.5 p-0.5 bg-md-surface-container border border-md-outline-variant/30 rounded-btn-md">
           <button
             type="button"
             onClick={() => setActiveSection('themes')}
-            className={`py-1 text-[11px] font-medium rounded-btn-sm transition-all ${
+            className={`py-1 text-[11px] font-medium rounded-btn-sm transition-all cursor-pointer ${
               activeSection === 'themes'
                 ? 'bg-md-primary text-md-on-primary shadow-xs font-semibold'
                 : 'text-md-on-surface-variant hover:text-md-on-surface hover:bg-white/[0.04]'
             }`}
           >
-            Themes
+            {t.style.tabThemes}
           </button>
           <button
             type="button"
             onClick={() => setActiveSection('typography')}
-            className={`py-1 text-[11px] font-medium rounded-btn-sm transition-all ${
+            className={`py-1 text-[11px] font-medium rounded-btn-sm transition-all cursor-pointer ${
               activeSection === 'typography'
                 ? 'bg-md-primary text-md-on-primary shadow-xs font-semibold'
                 : 'text-md-on-surface-variant hover:text-md-on-surface hover:bg-white/[0.04]'
             }`}
           >
-            Fonts
+            {t.style.tabFonts}
           </button>
           <button
             type="button"
             onClick={() => setActiveSection('headers')}
-            className={`py-1 text-[11px] font-medium rounded-btn-sm transition-all ${
+            className={`py-1 text-[11px] font-medium rounded-btn-sm transition-all cursor-pointer ${
               activeSection === 'headers'
                 ? 'bg-md-primary text-md-on-primary shadow-xs font-semibold'
                 : 'text-md-on-surface-variant hover:text-md-on-surface hover:bg-white/[0.04]'
             }`}
           >
-            Headers
+            {t.style.tabHeaders}
           </button>
           <button
             type="button"
             onClick={() => setActiveSection('layout')}
-            className={`py-1 text-[11px] font-medium rounded-btn-sm transition-all ${
+            className={`py-1 text-[11px] font-medium rounded-btn-sm transition-all cursor-pointer ${
               activeSection === 'layout'
                 ? 'bg-md-primary text-md-on-primary shadow-xs font-semibold'
                 : 'text-md-on-surface-variant hover:text-md-on-surface hover:bg-white/[0.04]'
             }`}
           >
-            Layout
+            {t.style.tabLayout}
           </button>
         </div>
 
         <button
           type="button"
           onClick={handleResetDefaults}
-          className="h-7 px-2 flex items-center gap-1 text-[11px] font-medium rounded-btn-md border border-md-outline-variant/30 text-md-on-surface-variant hover:text-md-on-surface hover:bg-white/[0.04] transition-colors shrink-0"
-          title="Restore factory default styling"
+          className="h-7 px-2 flex items-center gap-1 text-[11px] font-medium rounded-btn-md border border-md-outline-variant/30 text-md-on-surface-variant hover:text-md-on-surface hover:bg-white/[0.04] transition-colors shrink-0 cursor-pointer"
+          title={t.style.resetDefault}
         >
           <RotateCcw className="w-3 h-3" />
-          {resetConfirm ? 'Reset' : 'Defaults'}
+          {resetConfirm ? t.common.reset : t.style.restoreDefaults}
         </button>
       </div>
 
@@ -286,9 +288,9 @@ export const SidebarStyleTab: React.FC = () => {
         <div className="flex flex-col gap-3">
           <div className="flex items-center justify-between text-xs text-md-on-surface-variant">
             <span className="font-semibold uppercase tracking-wider text-[10px]">
-              Theme Palettes
+              {t.style.themePalettes}
             </span>
-            <span className="text-[10px]">One-click styling</span>
+            <span className="text-[10px]">{t.style.oneClickStyling}</span>
           </div>
 
           {/* Compact 2-column theme cards */}
@@ -303,7 +305,7 @@ export const SidebarStyleTab: React.FC = () => {
                   key={preset.id}
                   type="button"
                   onClick={() => applyPreset(preset)}
-                  className={`p-2 rounded-btn-md border text-left transition-all flex flex-col justify-between ${
+                  className={`p-2 rounded-btn-md border text-left transition-all flex flex-col justify-between cursor-pointer ${
                     isSelected
                       ? 'border-md-primary bg-md-primary-container/20 ring-1 ring-md-primary shadow-xs'
                       : 'border-md-outline-variant/30 bg-md-surface-container hover:bg-md-surface-container-high'
@@ -348,7 +350,7 @@ export const SidebarStyleTab: React.FC = () => {
           <div className="p-2.5 bg-md-surface-container border border-md-outline-variant/30 rounded-btn-md flex flex-col gap-2">
             <div className="flex items-center justify-between">
               <span className="text-[11px] font-medium text-md-on-surface">
-                Brand Accent Color
+                {t.style.brandAccent}
               </span>
               <div className="flex items-center gap-1.5">
                 <input
@@ -373,7 +375,7 @@ export const SidebarStyleTab: React.FC = () => {
                   key={hex}
                   type="button"
                   onClick={() => handleUpdateStyleSettings({ accentColor: hex })}
-                  className={`w-5 h-5 rounded-btn-sm transition-all flex items-center justify-center border ${
+                  className={`w-5 h-5 rounded-btn-sm transition-all flex items-center justify-center border cursor-pointer ${
                     styleSettings.accentColor.toLowerCase() === hex.toLowerCase()
                       ? 'ring-2 ring-md-primary ring-offset-1 ring-offset-md-surface border-white scale-110'
                       : 'border-white/10 hover:scale-105'
@@ -396,9 +398,9 @@ export const SidebarStyleTab: React.FC = () => {
         <div className="flex flex-col gap-3">
           <div className="flex items-center justify-between text-xs text-md-on-surface-variant">
             <span className="font-semibold uppercase tracking-wider text-[10px]">
-              Font Pairings
+              {t.style.fontPairings}
             </span>
-            <span className="text-[10px]">Harmonious typographic scale</span>
+            <span className="text-[10px]">{t.style.harmoniousScale}</span>
           </div>
 
           {/* Quick Pairing Chips Matrix */}
@@ -413,7 +415,7 @@ export const SidebarStyleTab: React.FC = () => {
                   key={pair.id}
                   type="button"
                   onClick={() => handleUpdateStyleSettings({ headingFont: pair.heading, bodyFont: pair.body })}
-                  className={`px-2 py-1.5 rounded-btn-md border text-left transition-all flex items-center justify-between ${
+                  className={`px-2 py-1.5 rounded-btn-md border text-left transition-all flex items-center justify-between cursor-pointer ${
                     isSelected
                       ? 'border-md-primary bg-md-primary-container/20 text-md-on-primary-container ring-1 ring-md-primary'
                       : 'border-md-outline-variant/30 bg-md-surface-container hover:bg-md-surface-container-high text-md-on-surface'
@@ -433,7 +435,7 @@ export const SidebarStyleTab: React.FC = () => {
             <div className="flex flex-col gap-1">
               <label className="text-[11px] font-medium text-md-on-surface flex items-center gap-1.5">
                 <Type className="w-3 h-3 text-md-primary" />
-                Heading Font
+                {t.style.headingFontLabel}
               </label>
               <select
                 value={styleSettings.headingFont}
@@ -451,7 +453,7 @@ export const SidebarStyleTab: React.FC = () => {
             <div className="flex flex-col gap-1">
               <label className="text-[11px] font-medium text-md-on-surface flex items-center gap-1.5">
                 <Type className="w-3 h-3 text-md-secondary" />
-                Body Font
+                {t.style.bodyFontLabel}
               </label>
               <select
                 value={styleSettings.bodyFont}
@@ -471,7 +473,7 @@ export const SidebarStyleTab: React.FC = () => {
           <div className="p-2.5 bg-md-surface-container border border-md-outline-variant/30 rounded-btn-md flex flex-col gap-1.5">
             <div className="flex items-center justify-between">
               <span className="text-[11px] font-medium text-md-on-surface">
-                Font Size Scale
+                {t.style.fontSizeScale}
               </span>
               <span className="text-[10px] font-mono text-md-on-surface-variant">
                 {styleSettings.fontScale === 'compact' ? '9.5pt' : styleSettings.fontScale === 'spacious' ? '10.5pt' : '10.0pt'}
@@ -483,13 +485,13 @@ export const SidebarStyleTab: React.FC = () => {
                   key={scale}
                   type="button"
                   onClick={() => handleUpdateStyleSettings({ fontScale: scale })}
-                  className={`py-1 text-[11px] font-medium rounded-btn-xs transition-all ${
+                  className={`py-1 text-[11px] font-medium rounded-btn-xs transition-all cursor-pointer ${
                     styleSettings.fontScale === scale
                       ? 'bg-md-primary text-md-on-primary shadow-xs'
                       : 'text-md-on-surface-variant hover:text-md-on-surface'
                   }`}
                 >
-                  {scale === 'compact' ? 'Compact' : scale === 'standard' ? 'Standard' : 'Spacious'}
+                  {scale === 'compact' ? t.style.fontScaleCompact : scale === 'standard' ? t.style.fontScaleStandard : t.style.fontScaleSpacious}
                 </button>
               ))}
             </div>
@@ -502,9 +504,9 @@ export const SidebarStyleTab: React.FC = () => {
         <div className="flex flex-col gap-3">
           <div className="flex items-center justify-between text-xs text-md-on-surface-variant">
             <span className="font-semibold uppercase tracking-wider text-[10px]">
-              Section Divider Style
+              {t.style.sectionDividerStyle}
             </span>
-            <span className="text-[10px]">Single-row preview grid</span>
+            <span className="text-[10px]">{t.style.singleRowPreview}</span>
           </div>
 
           {/* Single-Row 5-Column Preview Grid (Figma/Linear Style) */}
@@ -517,7 +519,7 @@ export const SidebarStyleTab: React.FC = () => {
                   key={style.id}
                   type="button"
                   onClick={() => handleUpdateStyleSettings({ headerStyle: style.id })}
-                  className={`flex flex-col items-center justify-center p-1.5 rounded-btn-md border transition-all h-[52px] ${
+                  className={`flex flex-col items-center justify-center p-1.5 rounded-btn-md border transition-all h-[52px] cursor-pointer ${
                     isSelected
                       ? 'border-md-primary bg-md-primary-container/25 ring-1 ring-md-primary'
                       : 'border-md-outline-variant/30 bg-md-surface-container hover:bg-md-surface-container-high'
@@ -573,7 +575,7 @@ export const SidebarStyleTab: React.FC = () => {
           {/* Uppercase Headers Switch Row */}
           <div className="p-2.5 bg-md-surface-container border border-md-outline-variant/30 rounded-btn-md flex items-center justify-between">
             <span className="text-[11px] font-medium text-md-on-surface">
-              Force All-Caps Section Headers
+              {t.style.forceAllCaps}
             </span>
             <Switch
               size="sm"
@@ -585,7 +587,7 @@ export const SidebarStyleTab: React.FC = () => {
           {/* Document Paper Color Swatch Row */}
           <div className="p-2.5 bg-md-surface-container border border-md-outline-variant/30 rounded-btn-md flex items-center justify-between">
             <span className="text-[11px] font-medium text-md-on-surface">
-              Paper Background Tone
+              {t.style.paperBackgroundTone}
             </span>
             <div className="flex items-center gap-1.5">
               {PAPER_SWATCHES.map((paper) => (
@@ -593,7 +595,7 @@ export const SidebarStyleTab: React.FC = () => {
                   key={paper.value}
                   type="button"
                   onClick={() => handleUpdateStyleSettings({ paperBackground: paper.value })}
-                  className={`w-6 h-6 rounded-btn-sm border flex items-center justify-center transition-all ${
+                  className={`w-6 h-6 rounded-btn-sm border flex items-center justify-center transition-all cursor-pointer ${
                     styleSettings.paperBackground.toLowerCase() === paper.value.toLowerCase()
                       ? 'border-md-primary ring-1 ring-md-primary scale-105'
                       : 'border-white/10 hover:scale-105'
@@ -616,15 +618,15 @@ export const SidebarStyleTab: React.FC = () => {
         <div className="flex flex-col gap-3">
           <div className="flex items-center justify-between text-xs text-md-on-surface-variant">
             <span className="font-semibold uppercase tracking-wider text-[10px]">
-              Document Geometry
+              {t.style.documentGeometry}
             </span>
             <button
               type="button"
               onClick={autoFitContent}
-              className="text-[11px] flex items-center gap-1 text-md-primary font-medium hover:underline"
+              className="text-[11px] flex items-center gap-1 text-md-primary font-medium hover:underline cursor-pointer"
             >
               <Sparkles className="w-3 h-3" />
-              Auto-Fit Content
+              {t.style.autoFitContent}
             </button>
           </div>
 
@@ -635,13 +637,13 @@ export const SidebarStyleTab: React.FC = () => {
                 key={preset}
                 type="button"
                 onClick={() => handleApplySpacingPreset(preset)}
-                className={`py-1 text-[11px] font-medium rounded-btn-xs transition-all ${
+                className={`py-1 text-[11px] font-medium rounded-btn-xs transition-all cursor-pointer ${
                   spacingPreset === preset
                     ? 'bg-md-primary text-md-on-primary shadow-xs'
                     : 'text-md-on-surface-variant hover:text-md-on-surface'
                 }`}
               >
-                {preset === 'standard' ? 'Standard' : preset === 'compact' ? 'Compact' : 'Super'}
+                {preset === 'standard' ? t.style.fontScaleStandard : preset === 'compact' ? t.style.fontScaleCompact : 'Super'}
               </button>
             ))}
           </div>
@@ -649,7 +651,7 @@ export const SidebarStyleTab: React.FC = () => {
           {/* High-Precision Scrubber Inputs */}
           <div className="p-2.5 bg-md-surface-container border border-md-outline-variant/30 rounded-btn-md flex flex-col gap-1 divide-y divide-white/[0.04]">
             <ScrubberInput
-              label="Top & Bottom Margins"
+              label={t.style.topBottomMargins}
               value={paddingTopBottom}
               onChange={setPaddingTopBottom}
               min={6}
@@ -658,7 +660,7 @@ export const SidebarStyleTab: React.FC = () => {
               unit="mm"
             />
             <ScrubberInput
-              label="Left & Right Margins"
+              label={t.style.leftRightMargins}
               value={paddingLeftRight}
               onChange={setPaddingLeftRight}
               min={8}
@@ -667,7 +669,7 @@ export const SidebarStyleTab: React.FC = () => {
               unit="mm"
             />
             <ScrubberInput
-              label="Section Spacing"
+              label={t.style.sectionSpacing}
               value={sectionSpacing}
               onChange={setSectionSpacing}
               min={0.4}
@@ -676,7 +678,7 @@ export const SidebarStyleTab: React.FC = () => {
               unit="x"
             />
             <ScrubberInput
-              label="Item & Bullet Spacing"
+              label={t.style.itemSpacing}
               value={itemSpacing}
               onChange={setItemSpacing}
               min={0.4}
@@ -690,7 +692,7 @@ export const SidebarStyleTab: React.FC = () => {
           <div className="p-2.5 bg-md-surface-container border border-md-outline-variant/30 rounded-btn-md flex flex-col gap-2">
             <div className="flex items-center justify-between">
               <span className="text-[11px] font-medium text-md-on-surface">
-                Show Page Guides & Numbers
+                {t.style.showPageGuidesNumbers}
               </span>
               <Switch
                 size="sm"
@@ -700,7 +702,7 @@ export const SidebarStyleTab: React.FC = () => {
             </div>
             <div className="flex items-center justify-between pt-1.5 border-t border-white/[0.04]">
               <span className="text-[11px] font-medium text-md-on-surface">
-                Adaptive Anti-Void Micro-Fit
+                {t.style.adaptiveAntiVoidMicro}
               </span>
               <Switch
                 size="sm"

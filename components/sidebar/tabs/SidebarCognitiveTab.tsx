@@ -22,6 +22,7 @@ import {
 import { ResumeData, CognitiveAnalysisResult } from '../../../types';
 import { Button } from '../../ui/Button';
 import { Badge } from '../../ui/Badge';
+import { useTranslation } from '../../../contexts/LanguageContext';
 
 interface SidebarCognitiveTabProps {
   resumeData: ResumeData;
@@ -42,6 +43,7 @@ export const SidebarCognitiveTab: React.FC<SidebarCognitiveTabProps> = ({
   runCognitiveAnalysis,
   handleApplyRewrite
 }) => {
+  const { t } = useTranslation();
   const [activeSubTab, setActiveSubTab] = useState<'overview' | 'laws' | 'frames'>('overview');
   const [showHotspotInfo, setShowHotspotInfo] = useState(false);
   const [expandedLaw, setExpandedLaw] = useState<string | null>(null);
@@ -127,7 +129,7 @@ export const SidebarCognitiveTab: React.FC<SidebarCognitiveTabProps> = ({
                 activeSubTab === 'overview' ? 'bg-md-primary text-md-on-primary font-semibold shadow-md-elevation-1' : 'bg-transparent text-md-on-surface-variant hover:text-md-on-surface hover:bg-md-surface-container-high'
               }`}
             >
-              Overview
+              {t.cognitive.tabOverview}
             </button>
             <button
               role="tab"
@@ -137,7 +139,7 @@ export const SidebarCognitiveTab: React.FC<SidebarCognitiveTabProps> = ({
                 activeSubTab === 'laws' ? 'bg-md-primary text-md-on-primary font-semibold shadow-md-elevation-1' : 'bg-transparent text-md-on-surface-variant hover:text-md-on-surface hover:bg-md-surface-container-high'
               }`}
             >
-              UX Laws
+              {t.cognitive.tabUxLaws}
             </button>
             <button
               role="tab"
@@ -147,7 +149,7 @@ export const SidebarCognitiveTab: React.FC<SidebarCognitiveTabProps> = ({
                 activeSubTab === 'frames' ? 'bg-md-primary text-md-on-primary font-semibold shadow-md-elevation-1' : 'bg-transparent text-md-on-surface-variant hover:text-md-on-surface hover:bg-md-surface-container-high'
               }`}
             >
-              Models
+              {t.cognitive.tabModels}
             </button>
           </div>
         </div>
@@ -185,8 +187,8 @@ export const SidebarCognitiveTab: React.FC<SidebarCognitiveTabProps> = ({
           <div className="bg-md-surface-container-low rounded-md-lg p-6 border border-md-outline-variant/30 text-center space-y-3 animate-pulse shadow-md-elevation-1">
             <Brain className="w-9 h-9 mx-auto text-md-primary animate-spin" />
             <div className="space-y-1.5">
-              <h5 className="text-sm font-semibold text-md-on-surface">Evaluating visual load...</h5>
-              <p className="text-xs text-md-on-surface-variant">Mapping text density, readability, and focal points.</p>
+              <h5 className="text-sm font-semibold text-md-on-surface">{t.cognitive.analyzing}</h5>
+              <p className="text-xs text-md-on-surface-variant">{t.cognitive.desc}</p>
             </div>
           </div>
         )}
@@ -198,9 +200,9 @@ export const SidebarCognitiveTab: React.FC<SidebarCognitiveTabProps> = ({
               <Sparkles className="w-5 h-5 text-md-primary" />
             </div>
             <div className="space-y-1.5">
-              <h4 className="text-sm font-semibold text-md-on-surface">Resume UX Audit</h4>
+              <h4 className="text-sm font-semibold text-md-on-surface">{t.cognitive.readyTitle}</h4>
               <p className="text-xs text-md-on-surface-variant leading-relaxed">
-                Scan layout structure, measure density, and get AI recommendations to sound more executive.
+                {t.cognitive.readyDesc}
               </p>
             </div>
             <Button
@@ -210,7 +212,7 @@ export const SidebarCognitiveTab: React.FC<SidebarCognitiveTabProps> = ({
               className="gap-2"
             >
               <RefreshCw className="w-4 h-4 text-md-on-primary" />
-              <span>Run UX Audit</span>
+              <span>{t.cognitive.analyzeBtn}</span>
             </Button>
           </div>
         )}
@@ -468,7 +470,7 @@ export const SidebarCognitiveTab: React.FC<SidebarCognitiveTabProps> = ({
                             size="sm"
                             className="gap-2 shrink-0"
                           >
-                            <span>Apply Fix</span>
+                            <span>{t.cognitive.applyRewrite}</span>
                             <ArrowRight className="w-4 h-4 text-md-on-primary" />
                           </Button>
                         </div>

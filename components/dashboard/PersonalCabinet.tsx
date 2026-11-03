@@ -63,6 +63,8 @@ const AVATAR_COLORS = [
   { label: 'M3 Rose', value: 'bg-rose-400 text-rose-950' },
 ];
 
+import { useTranslation } from '../../contexts/LanguageContext';
+
 export const PersonalCabinet: React.FC<PersonalCabinetProps> = ({
   resumes = [],
   exports = [],
@@ -77,6 +79,7 @@ export const PersonalCabinet: React.FC<PersonalCabinetProps> = ({
   onOpenEditor
 }) => {
   const { user, userProfile, signOut, updateUserProfileData } = useAuth();
+  const { language, setLanguage, t, languages, currentLanguageMeta } = useTranslation();
   const [activeTab, setActiveTab] = useState<'library' | 'telemetry' | 'profile'>('library');
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -223,10 +226,11 @@ export const PersonalCabinet: React.FC<PersonalCabinetProps> = ({
         avatarColor: profileForm.avatarColor,
         preferences: {
           defaultSpacingPreset: profileForm.defaultSpacingPreset,
-          defaultFormat: profileForm.defaultFormat
+          defaultFormat: profileForm.defaultFormat,
+          language: language
         }
       });
-      showToast('Profile and cloud settings saved successfully!', 'success');
+      showToast(t.cabinet.profileSavedSuccess, 'success');
     } catch (err: any) {
       console.error('Failed to update profile:', err);
       showToast(err.message || 'Could not update profile. Please try again.', 'error');
@@ -352,7 +356,7 @@ export const PersonalCabinet: React.FC<PersonalCabinetProps> = ({
             }`}
           >
             <Layers className="w-4 h-4" />
-            <span>Resumes ({safeResumes.length})</span>
+            <span>{t.cabinet.tabResumes} ({safeResumes.length})</span>
           </button>
 
           <button
@@ -367,7 +371,7 @@ export const PersonalCabinet: React.FC<PersonalCabinetProps> = ({
             }`}
           >
             <BarChart2 className="w-4 h-4" />
-            <span>Exports ({safeExports.length})</span>
+            <span>{t.cabinet.tabAnalytics} ({safeExports.length})</span>
           </button>
 
           <button
@@ -382,7 +386,7 @@ export const PersonalCabinet: React.FC<PersonalCabinetProps> = ({
             }`}
           >
             <UserIcon className="w-4 h-4" />
-            <span>Profile &amp; Settings</span>
+            <span>{t.cabinet.tabSettings}</span>
           </button>
         </nav>
 
@@ -400,7 +404,7 @@ export const PersonalCabinet: React.FC<PersonalCabinetProps> = ({
             ) : (
               <Plus className="w-4 h-4" />
             )}
-            <span>{isCreatingResume ? 'Creating...' : 'New Resume'}</span>
+            <span>{isCreatingResume ? t.common.loading : t.cabinet.createResume}</span>
           </Button>
 
           <button
@@ -427,10 +431,10 @@ export const PersonalCabinet: React.FC<PersonalCabinetProps> = ({
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <div>
                 <h2 className="text-xl font-bold font-display text-md-on-surface">
-                  Resume Library
+                  {t.cabinet.resumesHeader}
                 </h2>
                 <p className="text-xs text-md-on-surface-variant mt-0.5">
-                  Manage multiple targeted resumes tailored for distinct company roles and tech stacks.
+                  {t.cabinet.subtitle}
                 </p>
               </div>
 
@@ -441,7 +445,7 @@ export const PersonalCabinet: React.FC<PersonalCabinetProps> = ({
                     type="text"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Search resumes..."
+                    placeholder={t.cabinet.searchResumes}
                     className="w-full pl-9 pr-3 h-10 bg-md-surface-container border border-white/[0.08] rounded-[8px] text-xs text-md-on-surface focus:outline-none focus:border-md-primary font-sans"
                   />
                 </div>
@@ -451,14 +455,14 @@ export const PersonalCabinet: React.FC<PersonalCabinetProps> = ({
                   size="sm"
                   onClick={handleCreateResume}
                   disabled={isCreatingResume}
-                  className="gap-1.5 shrink-0"
+                  className="gap-1.5 shrink-0 cursor-pointer"
                 >
                   {isCreatingResume ? (
                     <RefreshCw className="w-3.5 h-3.5 animate-spin" />
                   ) : (
                     <Plus className="w-3.5 h-3.5" />
                   )}
-                  <span>{isCreatingResume ? 'Creating...' : 'Create Resume'}</span>
+                  <span>{isCreatingResume ? t.cabinet.creatingResume : t.cabinet.createResume}</span>
                 </Button>
               </div>
             </div>
@@ -470,9 +474,9 @@ export const PersonalCabinet: React.FC<PersonalCabinetProps> = ({
                   <FileText className="w-6 h-6" />
                 </div>
                 <div>
-                  <h3 className="text-sm font-semibold text-md-on-surface">No resumes found</h3>
+                  <h3 className="text-sm font-semibold text-md-on-surface">{t.cabinet.noResumesFound}</h3>
                   <p className="text-xs text-md-on-surface-variant mt-1">
-                    {searchQuery ? 'Try clearing your search query' : 'Create your first targeted resume to get started'}
+                    {searchQuery ? t.cabinet.noResumesFound : t.cabinet.noResumesFoundDesc}
                   </p>
                 </div>
                 <Button 
@@ -480,14 +484,14 @@ export const PersonalCabinet: React.FC<PersonalCabinetProps> = ({
                   size="sm" 
                   onClick={handleCreateResume} 
                   disabled={isCreatingResume}
-                  className="gap-2 mx-auto"
+                  className="gap-2 mx-auto cursor-pointer"
                 >
                   {isCreatingResume ? (
                     <RefreshCw className="w-3.5 h-3.5 animate-spin" />
                   ) : (
                     <Plus className="w-3.5 h-3.5" />
                   )}
-                  <span>{isCreatingResume ? 'Creating...' : 'Create Resume'}</span>
+                  <span>{isCreatingResume ? t.cabinet.creatingResume : t.cabinet.createResume}</span>
                 </Button>
               </div>
             ) : (
@@ -517,17 +521,17 @@ export const PersonalCabinet: React.FC<PersonalCabinetProps> = ({
                         <div className="flex items-start justify-between gap-2">
                           <div className="min-w-0 flex-1">
                             <span className="text-[11px] font-mono text-md-primary font-medium uppercase tracking-wider block">
-                              {resume.targetRole || 'General Profile'}
+                              {resume.targetRole || t.cabinet.generalProfile}
                             </span>
                             <h3 className="text-base font-semibold text-md-on-surface font-display truncate mt-0.5">
-                              {resume.title || 'Untitled Resume'}
+                              {resume.title || t.cabinet.untitledResume}
                             </h3>
                           </div>
 
                           <div className="flex items-center gap-1.5 shrink-0">
                             {isActive && (
                               <span className="text-[10px] font-medium text-emerald-300 bg-emerald-500/15 border border-emerald-500/30 px-2 py-0.5 rounded-full shrink-0">
-                                Active
+                                {t.common.active}
                               </span>
                             )}
                             {onRenameResume && (
@@ -538,8 +542,8 @@ export const PersonalCabinet: React.FC<PersonalCabinetProps> = ({
                                   title: resume.title || '',
                                   targetRole: resume.targetRole || ''
                                 })}
-                                title="Rename title or target role"
-                                aria-label="Rename resume"
+                                title={t.cabinet.renameModalHeader}
+                                aria-label={t.cabinet.renameModalHeader}
                                 className="w-8 h-8 rounded-[6px] flex items-center justify-center text-md-on-surface-variant hover:text-md-on-surface hover:bg-white/[0.06] transition-colors cursor-pointer"
                               >
                                 <Edit3 className="w-3.5 h-3.5" />
@@ -551,18 +555,18 @@ export const PersonalCabinet: React.FC<PersonalCabinetProps> = ({
                         {/* Resume Meta stats */}
                         <div className="grid grid-cols-2 gap-2 pt-2 border-t border-white/[0.06] text-xs font-mono">
                           <div className="bg-white/[0.02] p-2 rounded-[6px] border border-white/[0.04]">
-                            <span className="text-md-on-surface-variant block text-[10px]">EXPERIENCE</span>
-                            <span className="text-md-on-surface font-bold">{expCount} roles</span>
+                            <span className="text-md-on-surface-variant block text-[10px]">{t.form.workExperience.toUpperCase()}</span>
+                            <span className="text-md-on-surface font-bold">{expCount} {t.cabinet.rolesCount}</span>
                           </div>
                           <div className="bg-white/[0.02] p-2 rounded-[6px] border border-white/[0.04]">
-                            <span className="text-md-on-surface-variant block text-[10px]">SKILLS</span>
-                            <span className="text-md-on-surface font-bold">{skillCount} items</span>
+                            <span className="text-md-on-surface-variant block text-[10px]">{t.sidebar.tabStyle.toUpperCase()}</span>
+                            <span className="text-md-on-surface font-bold">{skillCount} {t.cabinet.itemsCount}</span>
                           </div>
                         </div>
 
                         <div className="text-[11px] text-md-on-surface-variant flex items-center gap-1.5 pt-1">
                           <Clock className="w-3 h-3 text-md-on-surface-variant/70" />
-                          <span>Updated {updatedDateStr}</span>
+                          <span>{t.cabinet.lastUpdated} {updatedDateStr}</span>
                         </div>
                       </div>
 
@@ -575,17 +579,17 @@ export const PersonalCabinet: React.FC<PersonalCabinetProps> = ({
                             onSelectResume(resume);
                             onOpenEditor();
                           }}
-                          className="flex-1 gap-1.5 text-xs"
+                          className="flex-1 gap-1.5 text-xs cursor-pointer"
                         >
                           <ExternalLink className="w-3.5 h-3.5" />
-                          <span>Open in Canvas</span>
+                          <span>{t.cabinet.openInEditor}</span>
                         </Button>
 
                         <button
                           type="button"
                           onClick={() => onDuplicateResume(resume)}
-                          title="Duplicate resume"
-                          aria-label="Duplicate resume"
+                          title={t.cabinet.duplicate}
+                          aria-label={t.cabinet.duplicate}
                           className="w-10 h-10 min-w-[40px] min-h-[40px] rounded-[8px] flex items-center justify-center hover:bg-white/[0.08] text-md-on-surface-variant hover:text-md-on-surface transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-md-primary"
                         >
                           <Copy className="w-4 h-4" />
@@ -594,9 +598,9 @@ export const PersonalCabinet: React.FC<PersonalCabinetProps> = ({
                         {safeResumes.length > 1 && (
                           <button
                             type="button"
-                            onClick={() => setDeleteModal({ resumeId: resume.id, title: resume.title || 'this resume' })}
-                            title="Delete resume"
-                            aria-label="Delete resume"
+                            onClick={() => setDeleteModal({ resumeId: resume.id, title: resume.title || t.cabinet.untitledResume })}
+                            title={t.cabinet.deleteResume}
+                            aria-label={t.cabinet.deleteResume}
                             className="w-10 h-10 min-w-[40px] min-h-[40px] rounded-[8px] flex items-center justify-center hover:bg-white/[0.08] text-md-on-surface-variant hover:text-rose-400 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-md-primary"
                           >
                             <Trash2 className="w-4 h-4" />
@@ -620,10 +624,10 @@ export const PersonalCabinet: React.FC<PersonalCabinetProps> = ({
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
                 <h2 className="text-xl font-bold font-display text-md-on-surface">
-                  Export Telemetry &amp; Activity
+                  {t.cabinet.analyticsTitle}
                 </h2>
                 <p className="text-xs text-md-on-surface-variant mt-0.5">
-                  Real-time tracking of generated PDF, Word, and print files
+                  {t.cabinet.analyticsSubtitle}
                 </p>
               </div>
 
@@ -635,11 +639,11 @@ export const PersonalCabinet: React.FC<PersonalCabinetProps> = ({
                     loadDemo();
                     showToast('Sample export telemetry loaded for demonstration!', 'info');
                   }}
-                  className="text-xs gap-1.5"
+                  className="text-xs gap-1.5 cursor-pointer"
                   title="Populate test analytics data"
                 >
                   <Sparkles className="w-3.5 h-3.5 text-md-primary" />
-                  <span>Load Sample Demo</span>
+                  <span>{t.cabinet.loadDemo}</span>
                 </Button>
 
                 {safeExports.length > 0 && (
@@ -1035,40 +1039,104 @@ export const PersonalCabinet: React.FC<PersonalCabinetProps> = ({
               <div className="bg-md-surface-container-low border border-white/[0.08] rounded-[12px] p-6 space-y-6">
                 <div>
                   <h3 className="text-sm font-semibold font-display text-md-on-surface">
-                    Cloud Workspace Defaults
+                    {t.cabinet.workspaceDefaults}
                   </h3>
                   <p className="text-xs text-md-on-surface-variant mt-0.5">
-                    Configure your preferred default spacing and export settings for newly generated documents.
+                    {t.cabinet.workspaceDefaultsDesc}
                   </p>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {/* Interface Language Selection (EN / UK / RU) */}
+                <div className="space-y-2.5 pt-1">
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs font-semibold text-md-on-surface flex items-center gap-2">
+                      <Globe className="w-3.5 h-3.5 text-md-primary" />
+                      <span>{t.cabinet.interfaceLanguage}</span>
+                    </label>
+                    <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-md-primary/10 text-md-primary border border-md-primary/20">
+                      {currentLanguageMeta.flag} {currentLanguageMeta.nativeName}
+                    </span>
+                  </div>
+                  <p className="text-xs text-md-on-surface-variant">
+                    {t.cabinet.interfaceLanguageDesc}
+                  </p>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
+                    {languages.map((lang) => {
+                      const isSelected = language === lang.code;
+                      return (
+                        <button
+                          key={lang.code}
+                          type="button"
+                          onClick={() => {
+                            setLanguage(lang.code);
+                            showToast(
+                              lang.code === 'uk'
+                                ? 'Мову інтерфейсу переключено на Українську!'
+                                : lang.code === 'ru'
+                                ? 'Язык интерфейса переключен на Русский!'
+                                : 'Interface language switched to English!',
+                              'info'
+                            );
+                          }}
+                          className={`flex items-start gap-3 p-3.5 rounded-[10px] border text-left transition-all duration-150 relative cursor-pointer ${
+                            isSelected
+                              ? 'bg-md-primary/10 border-md-primary shadow-[0_0_15px_rgba(208,188,255,0.15)] ring-1 ring-md-primary'
+                              : 'bg-white/[0.02] border-white/[0.08] hover:bg-white/[0.06] hover:border-white/[0.15]'
+                          }`}
+                        >
+                          <span className="text-2xl select-none leading-none pt-0.5">{lang.flag}</span>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center justify-between">
+                              <span className={`text-xs font-semibold ${isSelected ? 'text-md-primary' : 'text-md-on-surface'}`}>
+                                {lang.nativeName}
+                              </span>
+                              {isSelected && (
+                                <span className="w-4 h-4 rounded-full bg-md-primary text-md-on-primary flex items-center justify-center shrink-0">
+                                  <Check className="w-2.5 h-2.5 stroke-[3]" />
+                                </span>
+                              )}
+                            </div>
+                            <span className="text-[11px] text-md-on-surface-variant block mt-0.5 font-medium truncate">
+                              {lang.name}
+                            </span>
+                            <span className="text-[10px] text-white/40 block mt-1">
+                              {lang.description}
+                            </span>
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 border-t border-white/[0.06]">
                   <div>
                     <label className="block text-xs font-medium text-md-on-surface mb-1.5">
-                      Default Page Layout Spacing
+                      {t.cabinet.defaultSpacing}
                     </label>
                     <select
                       value={profileForm.defaultSpacingPreset}
                       onChange={e => setProfileForm({ ...profileForm, defaultSpacingPreset: e.target.value as any })}
                       className="w-full px-3.5 h-11 bg-md-surface-container border border-white/[0.08] rounded-[8px] text-xs text-md-on-surface focus:outline-none focus:border-md-primary font-sans"
                     >
-                      <option value="standard">Standard (Balanced Executive Spacing)</option>
-                      <option value="compact">Compact (High Information Density)</option>
-                      <option value="super">Super Compact (Maximum Density)</option>
+                      <option value="standard">{t.cabinet.defaultSpacingStandard}</option>
+                      <option value="compact">{t.cabinet.defaultSpacingCompact}</option>
+                      <option value="super">{t.cabinet.defaultSpacingSuper}</option>
                     </select>
                   </div>
 
                   <div>
                     <label className="block text-xs font-medium text-md-on-surface mb-1.5">
-                      Preferred Quick Export Format
+                      {t.cabinet.defaultFormat}
                     </label>
                     <select
                       value={profileForm.defaultFormat}
                       onChange={e => setProfileForm({ ...profileForm, defaultFormat: e.target.value as any })}
                       className="w-full px-3.5 h-11 bg-md-surface-container border border-white/[0.08] rounded-[8px] text-xs text-md-on-surface focus:outline-none focus:border-md-primary font-sans"
                     >
-                      <option value="pdf">Adobe PDF (Vector High-Fidelity)</option>
-                      <option value="docx">Microsoft Word DOCX</option>
+                      <option value="pdf">{t.cabinet.defaultFormatPdf}</option>
+                      <option value="docx">{t.cabinet.defaultFormatDocx}</option>
                     </select>
                   </div>
                 </div>
@@ -1076,11 +1144,11 @@ export const PersonalCabinet: React.FC<PersonalCabinetProps> = ({
                 {/* Account Diagnostics */}
                 <div className="pt-4 border-t border-white/[0.06] space-y-3">
                   <h4 className="text-xs font-mono font-semibold text-md-on-surface uppercase tracking-wider">
-                    Infrastructure &amp; Account Health
+                    {t.cabinet.infrastructure}
                   </h4>
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
                     <div className="bg-white/[0.02] border border-white/[0.04] p-3 rounded-[8px] space-y-1">
-                      <span className="text-[10px] font-mono text-md-on-surface-variant block">CLOUD DATABASE</span>
+                      <span className="text-[10px] font-mono text-md-on-surface-variant block">{t.cabinet.cloudDatabase}</span>
                       <div className="flex items-center gap-1.5 text-emerald-400 font-semibold font-mono text-xs">
                         <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
                         <span>Firestore Online</span>
@@ -1088,14 +1156,14 @@ export const PersonalCabinet: React.FC<PersonalCabinetProps> = ({
                     </div>
 
                     <div className="bg-white/[0.02] border border-white/[0.04] p-3 rounded-[8px] space-y-1">
-                      <span className="text-[10px] font-mono text-md-on-surface-variant block">ACCOUNT UID</span>
+                      <span className="text-[10px] font-mono text-md-on-surface-variant block">{t.cabinet.accountUid}</span>
                       <span className="font-mono text-md-on-surface text-[11px] truncate block">
                         {user?.uid}
                       </span>
                     </div>
 
                     <div className="bg-white/[0.02] border border-white/[0.04] p-3 rounded-[8px] space-y-1">
-                      <span className="text-[10px] font-mono text-md-on-surface-variant block">MEMBER SINCE</span>
+                      <span className="text-[10px] font-mono text-md-on-surface-variant block">{t.cabinet.memberSince}</span>
                       <span className="font-mono text-md-on-surface text-[11px] block">
                         {userProfile?.createdAt ? new Date(userProfile.createdAt).toLocaleDateString() : 'Active'}
                       </span>
@@ -1116,12 +1184,12 @@ export const PersonalCabinet: React.FC<PersonalCabinetProps> = ({
                   {isSavingProfile ? (
                     <>
                       <div className="w-4 h-4 border-2 border-md-on-primary border-t-transparent rounded-full animate-spin" />
-                      <span>Saving Profile...</span>
+                      <span>{t.cabinet.savingProfileBtn}</span>
                     </>
                   ) : (
                     <>
                       <Save className="w-4 h-4" />
-                      <span>Save Profile Changes</span>
+                      <span>{t.cabinet.saveProfileBtn}</span>
                     </>
                   )}
                 </Button>
@@ -1159,10 +1227,10 @@ export const PersonalCabinet: React.FC<PersonalCabinetProps> = ({
 
             <div className="space-y-1">
               <h3 id="delete-dialog-title" className="text-base font-bold font-display text-md-on-surface">
-                Delete Resume Document?
+                {t.cabinet.deleteModalHeader}
               </h3>
               <p className="text-xs text-md-on-surface-variant leading-relaxed">
-                Are you sure you want to permanently delete <strong className="text-md-on-surface font-semibold">"{deleteModal.title}"</strong> from your cloud storage? This action cannot be reversed.
+                {t.cabinet.deleteWarningText}
               </p>
             </div>
 
@@ -1171,9 +1239,9 @@ export const PersonalCabinet: React.FC<PersonalCabinetProps> = ({
                 variant="outline"
                 size="sm"
                 onClick={() => setDeleteModal(null)}
-                className="text-xs"
+                className="text-xs cursor-pointer"
               >
-                Cancel
+                {t.common.cancel}
               </Button>
               <Button
                 variant="primary"
@@ -1182,11 +1250,11 @@ export const PersonalCabinet: React.FC<PersonalCabinetProps> = ({
                   const id = deleteModal.resumeId;
                   setDeleteModal(null);
                   onDeleteResume(id);
-                  showToast('Resume removed from cloud storage', 'info');
+                  showToast(t.common.saved, 'info');
                 }}
-                className="text-xs bg-rose-600 hover:bg-rose-500 text-white border-rose-500"
+                className="text-xs bg-rose-600 hover:bg-rose-500 text-white border-rose-500 cursor-pointer"
               >
-                Delete Permanently
+                {t.cabinet.deletePermanently}
               </Button>
             </div>
           </div>
@@ -1208,14 +1276,14 @@ export const PersonalCabinet: React.FC<PersonalCabinetProps> = ({
               <div className="flex items-center gap-2">
                 <Edit3 className="w-4 h-4 text-md-primary" />
                 <h3 id="rename-dialog-title" className="text-sm font-bold font-display text-md-on-surface">
-                  Rename Resume Details
+                  {t.cabinet.renameModalHeader}
                 </h3>
               </div>
               <button
                 type="button"
                 onClick={() => setRenameModal(null)}
                 className="text-md-on-surface-variant hover:text-md-on-surface cursor-pointer"
-                aria-label="Close dialog"
+                aria-label={t.common.close}
               >
                 <X className="w-4 h-4" />
               </button>
@@ -1224,13 +1292,13 @@ export const PersonalCabinet: React.FC<PersonalCabinetProps> = ({
             <form onSubmit={handleRenameSubmit} className="space-y-4">
               <div>
                 <label className="block text-xs font-medium text-md-on-surface mb-1">
-                  Resume Title
+                  {t.cabinet.renameTitle}
                 </label>
                 <input
                   type="text"
                   value={renameModal.title}
                   onChange={e => setRenameModal({ ...renameModal, title: e.target.value })}
-                  placeholder="e.g. Senior Backend Architect"
+                  placeholder={t.form.projectTitlePlaceholder}
                   required
                   className="w-full px-3 h-10 bg-md-surface-container border border-white/[0.08] rounded-[8px] text-xs text-md-on-surface focus:outline-none focus:border-md-primary font-sans"
                 />
@@ -1238,13 +1306,13 @@ export const PersonalCabinet: React.FC<PersonalCabinetProps> = ({
 
               <div>
                 <label className="block text-xs font-medium text-md-on-surface mb-1">
-                  Target Specialization / Role
+                  {t.cabinet.renameRole}
                 </label>
                 <input
                   type="text"
                   value={renameModal.targetRole}
                   onChange={e => setRenameModal({ ...renameModal, targetRole: e.target.value })}
-                  placeholder="e.g. Fintech / Cloud Infrastructure"
+                  placeholder={t.form.projectRolePlaceholder}
                   className="w-full px-3 h-10 bg-md-surface-container border border-white/[0.08] rounded-[8px] text-xs text-md-on-surface focus:outline-none focus:border-md-primary font-sans"
                 />
               </div>
@@ -1255,18 +1323,18 @@ export const PersonalCabinet: React.FC<PersonalCabinetProps> = ({
                   variant="outline"
                   size="sm"
                   onClick={() => setRenameModal(null)}
-                  className="text-xs"
+                  className="text-xs cursor-pointer"
                 >
-                  Cancel
+                  {t.common.cancel}
                 </Button>
                 <Button
                   type="submit"
                   variant="primary"
                   size="sm"
                   disabled={renameLoading}
-                  className="text-xs"
+                  className="text-xs cursor-pointer"
                 >
-                  {renameLoading ? 'Updating...' : 'Save Changes'}
+                  {renameLoading ? t.common.loading : t.cabinet.renameSave}
                 </Button>
               </div>
             </form>

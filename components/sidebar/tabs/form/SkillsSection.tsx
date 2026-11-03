@@ -1,6 +1,7 @@
 import React from 'react';
 import { Sliders, ChevronDown, ChevronRight, Plus, Trash2 } from 'lucide-react';
 import { Button, Input, Label, Textarea } from '../../../ui';
+import { useTranslation } from '../../../../contexts/LanguageContext';
 
 interface SkillsSectionProps {
   isOpen: boolean;
@@ -19,6 +20,8 @@ export const SkillsSection: React.FC<SkillsSectionProps> = ({
   handleAddSkillCategory,
   handleRemoveSkillCategory,
 }) => {
+  const { t } = useTranslation();
+
   return (
     <div
       className={`border transition-all duration-200 rounded-md-lg overflow-hidden ${
@@ -36,7 +39,7 @@ export const SkillsSection: React.FC<SkillsSectionProps> = ({
       >
         <div className="flex items-center gap-3">
           <Sliders className={`w-5 h-5 transition-colors ${isOpen ? 'text-md-primary' : 'text-md-on-surface-variant'}`} />
-          <span className="font-display tracking-wide">Skills & Competencies</span>
+          <span className="font-display tracking-wide">{t.form.coreCompetencies}</span>
         </div>
         {isOpen ? <ChevronDown className="w-5 h-5 text-md-primary" /> : <ChevronRight className="w-5 h-5 text-md-on-surface-variant" />}
       </button>
@@ -48,34 +51,34 @@ export const SkillsSection: React.FC<SkillsSectionProps> = ({
               <button
                 onClick={() => handleRemoveSkillCategory(category)}
                 className="absolute top-3.5 right-3.5 p-1.5 text-md-error hover:text-md-error hover:bg-md-error-container/20 rounded-md-sm cursor-pointer transition-colors"
-                title="Remove category"
-                aria-label="Remove category"
+                title={t.common.delete}
+                aria-label={t.common.delete}
               >
                 <Trash2 className="w-4 h-4" />
               </button>
 
               <div className="pr-7">
-                <Label>Category Domain</Label>
+                <Label>{t.form.categoryName}</Label>
                 <Input
                   type="text"
                   defaultValue={category}
                   onBlur={(e) => handleUpdateSkillCategory(category, e.target.value, String(skillList))}
-                  placeholder="e.g. Behavioral Architecture, Prototyping"
+                  placeholder={t.form.categoryPlaceholder}
                 />
               </div>
               <div>
-                <Label>Skills & Tools (comma-separated)</Label>
+                <Label>{t.form.skillsList}</Label>
                 <Textarea
                   value={skillList}
                   onChange={(e) => handleUpdateSkillCategory(category, category, e.target.value)}
-                  placeholder="Figma, Design Tokens, User Journey Mapping, Storybook, React..."
+                  placeholder={t.form.skillsPlaceholder}
                   rows={2}
                 />
               </div>
             </div>
           ))}
           <Button onClick={handleAddSkillCategory} variant="secondary" fullWidth className="gap-2">
-            <Plus className="w-4 h-4 text-md-primary" /> Add Skill Category
+            <Plus className="w-4 h-4 text-md-primary" /> {t.form.addCategory}
           </Button>
         </div>
       )}

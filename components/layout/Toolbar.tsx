@@ -16,6 +16,7 @@ import {
   Cloud
 } from 'lucide-react';
 import { useResumeContext } from '../../contexts/ResumeContext';
+import { useTranslation } from '../../contexts/LanguageContext';
 import { getCompressionProfile } from '../../services/export/pdfExporter';
 import { motion, AnimatePresence } from 'motion/react';
 
@@ -46,6 +47,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({
   onOpenDashboard,
   saveStatus = 'saved'
 }) => {
+  const { t } = useTranslation();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   
@@ -96,11 +98,11 @@ export const Toolbar: React.FC<ToolbarProps> = ({
             type="button"
             onClick={onOpenDashboard}
             className="flex items-center gap-2 h-10 min-h-[40px] px-3.5 py-2 rounded-[8px] bg-white/[0.04] hover:bg-white/[0.08] text-xs text-md-on-surface-variant hover:text-md-on-surface border border-white/[0.08] transition-all cursor-pointer font-medium shrink-0 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-md-primary focus-visible:ring-offset-2 focus-visible:ring-offset-md-surface"
-            title="Return to Personal Cabinet"
-            aria-label="Return to Personal Cabinet"
+            title={t.header.backToCabinet}
+            aria-label={t.header.backToCabinet}
           >
             <ArrowLeft className="w-4 h-4" />
-            <span className="hidden sm:inline">Cabinet</span>
+            <span className="hidden sm:inline">{t.header.cabinet}</span>
           </button>
         )}
 
@@ -114,7 +116,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({
             </span>
             <span className="hidden md:inline-flex items-center gap-1 text-[10px] font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20 shrink-0">
               <Cloud className="w-3 h-3" />
-              <span>{saveStatus === 'saving' ? 'Saving...' : 'Cloud Synced'}</span>
+              <span>{saveStatus === 'saving' ? t.header.savingCloud : t.header.cloudSynced}</span>
             </span>
           </div>
         </div>
@@ -128,8 +130,8 @@ export const Toolbar: React.FC<ToolbarProps> = ({
             type="button"
             onClick={onOpenDesignSystem}
             className="hidden sm:inline-flex items-center gap-2 h-10 min-h-[40px] px-3.5 py-2 rounded-[8px] text-xs font-medium text-md-on-surface-variant hover:text-md-on-surface bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] hover:border-white/[0.16] transition-all cursor-pointer active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-md-primary focus-visible:ring-offset-2 focus-visible:ring-offset-md-surface"
-            title="Inspect Material Design 3 Tokens"
-            aria-label="Inspect Material Design 3 Tokens"
+            title={t.header.designSystem}
+            aria-label={t.header.designSystem}
           >
             <Palette className="w-4 h-4 text-md-primary" />
             <span className="text-xs font-sans">M3 Tokens</span>
@@ -166,15 +168,15 @@ export const Toolbar: React.FC<ToolbarProps> = ({
               onClick={onDownloadPdf}
               disabled={isGenerating || isGeneratingDoc}
               className="inline-flex items-center gap-2 h-10 min-h-[40px] bg-md-primary hover:bg-md-primary-hover active:bg-md-primary-active focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-md-primary focus-visible:ring-offset-2 focus-visible:ring-offset-md-surface text-md-on-primary pl-4 pr-3.5 py-2 rounded-l-[8px] rounded-r-none font-semibold text-xs transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-              title="Export Vector-Grade PDF"
-              aria-label="Export Vector-Grade PDF"
+              title={t.header.exportPdf}
+              aria-label={t.header.exportPdf}
             >
               {isGenerating ? (
                 <Loader2 className="w-4 h-4 animate-spin text-md-on-primary" />
               ) : (
                 <Download className="w-4 h-4 text-md-on-primary" />
               )}
-              <span>Export PDF</span>
+              <span>{t.header.exportPdf}</span>
             </button>
             
             <button 

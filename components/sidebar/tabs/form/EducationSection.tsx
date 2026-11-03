@@ -2,6 +2,7 @@ import React from 'react';
 import { GraduationCap, ChevronDown, ChevronRight, Plus, Trash2 } from 'lucide-react';
 import { EducationItem } from '../../../../types';
 import { Button, Input, Label } from '../../../ui';
+import { useTranslation } from '../../../../contexts/LanguageContext';
 
 interface EducationSectionProps {
   isOpen: boolean;
@@ -20,6 +21,8 @@ export const EducationSection: React.FC<EducationSectionProps> = ({
   handleAddEducationItem,
   handleRemoveEducation,
 }) => {
+  const { t } = useTranslation();
+
   return (
     <div
       className={`border transition-all duration-200 rounded-md-lg overflow-hidden ${
@@ -38,7 +41,7 @@ export const EducationSection: React.FC<EducationSectionProps> = ({
         <div className="flex items-center gap-3">
           <GraduationCap className={`w-5 h-5 transition-colors ${isOpen ? 'text-md-primary' : 'text-md-on-surface-variant'}`} />
           <span className="font-display tracking-wide">
-            Education ({education?.length || 0})
+            {t.form.education} ({education?.length || 0})
           </span>
         </div>
         {isOpen ? <ChevronDown className="w-5 h-5 text-md-primary" /> : <ChevronRight className="w-5 h-5 text-md-on-surface-variant" />}
@@ -51,47 +54,47 @@ export const EducationSection: React.FC<EducationSectionProps> = ({
               <button
                 onClick={() => handleRemoveEducation(idx)}
                 className="absolute top-3.5 right-3.5 p-1.5 text-md-error hover:text-md-error hover:bg-md-error-container/20 rounded-md-sm cursor-pointer transition-colors"
-                title="Remove education"
-                aria-label="Remove education"
+                title={t.common.delete}
+                aria-label={t.common.delete}
               >
                 <Trash2 className="w-4 h-4" />
               </button>
 
               <div className="space-y-4 pr-7">
                 <div>
-                  <Label>Degree / Certification</Label>
+                  <Label>{t.form.degree}</Label>
                   <Input
                     type="text"
                     value={edu.certification}
                     onChange={(e) => handleUpdateEducation(idx, 'certification', e.target.value)}
-                    placeholder="e.g. Master of Science in Computer Science"
+                    placeholder={t.form.degreePlaceholder}
                   />
                 </div>
 
                 <div>
-                  <Label>University / Institution</Label>
+                  <Label>{t.form.institution}</Label>
                   <Input
                     type="text"
                     value={edu.institution}
                     onChange={(e) => handleUpdateEducation(idx, 'institution', e.target.value)}
-                    placeholder="e.g. National Technical University"
+                    placeholder={t.form.institutionPlaceholder}
                   />
                 </div>
 
                 <div>
-                  <Label>Graduation Year / Period</Label>
+                  <Label>{t.form.year}</Label>
                   <Input
                     type="text"
                     value={edu.year}
                     onChange={(e) => handleUpdateEducation(idx, 'year', e.target.value)}
-                    placeholder="e.g. 2018 — 2020"
+                    placeholder={t.form.yearPlaceholder}
                   />
                 </div>
               </div>
             </div>
           ))}
           <Button onClick={handleAddEducationItem} variant="secondary" fullWidth className="gap-2">
-            <Plus className="w-4 h-4 text-md-primary" /> Add Education
+            <Plus className="w-4 h-4 text-md-primary" /> {t.form.addEducation}
           </Button>
         </div>
       )}

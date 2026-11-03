@@ -2,6 +2,7 @@ import React from 'react';
 import { Briefcase, ChevronDown, ChevronRight, Plus, Trash2 } from 'lucide-react';
 import { ExperienceItem } from '../../../../types';
 import { Button, Input, Label, Textarea } from '../../../ui';
+import { useTranslation } from '../../../../contexts/LanguageContext';
 
 interface ExperienceSectionProps {
   isOpen: boolean;
@@ -26,6 +27,8 @@ export const ExperienceSection: React.FC<ExperienceSectionProps> = ({
   handleAddHighlight,
   handleRemoveHighlight,
 }) => {
+  const { t } = useTranslation();
+
   return (
     <div
       className={`border transition-all duration-200 rounded-md-lg overflow-hidden ${
@@ -35,6 +38,7 @@ export const ExperienceSection: React.FC<ExperienceSectionProps> = ({
       }`}
     >
       <button
+        type="button"
         onClick={onToggle}
         aria-expanded={isOpen}
         className={`w-full flex items-center justify-between p-4.5 text-sm font-semibold transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-md-primary/40 ${
@@ -44,7 +48,7 @@ export const ExperienceSection: React.FC<ExperienceSectionProps> = ({
         <div className="flex items-center gap-3">
           <Briefcase className={`w-5 h-5 transition-colors ${isOpen ? 'text-md-primary' : 'text-md-on-surface-variant'}`} />
           <span className="font-display tracking-wide">
-            Work Experience ({experience?.length || 0})
+            {t.form.workExperience} ({experience?.length || 0})
           </span>
         </div>
         {isOpen ? <ChevronDown className="w-5 h-5 text-md-primary" /> : <ChevronRight className="w-5 h-5 text-md-on-surface-variant" />}
@@ -55,52 +59,53 @@ export const ExperienceSection: React.FC<ExperienceSectionProps> = ({
           {(experience || []).map((exp, expIdx) => (
             <div key={expIdx} className="bg-white/[0.02] rounded-md-md p-4.5 border border-white/[0.06] relative animate-fade-in space-y-4 hover:border-white/[0.14] transition-colors">
               <button
+                type="button"
                 onClick={() => handleRemoveExperienceItem(expIdx)}
                 className="absolute top-3.5 right-3.5 p-1.5 text-md-error hover:text-md-error hover:bg-md-error-container/20 rounded-md-sm cursor-pointer transition-colors"
-                title="Remove experience entry"
-                aria-label="Remove experience entry"
+                title={t.common.delete}
+                aria-label={t.common.delete}
               >
                 <Trash2 className="w-4 h-4" />
               </button>
 
               <div className="space-y-4 pr-7">
                 <div>
-                  <Label>Job Title / Role</Label>
+                  <Label>{t.form.role}</Label>
                   <Input
                     type="text"
                     value={exp.role}
                     onChange={(e) => handleUpdateExperience(expIdx, 'role', e.target.value)}
-                    placeholder="e.g. Lead Product Designer"
+                    placeholder={t.form.rolePlaceholder}
                   />
                 </div>
 
                 <div>
-                  <Label>Company Name</Label>
+                  <Label>{t.form.company}</Label>
                   <Input
                     type="text"
                     value={exp.company}
                     onChange={(e) => handleUpdateExperience(expIdx, 'company', e.target.value)}
-                    placeholder="e.g. Acme Studio"
+                    placeholder={t.form.companyPlaceholder}
                   />
                 </div>
 
                 <div className="grid grid-cols-2 gap-3.5">
                   <div>
-                    <Label>Dates / Duration</Label>
+                    <Label>{t.form.duration}</Label>
                     <Input
                       type="text"
                       value={exp.duration}
                       onChange={(e) => handleUpdateExperience(expIdx, 'duration', e.target.value)}
-                      placeholder="e.g. 2021 — Present"
+                      placeholder={t.form.durationPlaceholder}
                     />
                   </div>
                   <div>
-                    <Label>Employment Type</Label>
+                    <Label>{t.common.format}</Label>
                     <Input
                       type="text"
                       value={exp.type}
                       onChange={(e) => handleUpdateExperience(expIdx, 'type', e.target.value)}
-                      placeholder="e.g. Full-time, Contract"
+                      placeholder="Full-time / Remote"
                     />
                   </div>
                 </div>
@@ -108,47 +113,48 @@ export const ExperienceSection: React.FC<ExperienceSectionProps> = ({
                 {/* Highlights Bullet Rows */}
                 <div className="space-y-3 pt-3 border-t border-white/[0.08]">
                   <span className="block text-xs text-md-on-surface-variant font-medium">
-                    Key Achievements & Responsibilities
+                    {t.form.highlights}
                   </span>
                   {(exp.highlights || []).map((h, hIdx) => (
                     <div key={hIdx} className="bg-md-surface-container-lowest p-3.5 rounded-md-sm border border-white/[0.06] space-y-2.5 relative animate-fade-in">
                       <button
+                        type="button"
                         onClick={() => handleRemoveHighlight(expIdx, hIdx)}
                         className="absolute top-2.5 right-2.5 p-1 text-md-error hover:text-md-error hover:bg-md-error-container/20 rounded cursor-pointer"
-                        title="Remove highlight"
-                        aria-label="Remove highlight"
+                        title={t.common.remove}
+                        aria-label={t.common.remove}
                       >
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
                       <div className="pr-6">
-                        <Label>Achievement Heading</Label>
+                        <Label>{t.form.bulletTitle}</Label>
                         <Input
                           type="text"
                           value={h.title}
                           onChange={(e) => handleUpdateHighlight(expIdx, hIdx, 'title', e.target.value)}
-                          placeholder="e.g. Design System Architecture"
+                          placeholder={t.form.bulletTitlePlaceholder}
                         />
                       </div>
                       <div>
-                        <Label>Outcome & Impact (metrics bolded)</Label>
+                        <Label>{t.form.bulletDesc}</Label>
                         <Textarea
                           value={h.description}
                           onChange={(e) => handleUpdateHighlight(expIdx, hIdx, 'description', e.target.value)}
-                          placeholder="Reduced onboarding friction by +28% through iterative user journey testing..."
+                          placeholder={t.form.bulletDescPlaceholder}
                           rows={2}
                         />
                       </div>
                     </div>
                   ))}
                   <Button onClick={() => handleAddHighlight(expIdx)} variant="secondary" size="sm" fullWidth className="gap-2">
-                    <Plus className="w-3.5 h-3.5 text-md-primary" /> Add Achievement Bullet
+                    <Plus className="w-3.5 h-3.5 text-md-primary" /> {t.form.addHighlight}
                   </Button>
                 </div>
               </div>
             </div>
           ))}
           <Button onClick={handleAddExperienceItem} variant="secondary" fullWidth className="gap-2">
-            <Plus className="w-4 h-4 text-md-primary" /> Add Work Experience
+            <Plus className="w-4 h-4 text-md-primary" /> {t.form.addPosition}
           </Button>
         </div>
       )}

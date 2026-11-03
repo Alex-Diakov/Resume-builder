@@ -55,6 +55,17 @@ interface ResumeContextType {
   pageFraction: string;
   enableAdaptiveFit: boolean;
   setEnableAdaptiveFit: (val: boolean) => void;
+
+  // Canvas Zoom Controls
+  zoomLevel: number;
+  setZoomLevel: React.Dispatch<React.SetStateAction<number>>;
+  zoomIn: () => void;
+  zoomOut: () => void;
+  resetZoom: () => void;
+
+  // Direct Inline Canvas Editing Mode
+  isInlineEditing: boolean;
+  setIsInlineEditing: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const ResumeContext = createContext<ResumeContextType | undefined>(undefined);
@@ -77,6 +88,24 @@ export const ResumeProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [compressPdf, setCompressPdf] = useState(false);
   const [pdfImageQuality, setPdfImageQuality] = useState(0.7);
   const [enableAdaptiveFit, setEnableAdaptiveFit] = useState(true);
+  
+  // Canvas Zoom State (0.5 to 1.6 scale)
+  const [zoomLevel, setZoomLevel] = useState<number>(1.0);
+
+  // Direct Inline Canvas Editing Mode State
+  const [isInlineEditing, setIsInlineEditing] = useState<boolean>(false);
+
+  const zoomIn = useCallback(() => {
+    setZoomLevel(prev => Math.min(1.6, Math.round((prev + 0.1) * 10) / 10));
+  }, []);
+
+  const zoomOut = useCallback(() => {
+    setZoomLevel(prev => Math.max(0.5, Math.round((prev - 0.1) * 10) / 10));
+  }, []);
+
+  const resetZoom = useCallback(() => {
+    setZoomLevel(1.0);
+  }, []);
   
   // Style and Appearance State
   const [styleSettings, setStyleSettings] = useState<ResumeStyleSettings>(DEFAULT_STYLE_SETTINGS);
@@ -222,8 +251,9 @@ export const ResumeProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   // Global Keyboard Shortcuts (Ctrl+Z / Cmd+Z, Ctrl+Y / Cmd+Shift+Z)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      const isInput = ['INPUT', 'TEXTAREA'].includes((document.activeElement?.tagName || ''));
-      // When user is typing inside an input/textarea, let native text undo work unless Cmd+Shift+Z
+      const activeEl = document.activeElement as HTMLElement | null;
+      const isInput = ['INPUT', 'TEXTAREA'].includes(activeEl?.tagName || '') || Boolean(activeEl?.isContentEditable);
+      // When user is typing inside an input/textarea/contentEditable, let native text undo work unless Cmd+Shift+Z
       if (isInput) return;
 
       const isMac = typeof navigator !== 'undefined' && (/Mac|iPhone|iPod|iPad/i.test(navigator.userAgent || navigator.platform || ''));
@@ -323,7 +353,9 @@ export const ResumeProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       compressPdf, setCompressPdf,
       pdfImageQuality, setPdfImageQuality,
       autoFitContent, resumeHeight, setResumeHeight, pageFraction,
-      enableAdaptiveFit, setEnableAdaptiveFit
+      enableAdaptiveFit, setEnableAdaptiveFit,
+      zoomLevel, setZoomLevel, zoomIn, zoomOut, resetZoom,
+      isInlineEditing, setIsInlineEditing
     }}>
       {children}
     </ResumeContext.Provider>

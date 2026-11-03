@@ -1,6 +1,7 @@
 import React from 'react';
 import { Settings, ChevronDown, ChevronRight, Sparkles, CheckCircle2, ShieldAlert } from 'lucide-react';
 import { Button, Slider, Switch } from '../../../ui';
+import { useTranslation } from '../../../../contexts/LanguageContext';
 
 interface LayoutSectionProps {
   isOpen: boolean;
@@ -43,6 +44,8 @@ export const LayoutSection: React.FC<LayoutSectionProps> = ({
   enableAdaptiveFit = true,
   setEnableAdaptiveFit
 }) => {
+  const { t } = useTranslation();
+
   return (
     <div
       className={`border transition-all duration-200 rounded-md-lg overflow-hidden ${
@@ -60,7 +63,7 @@ export const LayoutSection: React.FC<LayoutSectionProps> = ({
       >
         <div className="flex items-center gap-3">
           <Settings className={`w-5 h-5 transition-colors ${isOpen ? 'text-md-primary' : 'text-md-on-surface-variant'}`} />
-          <span className="font-display tracking-wide">Layout & Formatting</span>
+          <span className="font-display tracking-wide">{t.form.layoutAndSpacing}</span>
         </div>
         {isOpen ? <ChevronDown className="w-5 h-5 text-md-primary" /> : <ChevronRight className="w-5 h-5 text-md-on-surface-variant" />}
       </button>
@@ -71,20 +74,20 @@ export const LayoutSection: React.FC<LayoutSectionProps> = ({
           <div className="flex items-center justify-between pb-1">
             <div>
               <span className="text-xs text-md-on-surface font-medium block">
-                Auto-Formatting
+                {t.form.autoFit}
               </span>
               <span className="text-[11px] text-md-on-surface-variant">
-                Dynamic page packing &amp; void prevention
+                {t.form.autoFitTooltip}
               </span>
             </div>
             <Button
               onClick={autoFitContent}
               size="sm"
-              title="Automatically calibrate spacing to balance content and eliminate empty voids"
+              title={t.form.autoFitTooltip}
               className="gap-2"
             >
               <Sparkles className="w-4 h-4 text-md-on-primary animate-pulse" />
-              <span>Auto-Fit Pages</span>
+              <span>{t.form.autoFit}</span>
             </Button>
           </div>
 
@@ -93,11 +96,11 @@ export const LayoutSection: React.FC<LayoutSectionProps> = ({
             <div className="p-3.5 rounded-md-md bg-white/[0.02] border border-white/[0.08] flex items-center justify-between gap-3">
               <div className="min-w-0">
                 <div className="flex items-center gap-2 mb-0.5">
-                  <span className="text-xs font-medium text-md-on-surface">Adaptive Anti-Void Engine</span>
+                  <span className="text-xs font-medium text-md-on-surface">{t.form.adaptiveFit}</span>
                   {enableAdaptiveFit ? (
                     <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-md-success-container/40 text-md-on-success-container text-[10px] font-medium rounded-md-xs">
                       <CheckCircle2 className="w-3 h-3 text-md-success" />
-                      Active
+                      {t.common.active}
                     </span>
                   ) : (
                     <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-md-warning-container/40 text-md-on-warning-container text-[10px] font-medium rounded-md-xs">
@@ -107,7 +110,7 @@ export const LayoutSection: React.FC<LayoutSectionProps> = ({
                   )}
                 </div>
                 <p className="text-[11px] text-md-on-surface-variant leading-tight">
-                  Prevents large blank gaps by adapting item spacing to fit content naturally on each page.
+                  {t.form.adaptiveFitDesc}
                 </p>
               </div>
               <Switch checked={enableAdaptiveFit} onCheckedChange={setEnableAdaptiveFit} />
@@ -117,7 +120,7 @@ export const LayoutSection: React.FC<LayoutSectionProps> = ({
           {/* PRESET PILLS */}
           <div className="space-y-2">
             <span className="block text-xs text-md-on-surface-variant font-medium">
-              Content Density
+              {t.form.contentDensity}
             </span>
             <div className="grid grid-cols-3 gap-2.5">
               {(['standard', 'compact', 'super'] as const).map((preset) => (
@@ -130,7 +133,7 @@ export const LayoutSection: React.FC<LayoutSectionProps> = ({
                       : 'bg-white/[0.03] text-md-on-surface-variant border-white/[0.08] hover:bg-white/[0.07] hover:border-white/[0.15] hover:text-md-on-surface'
                   }`}
                 >
-                  {preset}
+                  {preset === 'standard' ? t.style.fontScaleStandard : preset === 'compact' ? t.style.fontScaleCompact : 'Super'}
                 </button>
               ))}
             </div>
@@ -141,7 +144,7 @@ export const LayoutSection: React.FC<LayoutSectionProps> = ({
             <div>
               <div className="flex justify-between items-baseline mb-1.5">
                 <span className="text-xs text-md-on-surface-variant font-medium">
-                  Top / Bottom Padding
+                  {t.form.topBottomPadding}
                 </span>
                 <span className="text-xs text-md-on-surface font-mono bg-md-surface-container-lowest px-2 py-0.5 rounded-md-xs border border-white/[0.08]">{paddingTopBottom}mm</span>
               </div>
@@ -157,7 +160,7 @@ export const LayoutSection: React.FC<LayoutSectionProps> = ({
             <div>
               <div className="flex justify-between items-baseline mb-1.5">
                 <span className="text-xs text-md-on-surface-variant font-medium">
-                  Left / Right Padding
+                  {t.form.leftRightPadding}
                 </span>
                 <span className="text-xs text-md-on-surface font-mono bg-md-surface-container-lowest px-2 py-0.5 rounded-md-xs border border-white/[0.08]">{paddingLeftRight}mm</span>
               </div>
@@ -174,7 +177,7 @@ export const LayoutSection: React.FC<LayoutSectionProps> = ({
               <div>
                 <div className="flex justify-between items-baseline mb-1.5">
                   <span className="text-xs text-md-on-surface-variant font-medium">
-                    Section Spacing
+                    {t.form.sectionSpacingLabel}
                   </span>
                   <span className="text-xs text-md-on-surface font-mono bg-md-surface-container-lowest px-2 py-0.5 rounded-md-xs border border-white/[0.08]">
                     {Math.round(sectionSpacing * 100)}%
@@ -192,7 +195,7 @@ export const LayoutSection: React.FC<LayoutSectionProps> = ({
               <div>
                 <div className="flex justify-between items-baseline mb-1.5">
                   <span className="text-xs text-md-on-surface-variant font-medium">
-                    Item Spacing
+                    {t.form.itemSpacingLabel}
                   </span>
                   <span className="text-xs text-md-on-surface font-mono bg-md-surface-container-lowest px-2 py-0.5 rounded-md-xs border border-white/[0.08]">
                     {Math.round(itemSpacing * 100)}%
@@ -212,12 +215,12 @@ export const LayoutSection: React.FC<LayoutSectionProps> = ({
           {/* PAGE GUIDE TOGGLE */}
           <div className="flex items-center justify-between pt-3 border-t border-white/[0.08]">
             <span className="text-xs text-md-on-surface-variant font-medium">
-              Show A4 Page Break Guides
+              {t.form.showPageBreakGuides}
             </span>
             <Switch checked={showPageGuides} onCheckedChange={setShowPageGuides} />
           </div>
           <div className="text-xs text-md-on-surface-variant text-center leading-normal pt-2.5 border-t border-white/[0.08]">
-            Content density scale: <strong className="text-md-primary font-mono">{pageFraction}</strong>
+            {t.form.densityScale} <strong className="text-md-primary font-mono">{pageFraction}</strong>
           </div>
         </div>
       )}

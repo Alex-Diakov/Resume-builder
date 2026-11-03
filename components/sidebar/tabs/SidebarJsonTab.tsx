@@ -6,6 +6,7 @@ import {
   Clipboard,
   AlertTriangle 
 } from 'lucide-react';
+import { useTranslation } from '../../../contexts/LanguageContext';
 
 interface SidebarJsonTabProps {
   jsonInput: string;
@@ -18,6 +19,7 @@ export const SidebarJsonTab: React.FC<SidebarJsonTabProps> = ({
   setJsonInput,
   jsonError
 }) => {
+  const { t } = useTranslation();
   const [copied, setCopied] = useState(false);
   const [pasted, setPasted] = useState(false);
   const [pasteError, setPasteError] = useState<string | null>(null);
@@ -62,7 +64,7 @@ export const SidebarJsonTab: React.FC<SidebarJsonTabProps> = ({
             <span className={`relative inline-flex rounded-full h-2.5 w-2.5 ${jsonError ? 'bg-md-error' : 'bg-md-success'}`}></span>
           </span>
           <span className="text-xs text-md-on-surface font-semibold">
-            {jsonError ? 'Syntax Invalid' : 'A4 Realtime Synced'}
+            {jsonError ? t.json.syntaxInvalid : t.json.realtimeSynced}
           </span>
         </div>
         
@@ -71,12 +73,12 @@ export const SidebarJsonTab: React.FC<SidebarJsonTabProps> = ({
           <button 
             type="button" 
             onClick={handlePaste} 
-            title="Paste JSON from clipboard" 
-            aria-label="Paste JSON from clipboard"
+            title={t.json.paste} 
+            aria-label={t.json.paste}
             className="flex items-center gap-1.5 h-8.5 min-h-[34px] px-3.5 py-1.5 rounded-[6px] text-xs font-medium text-md-on-surface-variant hover:text-md-on-surface hover:bg-white/[0.06] transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-md-primary"
           >
             {pasted ? <Check className="w-4 h-4 text-md-success" /> : <Clipboard className="w-4 h-4 text-md-primary" />}
-            <span>{pasted ? 'Pasted!' : 'Paste'}</span>
+            <span>{pasted ? t.json.pasted : t.json.paste}</span>
           </button>
 
           <div className="w-[1px] h-4 bg-white/[0.10] mx-0.5" />
@@ -84,12 +86,12 @@ export const SidebarJsonTab: React.FC<SidebarJsonTabProps> = ({
           <button 
             type="button" 
             onClick={handleCopy} 
-            title="Copy JSON to clipboard" 
-            aria-label="Copy JSON to clipboard"
+            title={t.json.copy} 
+            aria-label={t.json.copy}
             className="flex items-center gap-1.5 h-8.5 min-h-[34px] px-3.5 py-1.5 rounded-[6px] text-xs font-medium text-md-on-surface-variant hover:text-md-on-surface hover:bg-white/[0.06] transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-md-primary"
           >
             {copied ? <Check className="w-4 h-4 text-md-success" /> : <Copy className="w-4 h-4 text-md-primary" />}
-            <span>{copied ? 'Copied' : 'Copy'}</span>
+            <span>{copied ? t.json.copied : t.json.copy}</span>
           </button>
         </div>
       </div>
@@ -101,7 +103,7 @@ export const SidebarJsonTab: React.FC<SidebarJsonTabProps> = ({
           onChange={(e) => setJsonInput(e.target.value)}
           className="flex-1 w-full p-4.5 bg-md-surface-container text-md-on-surface font-mono text-xs leading-relaxed resize-none outline-none focus:outline-none focus:ring-0 caret-md-primary"
           spellCheck={false}
-          placeholder="Paste your JSON here..."
+          placeholder={t.json.placeholder}
         />
 
         {/* CLIPPED HELPER EXPLANATION GIVEN SANDBOX PERMISSION ISSUES */}

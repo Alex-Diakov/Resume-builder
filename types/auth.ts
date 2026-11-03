@@ -4,6 +4,7 @@ export interface UserProfilePreferences {
   defaultSpacingPreset?: 'standard' | 'compact' | 'super';
   defaultFormat?: 'pdf' | 'docx';
   autoSaveIntervalMs?: number;
+  language?: 'en' | 'uk' | 'ru';
 }
 
 export interface UserProfile {

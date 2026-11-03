@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { User, ChevronDown, ChevronRight, Image, Upload } from 'lucide-react';
 import { ResumeData } from '../../../../types';
 import { Button, Input, Label, Switch } from '../../../ui';
+import { useTranslation } from '../../../../contexts/LanguageContext';
 
 interface PersonalInfoSectionProps {
   isOpen: boolean;
@@ -23,6 +24,7 @@ export const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({
   handlePhotoFile,
 }) => {
   const [isDragging, setIsDragging] = useState(false);
+  const { t } = useTranslation();
 
   return (
     <div
@@ -41,7 +43,7 @@ export const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({
       >
         <div className="flex items-center gap-3">
           <User className={`w-5 h-5 transition-colors ${isOpen ? 'text-md-primary' : 'text-md-on-surface-variant'}`} />
-          <span className="font-display tracking-wide">Personal Details</span>
+          <span className="font-display tracking-wide">{t.form.personalDetails}</span>
         </div>
         {isOpen ? <ChevronDown className="w-5 h-5 text-md-primary" /> : <ChevronRight className="w-5 h-5 text-md-on-surface-variant" />}
       </button>
@@ -51,10 +53,10 @@ export const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({
           {/* Profile Photo Upload Section */}
           <div className="pb-5 border-b border-white/[0.08] space-y-3">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-medium text-md-on-surface-variant">Profile Photo</span>
+              <span className="text-xs font-medium text-md-on-surface-variant">{t.form.profilePhoto}</span>
               {resumeData.photo && (
                 <div className="flex items-center gap-2">
-                  <span className="text-[11px] text-md-on-surface-variant">Show on resume</span>
+                  <span className="text-[11px] text-md-on-surface-variant">{t.form.showOnResume}</span>
                   <Switch
                     id="toggle-photo-display"
                     checked={resumeData.showPhoto !== false}
@@ -91,7 +93,7 @@ export const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({
                       ? 'border-md-primary bg-md-primary-container/20'
                       : 'border-md-outline-variant/40 hover:border-md-outline bg-md-surface-container-lowest hover:bg-md-surface-container-low'
                 }`}
-                title="Click or Drag & Drop photo here"
+                title={t.form.photoDropzone}
               >
                 {resumeData.photo ? (
                   <>
@@ -103,13 +105,13 @@ export const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({
                     />
                     <div className="absolute inset-0 bg-black/75 opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center transition-opacity text-[11px] font-medium text-white text-center p-1">
                       <Upload className="w-3.5 h-3.5 mb-1 text-md-primary" />
-                      Replace
+                      {t.common.edit}
                     </div>
                   </>
                 ) : (
                   <div className="flex flex-col items-center justify-center text-center p-2 text-md-on-surface-variant">
                     <Image className="w-5 h-5 mb-1 text-md-primary group-hover:scale-110 transition-transform" />
-                    <span className="text-[11px] font-medium">Upload</span>
+                    <span className="text-[11px] font-medium">{t.common.add}</span>
                   </div>
                 )}
                 <input
@@ -128,8 +130,8 @@ export const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({
               {/* Photo Action / Description */}
               <div className="flex-1 min-w-0 space-y-2">
                 <div>
-                  <p className="text-xs font-medium text-md-on-surface">Upload headshot</p>
-                  <p className="text-[11px] text-md-on-surface-variant mt-0.5">Recommended: Square format, up to 2MB.</p>
+                  <p className="text-xs font-medium text-md-on-surface">{t.form.uploadPhoto}</p>
+                  <p className="text-[11px] text-md-on-surface-variant mt-0.5">{t.form.photoDropzone}</p>
                 </div>
 
                 <div className="flex items-center gap-2">
@@ -139,7 +141,7 @@ export const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({
                     size="sm"
                     onClick={() => document.getElementById('photo-upload-input')?.click()}
                   >
-                    {resumeData.photo ? 'Change Photo' : 'Select Image'}
+                    {resumeData.photo ? t.common.edit : t.form.uploadPhoto}
                   </Button>
 
                   {resumeData.photo && (
@@ -155,7 +157,7 @@ export const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({
                         onChangeData(updated);
                       }}
                     >
-                      Delete
+                      {t.common.delete}
                     </Button>
                   )}
                 </div>
@@ -164,72 +166,72 @@ export const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({
           </div>
 
           <div>
-            <Label>Full Name</Label>
+            <Label>{t.form.fullName}</Label>
             <Input
               type="text"
               value={resumeData.name}
               onChange={(e) => handleFieldChange('name', e.target.value)}
-              placeholder="e.g. Alex Diakov"
+              placeholder={t.form.fullNamePlaceholder}
             />
           </div>
 
           <div>
-            <Label>Professional Title</Label>
+            <Label>{t.form.jobTitle}</Label>
             <Input
               type="text"
               value={resumeData.title}
               onChange={(e) => handleFieldChange('title', e.target.value)}
-              placeholder="e.g. Product Ventures & Innovation"
+              placeholder={t.form.jobTitlePlaceholder}
             />
           </div>
 
           <div>
-            <Label>Email Address</Label>
+            <Label>{t.form.email}</Label>
             <Input
               type="email"
               value={resumeData.contact.email}
               onChange={(e) => handleFieldChange('contact.email', e.target.value)}
-              placeholder="name@example.com"
+              placeholder={t.form.emailPlaceholder}
             />
           </div>
 
           <div>
-            <Label>Location / City</Label>
+            <Label>{t.form.location}</Label>
             <Input
               type="text"
               value={resumeData.contact.location}
               onChange={(e) => handleFieldChange('contact.location', e.target.value)}
-              placeholder="e.g. Kyiv, Ukraine or Remote"
+              placeholder={t.form.locationPlaceholder}
             />
           </div>
 
           <div>
-            <Label>Portfolio / Personal Website</Label>
+            <Label>{t.form.website}</Label>
             <Input
               type="text"
               value={resumeData.contact.website || ''}
               onChange={(e) => handleFieldChange('contact.website', e.target.value)}
-              placeholder="https://alexdiakov.design"
+              placeholder={t.form.websitePlaceholder}
             />
           </div>
 
           <div>
-            <Label>LinkedIn Profile</Label>
+            <Label>{t.form.linkedin}</Label>
             <Input
               type="text"
               value={resumeData.contact.linkedin || ''}
               onChange={(e) => handleFieldChange('contact.linkedin', e.target.value)}
-              placeholder="https://linkedin.com/in/alex-diakov"
+              placeholder={t.form.linkedinPlaceholder}
             />
           </div>
 
           <div>
-            <Label optional>Video Pitch (Loom / YouTube)</Label>
+            <Label optional>{t.form.videoPitch}</Label>
             <Input
               type="text"
               value={resumeData.contact.videoPitch || ''}
               onChange={(e) => handleFieldChange('contact.videoPitch', e.target.value)}
-              placeholder="https://loom.com/share/..."
+              placeholder={t.form.videoPitchPlaceholder}
             />
           </div>
         </div>

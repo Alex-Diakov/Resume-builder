@@ -5,8 +5,10 @@ import { formatUrl, highlightText } from '../../utils/formatters';
 import { SectionHeader } from './SectionHeader';
 import { ExperienceBlock } from './ExperienceBlock';
 import { ProjectBlock } from './ProjectBlock';
+import { InlineEditable } from './InlineEditable';
 import { allocatePages, createRenderBlocks, RenderBlock } from '../../services/export/pageAllocator';
 import { useResumeContext } from '../../contexts/ResumeContext';
+import { useTranslation } from '../../contexts/LanguageContext';
 
 interface ResumePaperProps {
   data: ResumeData;
@@ -24,7 +26,9 @@ const renderBlockItem = (
   data: ResumeData,
   sectionSpacing: number,
   itemSpacing: number,
-  handleOpenLink: (e: React.MouseEvent<HTMLAnchorElement>, rawUrl?: string) => void
+  handleOpenLink: (e: React.MouseEvent<HTMLAnchorElement>, rawUrl?: string) => void,
+  isInlineEditing: boolean = false,
+  onUpdateResume?: (updater: (prev: ResumeData) => ResumeData) => void
 ) => {
   const gapStyle = {
     marginBottom: `${sectionSpacing * 16}px`
@@ -46,28 +50,33 @@ const renderBlockItem = (
               </div>
             )}
             <div className="flex-1 min-w-0">
-              <h1 
-                className="font-display text-resume-name font-bold text-resume-primary mb-1 leading-tight"
+              <InlineEditable
+                value={data.name}
+                onChange={(newVal) => onUpdateResume?.(prev => ({ ...prev, name: newVal }))}
+                enabled={isInlineEditing}
+                tag="h1"
+                className="font-display text-resume-name font-bold text-resume-primary mb-1 leading-tight block"
                 style={{ fontFamily: 'var(--doc-font-heading, Outfit, sans-serif)' }}
-              >
-                {data.name}
-              </h1>
-              <h2 
-                className="font-display text-resume-title font-medium text-resume-secondary mb-2.5"
+                placeholder="Полное Имя"
+                tooltip="Кликните для редактирования имени"
+              />
+
+              <InlineEditable
+                value={data.title}
+                onChange={(newVal) => onUpdateResume?.(prev => ({ ...prev, title: newVal }))}
+                enabled={isInlineEditing}
+                tag="h2"
+                className="font-display text-resume-title font-medium text-resume-secondary mb-2.5 block"
                 style={{ fontFamily: 'var(--doc-font-heading, Outfit, sans-serif)' }}
-              >
-                {data.title}
-              </h2>
+                placeholder="Профессия / Должность"
+                tooltip="Кликните для редактирования должности"
+              />
               
               <div className="resume-contact-bar flex flex-wrap items-center gap-y-1 text-resume-meta text-resume-muted">
                 {data.contact.website && (
                   <>
-                    <a 
-                      href={formatUrl(data.contact.website) || '#'} 
-                      target="_blank" 
-                      rel="noopener noreferrer" 
-                      onClick={(e) => handleOpenLink(e, data.contact.website)}
-                      className="resume-contact-item group cursor-pointer"
+                    <span 
+                      className="resume-contact-item group cursor-pointer inline-flex items-center"
                       style={{ display: 'inline-table', verticalAlign: 'middle', borderCollapse: 'collapse', textDecoration: 'none' }}
                     >
                       <span 
@@ -80,21 +89,34 @@ const renderBlockItem = (
                         className="resume-contact-text text-resume-accent group-hover:text-resume-primary transition-colors font-medium" 
                         style={{ display: 'table-cell', verticalAlign: 'middle', lineHeight: 1 }}
                       >
-                        Portfolio
+                        {isInlineEditing ? (
+                          <InlineEditable
+                            value={data.contact.website}
+                            onChange={(newVal) => onUpdateResume?.(prev => ({ ...prev, contact: { ...prev.contact, website: newVal } }))}
+                            enabled={true}
+                            placeholder="URL портфолио"
+                          />
+                        ) : (
+                          <a
+                            href={formatUrl(data.contact.website) || '#'} 
+                            target="_blank" 
+                            rel="noopener noreferrer" 
+                            onClick={(e) => handleOpenLink(e, data.contact.website)}
+                            className="hover:underline"
+                          >
+                            Portfolio
+                          </a>
+                        )}
                       </span>
-                    </a>
-                    <span className="resume-contact-dot" style={{ display: 'inline-table', verticalAlign: 'middle', padding: '0 6px', color: 'var(--doc-border, #cbd5e1)', lineHeight: 1, selectNone: 'none' }}>•</span>
+                    </span>
+                    <span className="resume-contact-dot" style={{ display: 'inline-table', verticalAlign: 'middle', padding: '0 6px', color: 'var(--doc-border, #cbd5e1)', lineHeight: 1, userSelect: 'none' }}>•</span>
                   </>
                 )}
 
                 {data.contact.linkedin && (
                   <>
-                    <a 
-                      href={formatUrl(data.contact.linkedin) || '#'} 
-                      target="_blank" 
-                      rel="noopener noreferrer" 
-                      onClick={(e) => handleOpenLink(e, data.contact.linkedin)}
-                      className="resume-contact-item group cursor-pointer"
+                    <span 
+                      className="resume-contact-item group cursor-pointer inline-flex items-center"
                       style={{ display: 'inline-table', verticalAlign: 'middle', borderCollapse: 'collapse', textDecoration: 'none' }}
                     >
                       <span 
@@ -107,21 +129,34 @@ const renderBlockItem = (
                         className="resume-contact-text text-resume-accent group-hover:text-resume-primary transition-colors font-medium" 
                         style={{ display: 'table-cell', verticalAlign: 'middle', lineHeight: 1 }}
                       >
-                        LinkedIn
+                        {isInlineEditing ? (
+                          <InlineEditable
+                            value={data.contact.linkedin}
+                            onChange={(newVal) => onUpdateResume?.(prev => ({ ...prev, contact: { ...prev.contact, linkedin: newVal } }))}
+                            enabled={true}
+                            placeholder="LinkedIn URL"
+                          />
+                        ) : (
+                          <a
+                            href={formatUrl(data.contact.linkedin) || '#'} 
+                            target="_blank" 
+                            rel="noopener noreferrer" 
+                            onClick={(e) => handleOpenLink(e, data.contact.linkedin)}
+                            className="hover:underline"
+                          >
+                            LinkedIn
+                          </a>
+                        )}
                       </span>
-                    </a>
-                    <span className="resume-contact-dot" style={{ display: 'inline-table', verticalAlign: 'middle', padding: '0 6px', color: 'var(--doc-border, #cbd5e1)', lineHeight: 1, selectNone: 'none' }}>•</span>
+                    </span>
+                    <span className="resume-contact-dot" style={{ display: 'inline-table', verticalAlign: 'middle', padding: '0 6px', color: 'var(--doc-border, #cbd5e1)', lineHeight: 1, userSelect: 'none' }}>•</span>
                   </>
                 )}
 
                 {data.contact.videoPitch && (
                   <>
-                    <a 
-                      href={formatUrl(data.contact.videoPitch) || '#'} 
-                      target="_blank" 
-                      rel="noopener noreferrer" 
-                      onClick={(e) => handleOpenLink(e, data.contact.videoPitch)}
-                      className="resume-contact-item group cursor-pointer"
+                    <span 
+                      className="resume-contact-item group cursor-pointer inline-flex items-center"
                       style={{ display: 'inline-table', verticalAlign: 'middle', borderCollapse: 'collapse', textDecoration: 'none' }}
                     >
                       <span 
@@ -134,16 +169,32 @@ const renderBlockItem = (
                         className="resume-contact-text text-resume-accent group-hover:text-resume-primary transition-colors font-medium" 
                         style={{ display: 'table-cell', verticalAlign: 'middle', lineHeight: 1 }}
                       >
-                        Video Pitch
+                        {isInlineEditing ? (
+                          <InlineEditable
+                            value={data.contact.videoPitch}
+                            onChange={(newVal) => onUpdateResume?.(prev => ({ ...prev, contact: { ...prev.contact, videoPitch: newVal } }))}
+                            enabled={true}
+                            placeholder="Video Pitch URL"
+                          />
+                        ) : (
+                          <a
+                            href={formatUrl(data.contact.videoPitch) || '#'} 
+                            target="_blank" 
+                            rel="noopener noreferrer" 
+                            onClick={(e) => handleOpenLink(e, data.contact.videoPitch)}
+                            className="hover:underline"
+                          >
+                            Video Pitch
+                          </a>
+                        )}
                       </span>
-                    </a>
-                    <span className="resume-contact-dot" style={{ display: 'inline-table', verticalAlign: 'middle', padding: '0 6px', color: 'var(--doc-border, #cbd5e1)', lineHeight: 1, selectNone: 'none' }}>•</span>
+                    </span>
+                    <span className="resume-contact-dot" style={{ display: 'inline-table', verticalAlign: 'middle', padding: '0 6px', color: 'var(--doc-border, #cbd5e1)', lineHeight: 1, userSelect: 'none' }}>•</span>
                   </>
                 )}
 
-                <a 
-                  href={`mailto:${data.contact.email}`} 
-                  className="resume-contact-item group cursor-pointer"
+                <span 
+                  className="resume-contact-item group cursor-pointer inline-flex items-center"
                   style={{ display: 'inline-table', verticalAlign: 'middle', borderCollapse: 'collapse', textDecoration: 'none' }}
                 >
                   <span 
@@ -156,15 +207,20 @@ const renderBlockItem = (
                     className="resume-contact-text text-resume-accent group-hover:text-resume-primary transition-colors font-medium" 
                     style={{ display: 'table-cell', verticalAlign: 'middle', lineHeight: 1 }}
                   >
-                    {data.contact.email}
+                    <InlineEditable
+                      value={data.contact.email}
+                      onChange={(newVal) => onUpdateResume?.(prev => ({ ...prev, contact: { ...prev.contact, email: newVal } }))}
+                      enabled={isInlineEditing}
+                      placeholder="email@example.com"
+                    />
                   </span>
-                </a>
+                </span>
                 
                 {data.contact.location && (
                   <>
-                    <span className="resume-contact-dot" style={{ display: 'inline-table', verticalAlign: 'middle', padding: '0 6px', color: 'var(--doc-border, #cbd5e1)', lineHeight: 1, selectNone: 'none' }}>•</span>
+                    <span className="resume-contact-dot" style={{ display: 'inline-table', verticalAlign: 'middle', padding: '0 6px', color: 'var(--doc-border, #cbd5e1)', lineHeight: 1, userSelect: 'none' }}>•</span>
                     <span 
-                      className="resume-contact-item text-resume-muted cursor-default"
+                      className="resume-contact-item text-resume-muted cursor-default inline-flex items-center"
                       style={{ display: 'inline-table', verticalAlign: 'middle', borderCollapse: 'collapse' }}
                     >
                       <span 
@@ -177,7 +233,12 @@ const renderBlockItem = (
                         className="resume-contact-text" 
                         style={{ display: 'table-cell', verticalAlign: 'middle', lineHeight: 1 }}
                       >
-                        {data.contact.location}
+                        <InlineEditable
+                          value={data.contact.location}
+                          onChange={(newVal) => onUpdateResume?.(prev => ({ ...prev, contact: { ...prev.contact, location: newVal } }))}
+                          enabled={isInlineEditing}
+                          placeholder="Город, Страна"
+                        />
                       </span>
                     </span>
                   </>
@@ -193,9 +254,38 @@ const renderBlockItem = (
         <section style={gapStyle}>
           <div className="text-resume-body text-resume-secondary text-justify">
              {Array.isArray(data.summary) ? data.summary.map((para, i) => (
-               <span key={i} className={i > 0 ? "ml-1" : ""}>{highlightText(para)} </span>
+               <React.Fragment key={i}>
+                 {isInlineEditing ? (
+                   <InlineEditable
+                     value={para}
+                     onChange={(newVal) => onUpdateResume?.(prev => {
+                       const arr = Array.isArray(prev.summary) ? [...prev.summary] : [prev.summary];
+                       arr[i] = newVal;
+                       return { ...prev, summary: arr };
+                     })}
+                     enabled={true}
+                     multiline={true}
+                     tag="p"
+                     className={`mb-1.5 ${i > 0 ? "mt-1" : ""}`}
+                     placeholder="Текст резюме / Summary"
+                   />
+                 ) : (
+                   <span className={i > 0 ? "ml-1" : ""}>{highlightText(para)} </span>
+                 )}
+               </React.Fragment>
              )) : (
-               <span>{highlightText(data.summary as unknown as string)} </span>
+               isInlineEditing ? (
+                 <InlineEditable
+                   value={data.summary as unknown as string}
+                   onChange={(newVal) => onUpdateResume?.(prev => ({ ...prev, summary: [newVal] }))}
+                   enabled={true}
+                   multiline={true}
+                   tag="p"
+                   placeholder="Текст резюме / Summary"
+                 />
+               ) : (
+                 <span>{highlightText(data.summary as unknown as string)} </span>
+               )
              )}
           </div>
         </section>
@@ -206,15 +296,93 @@ const renderBlockItem = (
         <SectionHeader title={block.title || ''} sectionSpacing={sectionSpacing} />
       );
 
-    case 'experience-item':
+    case 'experience-item': {
+      const expIdx = parseInt(block.id.replace('experience-', ''), 10);
       return (
-        <ExperienceBlock item={block.item} spacing={itemSpacing} />
+        <ExperienceBlock 
+          item={block.item} 
+          spacing={itemSpacing} 
+          isInlineEditing={isInlineEditing}
+          onUpdateRole={(val) => onUpdateResume?.(prev => {
+            const exp = [...prev.experience];
+            if (exp[expIdx]) exp[expIdx] = { ...exp[expIdx], role: val };
+            return { ...prev, experience: exp };
+          })}
+          onUpdateCompany={(val) => onUpdateResume?.(prev => {
+            const exp = [...prev.experience];
+            if (exp[expIdx]) exp[expIdx] = { ...exp[expIdx], company: val };
+            return { ...prev, experience: exp };
+          })}
+          onUpdateDuration={(val) => onUpdateResume?.(prev => {
+            const exp = [...prev.experience];
+            if (exp[expIdx]) exp[expIdx] = { ...exp[expIdx], duration: val };
+            return { ...prev, experience: exp };
+          })}
+          onUpdateHighlightTitle={(hIdx, val) => onUpdateResume?.(prev => {
+            const exp = [...prev.experience];
+            if (exp[expIdx] && exp[expIdx].highlights[hIdx]) {
+              const highlights = [...exp[expIdx].highlights];
+              highlights[hIdx] = { ...highlights[hIdx], title: val };
+              exp[expIdx] = { ...exp[expIdx], highlights };
+            }
+            return { ...prev, experience: exp };
+          })}
+          onUpdateHighlightDesc={(hIdx, val) => onUpdateResume?.(prev => {
+            const exp = [...prev.experience];
+            if (exp[expIdx] && exp[expIdx].highlights[hIdx]) {
+              const highlights = [...exp[expIdx].highlights];
+              highlights[hIdx] = { ...highlights[hIdx], description: val };
+              exp[expIdx] = { ...exp[expIdx], highlights };
+            }
+            return { ...prev, experience: exp };
+          })}
+        />
       );
+    }
 
-    case 'project-item':
+    case 'project-item': {
+      const projIdx = parseInt(block.id.replace('project-', ''), 10);
       return (
-        <ProjectBlock item={block.item} spacing={itemSpacing} />
+        <ProjectBlock 
+          item={block.item} 
+          spacing={itemSpacing} 
+          isInlineEditing={isInlineEditing}
+          onUpdateTitle={(val) => onUpdateResume?.(prev => {
+            const proj = [...prev.projects];
+            if (proj[projIdx]) proj[projIdx] = { ...proj[projIdx], title: val };
+            return { ...prev, projects: proj };
+          })}
+          onUpdateRole={(val) => onUpdateResume?.(prev => {
+            const proj = [...prev.projects];
+            if (proj[projIdx]) proj[projIdx] = { ...proj[projIdx], role: val };
+            return { ...prev, projects: proj };
+          })}
+          onUpdateDescription={(val) => onUpdateResume?.(prev => {
+            const proj = [...prev.projects];
+            if (proj[projIdx]) proj[projIdx] = { ...proj[projIdx], description: val };
+            return { ...prev, projects: proj };
+          })}
+          onUpdateDetailLabel={(dIdx, val) => onUpdateResume?.(prev => {
+            const proj = [...prev.projects];
+            if (proj[projIdx] && proj[projIdx].details[dIdx]) {
+              const details = [...proj[projIdx].details];
+              details[dIdx] = { ...details[dIdx], label: val };
+              proj[projIdx] = { ...proj[projIdx], details };
+            }
+            return { ...prev, projects: proj };
+          })}
+          onUpdateDetailValue={(dIdx, val) => onUpdateResume?.(prev => {
+            const proj = [...prev.projects];
+            if (proj[projIdx] && proj[projIdx].details[dIdx]) {
+              const details = [...proj[projIdx].details];
+              details[dIdx] = { ...details[dIdx], value: val };
+              proj[projIdx] = { ...proj[projIdx], details };
+            }
+            return { ...prev, projects: proj };
+          })}
+        />
       );
+    }
 
     case 'skills-education':
       return (
@@ -226,8 +394,34 @@ const renderBlockItem = (
                <div className="space-y-2">
                   {Object.entries(data.skills).map(([category, skills]) => (
                     <div key={category} className="text-resume-body">
-                      <span className="font-bold text-resume-primary text-[9.5pt] uppercase mr-2">{category}:</span>
-                      <span className="text-resume-secondary">{skills}</span>
+                      <span className="font-bold text-resume-primary text-[9.5pt] uppercase mr-2">
+                        <InlineEditable
+                          value={category}
+                          onChange={(newCategory) => onUpdateResume?.(prev => {
+                            const newSkills: Record<string, string> = {};
+                            for (const [k, v] of Object.entries(prev.skills || {})) {
+                              if (k === category) {
+                                newSkills[newCategory] = v;
+                              } else {
+                                newSkills[k] = v;
+                              }
+                            }
+                            return { ...prev, skills: newSkills };
+                          })}
+                          enabled={isInlineEditing}
+                          placeholder="Категория"
+                        />:
+                      </span>
+                      <InlineEditable
+                        value={skills}
+                        onChange={(newVal) => onUpdateResume?.(prev => ({
+                          ...prev,
+                          skills: { ...prev.skills, [category]: newVal }
+                        }))}
+                        enabled={isInlineEditing}
+                        className="text-resume-secondary"
+                        placeholder="Навыки через запятую"
+                      />
                     </div>
                   ))}
                </div>
@@ -241,8 +435,41 @@ const renderBlockItem = (
               <ul className="space-y-2">
                 {data.education.map((edu, idx) => (
                   <li key={idx} className="text-resume-body">
-                    <div className="font-bold text-resume-primary text-[10pt]">{edu.certification}</div>
-                    <div className="text-resume-meta text-resume-muted">{edu.institution} | {edu.year}</div>
+                    <div className="font-bold text-resume-primary text-[10pt]">
+                      <InlineEditable
+                        value={edu.certification}
+                        onChange={(newVal) => onUpdateResume?.(prev => {
+                          const edus = [...prev.education];
+                          edus[idx] = { ...edus[idx], certification: newVal };
+                          return { ...prev, education: edus };
+                        })}
+                        enabled={isInlineEditing}
+                        placeholder="Специальность / Сертификат"
+                      />
+                    </div>
+                    <div className="text-resume-meta text-resume-muted">
+                      <InlineEditable
+                        value={edu.institution}
+                        onChange={(newVal) => onUpdateResume?.(prev => {
+                          const edus = [...prev.education];
+                          edus[idx] = { ...edus[idx], institution: newVal };
+                          return { ...prev, education: edus };
+                        })}
+                        enabled={isInlineEditing}
+                        placeholder="Учебное заведение"
+                      />
+                      {' | '}
+                      <InlineEditable
+                        value={edu.year}
+                        onChange={(newVal) => onUpdateResume?.(prev => {
+                          const edus = [...prev.education];
+                          edus[idx] = { ...edus[idx], year: newVal };
+                          return { ...prev, education: edus };
+                        })}
+                        enabled={isInlineEditing}
+                        placeholder="Год"
+                      />
+                    </div>
                   </li>
                 ))}
               </ul>
@@ -266,9 +493,15 @@ export const ResumePaper: React.FC<ResumePaperProps> = ({
   showPageGuides = true,
   enableAdaptiveFit = true
 }) => {
-  const { setResumeHeight, styleSettings } = useResumeContext();
+  const { setResumeHeight, styleSettings, isInlineEditing, handleUpdateResumeData } = useResumeContext();
+  const { t } = useTranslation();
   const measureContainerRef = useRef<HTMLDivElement>(null);
   const [measuredHeights, setMeasuredHeights] = useState<Record<string, number> | null>(null);
+
+  const onUpdateResume = useCallback((updater: (prev: ResumeData) => ResumeData) => {
+    const nextData = updater(data);
+    handleUpdateResumeData(nextData);
+  }, [data, handleUpdateResumeData]);
 
   const docCssVars: React.CSSProperties = {
     ['--doc-text-primary' as any]: styleSettings?.primaryColor || '#1e293b',
@@ -384,7 +617,7 @@ export const ResumePaper: React.FC<ResumePaperProps> = ({
       >
         {candidateBlocks.map((block) => (
           <div key={block.id} data-measure-id={block.id} className="w-full">
-            {renderBlockItem(block, data, sectionSpacing, itemSpacing, handleOpenLink)}
+            {renderBlockItem(block, data, sectionSpacing, itemSpacing, handleOpenLink, false)}
           </div>
         ))}
       </div>
@@ -412,7 +645,9 @@ export const ResumePaper: React.FC<ResumePaperProps> = ({
           return (
             <div
               key={pageIdx}
-              className="resume-page shadow-xl mx-auto rounded-md relative flex flex-col justify-between"
+              className={`resume-page shadow-xl mx-auto rounded-md relative flex flex-col justify-between transition-all duration-200 ${
+                isInlineEditing ? 'ring-2 ring-emerald-500/30' : ''
+              }`}
               style={{
                 width: '210mm',
                 height: '297mm', // Strict physical A4 page size
@@ -431,7 +666,15 @@ export const ResumePaper: React.FC<ResumePaperProps> = ({
               <div className="flex flex-col flex-1">
                 {page.blocks.map((block) => (
                   <React.Fragment key={block.id}>
-                    {renderBlockItem(block, data, effectiveSection, effectiveItem, handleOpenLink)}
+                    {renderBlockItem(
+                      block, 
+                      data, 
+                      effectiveSection, 
+                      effectiveItem, 
+                      handleOpenLink, 
+                      isInlineEditing, 
+                      onUpdateResume
+                    )}
                   </React.Fragment>
                 ))}
               </div>
@@ -440,7 +683,7 @@ export const ResumePaper: React.FC<ResumePaperProps> = ({
               {showPageGuides && (
                 <div className="resume-footer text-[8px] text-resume-muted font-mono flex justify-between border-t border-resume-border pt-1.5 mt-2 select-none print:flex">
                   <span className="uppercase tracking-wider font-semibold opacity-75">{data.name} — {data.title}</span>
-                  <span className="font-bold">Page {pageIdx + 1} of {pages.length}</span>
+                  <span className="font-bold">{t.canvas.page} {pageIdx + 1} {t.canvas.of} {pages.length}</span>
                 </div>
               )}
             </div>

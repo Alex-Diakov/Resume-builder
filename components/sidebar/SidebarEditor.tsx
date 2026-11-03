@@ -19,6 +19,7 @@ import { SidebarAtsTab } from './tabs/SidebarAtsTab';
 import { SidebarCognitiveTab } from './tabs/SidebarCognitiveTab';
 import { SidebarAnalyticsTab } from './tabs/SidebarAnalyticsTab';
 import { useResumeContext } from '../../contexts/ResumeContext';
+import { useTranslation } from '../../contexts/LanguageContext';
 import { useCognitiveAnalysis } from '../../hooks/useCognitiveAnalysis';
 
 export type SidebarTabType = 'form' | 'style' | 'json' | 'cognitive' | 'ats' | 'analytics';
@@ -159,6 +160,20 @@ export const SidebarEditor: React.FC<SidebarEditorProps> = ({
       }
     }
   }, [activeTab]);
+
+  const { t } = useTranslation();
+
+  const getTabLabel = (id: SidebarTabType) => {
+    switch (id) {
+      case 'form': return t.sidebar.tabForm;
+      case 'style': return t.sidebar.tabStyle;
+      case 'json': return t.sidebar.tabJson;
+      case 'ats': return t.sidebar.tabAts;
+      case 'cognitive': return t.sidebar.tabCognitive;
+      case 'analytics': return t.sidebar.tabAnalytics;
+      default: return id;
+    }
+  };
 
   const currentTabConfig = TAB_CONFIGS.find((t) => t.id === activeTab) || TAB_CONFIGS[0];
 
@@ -328,7 +343,7 @@ export const SidebarEditor: React.FC<SidebarEditorProps> = ({
               <div className="min-w-0">
                 <div className="flex items-center gap-2">
                   <h2 className="text-sm font-semibold text-md-on-surface font-display truncate">
-                    {currentTabConfig.label}
+                    {getTabLabel(currentTabConfig.id)}
                   </h2>
                   {currentTabConfig.id !== 'analytics' && (
                     <span className="text-xs text-md-on-surface-variant font-normal">

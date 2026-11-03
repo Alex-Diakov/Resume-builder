@@ -1,12 +1,13 @@
 import React, { useCallback, useEffect, useState, useRef } from 'react';
 import { ResumePaper } from './components/resume';
-import { Toolbar, IntroAnimation, DesignSystemPage } from './components/layout';
+import { Toolbar, IntroAnimation, DesignSystemPage, CanvasToolbar } from './components/layout';
 import { SidebarEditor } from './components/sidebar';
 import { AuthScreen } from './components/auth/AuthScreen';
 import { PersonalCabinet } from './components/dashboard/PersonalCabinet';
 import { INITIAL_RESUME_DATA } from './constants';
 import { useAuth } from './contexts/AuthContext';
 import { useResumeContext } from './contexts/ResumeContext';
+import { useTranslation } from './contexts/LanguageContext';
 import { usePdfExport } from './hooks/usePdfExport';
 import { useDocExport } from './hooks/useDocExport';
 import { 
@@ -34,6 +35,7 @@ declare global {
 
 const App: React.FC = () => {
   const { user, loading: authLoading } = useAuth();
+  const { t } = useTranslation();
 
   const [showIntro, setShowIntro] = useState(() => {
     try {
@@ -70,6 +72,9 @@ const App: React.FC = () => {
     compressPdf,
     pdfImageQuality,
     enableAdaptiveFit,
+    zoomLevel,
+    isInlineEditing,
+    setIsInlineEditing,
   } = useResumeContext();
 
   const isInitialLoadRef = useRef(true);
@@ -396,23 +401,53 @@ const App: React.FC = () => {
           </div>
         </aside>
 
-        {/* Main Resume Canvas Area */}
-        <main className="flex-1 overflow-y-auto w-full bg-md-surface p-4 md:p-8 flex justify-center print:p-0 print:block print:overflow-visible relative">
-          <div className="w-full max-w-[210mm] transition-all duration-300 ease-in-out print:max-w-none print:w-full min-h-full">
-            <ResumePaper 
-              data={resumeData} 
-              paddingTopBottom={paddingTopBottom}
-              paddingLeftRight={paddingLeftRight}
-              sectionSpacing={sectionSpacing}
-              itemSpacing={itemSpacing}
-              showPageGuides={showPageGuides}
-              enableAdaptiveFit={enableAdaptiveFit}
-            />
-            <footer className="mt-8 mb-4 text-center text-md-on-surface-variant text-xs print:hidden">
-               <p>&copy; {new Date().getFullYear()} Cognitive Resume SaaS. All cloud records synchronized.</p>
-            </footer>
-          </div>
-        </main>
+        {/* Main Resume Canvas Area with Floating CanvasToolbar */}
+        <div className="flex-1 relative overflow-hidden flex flex-col print:overflow-visible print:block">
+          <main className="flex-1 overflow-y-auto w-full bg-md-surface p-4 md:p-8 flex justify-center print:p-0 print:block print:overflow-visible relative">
+            <div 
+              className="w-full max-w-[210mm] transition-transform duration-200 ease-out print:max-w-none print:w-full min-h-full origin-top pb-24 print:pb-0"
+              style={{
+                transform: zoomLevel !== 1.0 ? `scale(${zoomLevel})` : undefined,
+              }}
+            >
+              <ResumePaper 
+                data={resumeData} 
+                paddingTopBottom={paddingTopBottom}
+                paddingLeftRight={paddingLeftRight}
+                sectionSpacing={sectionSpacing}
+                itemSpacing={itemSpacing}
+                showPageGuides={showPageGuides}
+                enableAdaptiveFit={enableAdaptiveFit}
+              />
+              <footer className="mt-8 mb-4 text-center text-md-on-surface-variant text-xs print:hidden">
+                 <p>&copy; {new Date().getFullYear()} Cognitive Resume SaaS. All cloud records synchronized.</p>
+              </footer>
+            </div>
+          </main>
+
+          {/* Floating Canvas Direct Editing Active Indicator */}
+          {isInlineEditing && (
+            <div className="absolute top-4 left-1/2 -translate-x-1/2 z-30 print:hidden animate-in fade-in slide-in-from-top-2 duration-200">
+              <div className="flex items-center gap-2.5 px-4 py-2 rounded-full bg-[#14161c]/95 border border-emerald-500/40 text-emerald-200 text-xs shadow-2xl backdrop-blur-xl">
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400" />
+                </span>
+                <span className="font-medium">{t.canvas.bannerActive}</span>
+                <button
+                  type="button"
+                  onClick={() => setIsInlineEditing(false)}
+                  className="ml-2 px-2.5 py-0.5 rounded-full bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-100 text-[11px] font-medium border border-emerald-400/30 transition-colors cursor-pointer"
+                >
+                  {t.canvas.bannerDone}
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Floating Canvas Docked Toolbar */}
+          <CanvasToolbar />
+        </div>
       </div>
       
       {/* Mobile Overlay */}

@@ -4,6 +4,7 @@ import { FileText, FileType, Printer } from 'lucide-react';
 import { useAnalyticsStats } from '../../../hooks/useAnalyticsStats';
 import { ActivityKpiSlider } from '../../statistics/ActivityKpiSlider';
 import { ResumeActivityInfographic } from '../../statistics/ResumeActivityInfographic';
+import { useTranslation } from '../../../contexts/LanguageContext';
 
 interface SidebarAnalyticsTabProps {
   resumeData: ResumeData;
@@ -14,6 +15,7 @@ export const SidebarAnalyticsTab: React.FC<SidebarAnalyticsTabProps> = ({
   resumeData: _resumeData,
   atsInput: _atsInput
 }) => {
+  const { t } = useTranslation();
   const now = new Date();
   const [selectedYear, setSelectedYear] = useState<number>(now.getFullYear());
   const [selectedMonthIndex, setSelectedMonthIndex] = useState<number>(now.getMonth());
@@ -49,18 +51,18 @@ export const SidebarAnalyticsTab: React.FC<SidebarAnalyticsTabProps> = ({
               <div className="min-w-0">
                 <div className="flex items-center gap-2">
                   <span className="text-xs font-semibold text-md-on-surface block truncate">
-                    Total Exports
+                    {t.cabinet.totalExports}
                   </span>
                 </div>
                 <span className="text-xs text-md-on-surface-variant block truncate mt-0.5">
-                  Synchronized count of all exported and downloaded files
+                  {t.cabinet.analyticsSubtitle}
                 </span>
               </div>
               <div className="flex items-baseline gap-1.5 shrink-0">
                 <span className="text-3xl font-mono font-bold text-emerald-300 tabular-nums">
                   {allTimeStats.totalExports}
                 </span>
-                <span className="text-xs text-md-on-surface-variant font-medium">total</span>
+                <span className="text-xs text-md-on-surface-variant font-medium">{t.common.all}</span>
               </div>
             </div>
 
@@ -101,7 +103,7 @@ export const SidebarAnalyticsTab: React.FC<SidebarAnalyticsTabProps> = ({
             </div>
           </div>
 
-        {/* 2. NATIVE KPI SLIDER (4 CARDS IN ENGLISH: This Month, Export Streak, Monthly Peak, Active Days) */}
+        {/* 2. NATIVE KPI SLIDER */}
         <ActivityKpiSlider
           selectedYear={selectedYear}
           selectedMonthIndex={selectedMonthIndex}

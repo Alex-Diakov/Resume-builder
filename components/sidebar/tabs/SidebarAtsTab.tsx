@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Textarea } from '../../ui/Textarea';
@@ -17,6 +16,7 @@ import {
   FileSearch
 } from 'lucide-react';
 import { ResumeData, AtsResult } from '../../../types';
+import { useTranslation } from '../../../contexts/LanguageContext';
 
 interface SidebarAtsTabProps {
   resumeData: ResumeData;
@@ -45,6 +45,7 @@ export const SidebarAtsTab: React.FC<SidebarAtsTabProps> = ({
   atsInput, 
   setAtsInput 
 }) => {
+  const { t } = useTranslation();
   const [analyzing, setAnalyzing] = useState(false);
   const [results, setResults] = useState<AtsResult | null>(null);
   const [copiedKeyword, setCopiedKeyword] = useState<string | null>(null);
@@ -95,7 +96,7 @@ export const SidebarAtsTab: React.FC<SidebarAtsTabProps> = ({
         {/* Quick Role Presets */}
         <div className="space-y-2">
           <span className="text-xs text-md-on-surface font-medium">
-            Quick Presets
+            {t.ats.quickPresets}
           </span>
           <div className="flex flex-wrap gap-2">
             {PRESET_ROLES.map((preset) => (
@@ -117,12 +118,12 @@ export const SidebarAtsTab: React.FC<SidebarAtsTabProps> = ({
             value={atsInput}
             onChange={(e) => setAtsInput(e.target.value)}
             rows={5}
-            placeholder="Paste job description keywords (e.g., React, TypeScript, System Design, WCAG, Figma)..."
+            placeholder={t.ats.placeholder}
             className="font-mono text-xs"
           />
           <div className="flex justify-between items-center px-1 text-xs text-md-on-surface-variant font-mono">
-            <span>{wordCount} words detected</span>
-            <span>{atsInput.length} chars</span>
+            <span>{wordCount} {t.ats.wordsDetected}</span>
+            <span>{atsInput.length} {t.ats.charsDetected}</span>
           </div>
         </div>
 
@@ -138,7 +139,7 @@ export const SidebarAtsTab: React.FC<SidebarAtsTabProps> = ({
           ) : (
             <Scan className="w-4 h-4 text-md-on-primary" />
           )}
-          <span>{analyzing ? 'Scanning Resume Content...' : 'Run ATS Scanner'}</span>
+          <span>{analyzing ? t.ats.scanningResume : t.ats.scanResumeBtn}</span>
         </Button>
       </section>
 
@@ -154,7 +155,7 @@ export const SidebarAtsTab: React.FC<SidebarAtsTabProps> = ({
             <div className="p-3.5 bg-md-warning-container/20 border border-md-warning/30 rounded-md-md text-md-on-warning-container text-xs flex gap-3 leading-relaxed">
               <Info className="w-4.5 h-4.5 text-md-warning shrink-0 mt-0.5" />
               <div>
-                <strong className="font-semibold block mb-0.5">Notice:</strong>
+                <strong className="font-semibold block mb-0.5">{t.common.notice}:</strong>
                 <span className="opacity-90">{results.warning}</span>
               </div>
             </div>
@@ -165,14 +166,14 @@ export const SidebarAtsTab: React.FC<SidebarAtsTabProps> = ({
             <div className="flex items-center justify-between">
               <div>
                 <span className="text-xs font-semibold text-md-on-surface block">
-                  ATS Match Score
+                  {t.ats.atsMatchScore}
                 </span>
                 <span className="text-xs text-md-on-surface-variant mt-0.5 block font-medium">
                   {results.score >= 80 
-                    ? 'Excellent ATS Alignment' 
+                    ? t.ats.excellentMatch 
                     : results.score >= 50 
-                      ? 'Moderate Keyword Coverage' 
-                      : 'Needs Strategic Optimization'}
+                      ? t.ats.moderateMatch 
+                      : t.ats.needsOptimization}
                 </span>
               </div>
               <div className="flex items-center gap-2.5">
@@ -218,9 +219,9 @@ export const SidebarAtsTab: React.FC<SidebarAtsTabProps> = ({
               <div className="flex items-center justify-between">
                 <h4 className="text-xs font-semibold text-md-error flex items-center gap-2">
                   <AlertCircle className="w-4 h-4" />
-                  Missing Keywords ({results.missing.length})
+                  {t.ats.missingKeywordsTitle} ({results.missing.length})
                 </h4>
-                <span className="text-xs text-md-on-surface-variant">Click keyword to copy</span>
+                <span className="text-xs text-md-on-surface-variant">{t.ats.clickToCopy}</span>
               </div>
               <div className="flex flex-wrap gap-2">
                 {results.missing.map((k: string, i: number) => (
@@ -249,7 +250,7 @@ export const SidebarAtsTab: React.FC<SidebarAtsTabProps> = ({
               <div className="flex items-center justify-between">
                 <h4 className="text-xs font-semibold text-md-success flex items-center gap-2">
                   <CheckCircle2 className="w-4 h-4" />
-                  Matched Keywords ({results.found.length})
+                  {t.ats.matchedKeywordsTitle} ({results.found.length})
                 </h4>
               </div>
               <div className="flex flex-wrap gap-2">
@@ -266,7 +267,7 @@ export const SidebarAtsTab: React.FC<SidebarAtsTabProps> = ({
           {results.improvements && results.improvements.length > 0 && (
             <div className="space-y-2.5">
               <h4 className="text-xs font-semibold text-md-on-surface">
-                ATS Action Steps
+                {t.ats.atsActionSteps}
               </h4>
               <div className="space-y-2.5">
                 {results.improvements.map((imp: string, i: number) => (
@@ -288,13 +289,12 @@ export const SidebarAtsTab: React.FC<SidebarAtsTabProps> = ({
       {!results && (
         <div className="p-5 rounded-md-lg border border-dashed border-md-outline-variant/30 text-center space-y-2.5 bg-md-surface-container-low/40">
           <FileSearch className="w-7 h-7 text-md-on-surface-variant mx-auto" />
-          <h4 className="text-xs font-semibold text-md-on-surface">Ready for ATS Keyword Scan</h4>
+          <h4 className="text-xs font-semibold text-md-on-surface">{t.ats.readyTitle}</h4>
           <p className="text-xs text-md-on-surface-variant leading-relaxed max-w-xs mx-auto">
-            Scan your resume against employer requirements. Uncover critical missing keywords and boost your recruiter pass rate.
+            {t.ats.readyDesc}
           </p>
         </div>
       )}
     </div>
   );
 };
-

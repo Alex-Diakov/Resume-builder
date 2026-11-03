@@ -106,6 +106,55 @@ router.post('/export-pdf', async (req: Request, res: Response) => {
     const browser = await getBrowser();
     page = await browser.newPage();
 
+    // Security Hardening: Disable JavaScript execution in the print page
+    // Resumes are static CSS/HTML documents; disabling JS eliminates XSS and malicious script execution.
+    await page.setJavaScriptEnabled(false);
+
+    // Security Hardening: Network Request Interception (SSRF & LFI protection)
+    // Block access to private IPs (e.g. Cloud metadata 169.254.169.254), file:// schemes, and unsafe resources
+    await page.setRequestInterception(true);
+    page.on('request', (interceptedReq) => {
+      try {
+        const urlStr = interceptedReq.url();
+        const parsed = new URL(urlStr);
+        const protocol = parsed.protocol.toLowerCase();
+
+        // Disallow file://, ws://, ftp:// or non-standard schemes
+        if (protocol !== 'http:' && protocol !== 'https:' && protocol !== 'data:') {
+          return interceptedReq.abort();
+        }
+
+        const hostname = parsed.hostname.toLowerCase();
+
+        // Block SSRF to local interfaces and cloud metadata services
+        const isBlockedHost = 
+          hostname === 'localhost' ||
+          hostname === '127.0.0.1' ||
+          hostname === '0.0.0.0' ||
+          hostname === '::1' ||
+          hostname === '169.254.169.254' || // Cloud instance metadata
+          hostname.startsWith('10.') ||
+          hostname.startsWith('192.168.') ||
+          (hostname.startsWith('172.') && /^172\.(1[6-9]|2[0-9]|3[0-1])\./.test(hostname)) ||
+          hostname.endsWith('.internal') ||
+          hostname.endsWith('.local');
+
+        if (isBlockedHost) {
+          return interceptedReq.abort();
+        }
+
+        // Only allow stylesheets, fonts, and images
+        const resourceType = interceptedReq.resourceType();
+        if (['stylesheet', 'font', 'image', 'document'].includes(resourceType)) {
+          return interceptedReq.continue();
+        }
+
+        return interceptedReq.abort();
+      } catch {
+        return interceptedReq.abort();
+      }
+    });
+
     // Guard page commands with strict 7s timeout to prevent hanging
     page.setDefaultTimeout(7000);
     page.setDefaultNavigationTimeout(7000);
@@ -123,19 +172,33 @@ router.post('/export-pdf', async (req: Request, res: Response) => {
           .join('\n')
       : '';
 
-    const sanitizedTitle = (title || 'Resume').replace(/["\r\n]/g, '');
+    const sanitizedTitle = (title || 'Resume').replace(/["\r\n<>]/g, '');
     const compiledAppCss = getCompiledStyles();
+
+    // Sanitize HTML payload: strip script, iframe, object, embed, and refresh tags
+    const sanitizedHtml = String(html || '')
+      .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+      .replace(/<iframe\b[^<]*(?:(?!<\/iframe>)<[^<]*)*<\/iframe>/gi, '')
+      .replace(/<object\b[^<]*(?:(?!<\/object>)<[^<]*)*<\/object>/gi, '')
+      .replace(/<embed\b[^>]*>/gi, '')
+      .replace(/<meta\b[^>]*http-equiv\s*=\s*["']?refresh["']?[^>]*>/gi, '')
+      .replace(/src\s*=\s*["']javascript:[^"']*["']/gi, 'src=""')
+      .replace(/href\s*=\s*["']javascript:[^"']*["']/gi, 'href="#"');
+
+    const sanitizedStyles = String(styles || '')
+      .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
 
     const completeHtml = `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <title>${sanitizedTitle}</title>
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com data:; img-src data: https:;">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
   ${compiledAppCss ? `<style id="app-compiled-css">${compiledAppCss}</style>` : ''}
-  ${styles || ''}
+  ${sanitizedStyles}
   <style>
     @page {
       size: A4 portrait;
@@ -190,7 +253,7 @@ router.post('/export-pdf', async (req: Request, res: Response) => {
 </head>
 <body>
   <div id="resume-content">
-    ${html}
+    ${sanitizedHtml}
   </div>
 </body>
 </html>`;
